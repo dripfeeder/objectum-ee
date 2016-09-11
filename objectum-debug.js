@@ -4558,8 +4558,8 @@ projects.send = function (options) {
 	var request = options.request;
 	var response = options.response;
 	response.writeHead (200, {
-		"Content-Type": "text/html; charset=utf-8",
-		"Content-Length": Buffer.byteLength (options.msg, "utf8")
+		"Content-Type": "text/html; charset=utf-8"//,
+		//"Content-Length": Buffer.byteLength (options.msg, "utf8")
 	});
 	response.end (options.msg);
 	log.debug ({cls: "projects", fn: "send", params: options.msg});

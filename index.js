@@ -58,22 +58,22 @@ var currentTime = function (options) {
 };
 // DD.MM.YYYY HH:MM:SS
 var currentTimestamp = function () {
-	return me.currentDate () + " " + me.currentTime ();
+	return currentDate () + " " + currentTime ();
 };
 var start = function (config) {
-	var $o = new (require ("./objectum-debug").Objectum)(config);
+	var $o = new (require (__dirname + "/objectum-debug").Objectum)(config);
 	$o.server.init ({objectum: $o, success: function () {
 		$o.server.start ({port: $o.config.startPort});
 	}});
 };
 var startMaster = function (config) {
-	var env = {config: config};
+	var env = {config: JSON.stringify (config)};
 	cluster.setupMaster ({
-	    exec: "./index.js"
+	    exec: __dirname + "/index.js"
 	});
 	var log = function (text) {
 		console.log (text);
-		fs.appendFile ("./master.log", "[" + me.currentTimestamp () + "] " + text + '\n');
+		fs.appendFile (config.rootDir + "/master.log", "[" + currentTimestamp () + "] " + text + '\n');
 	};
 	var startWorker = function () {
 		log ("Worker started");
@@ -86,16 +86,16 @@ var startMaster = function (config) {
 	});
 };
 var startCluster = function (config) {
-	var $o = new (require ("./objectum-debug").Objectum)(config);
+	var $o = new (require (__dirname + "/objectum-debug").Objectum)(config);
 	cluster.setupMaster ({
-	    exec: "./ocluster.js"
+	    exec: __dirname + "/ocluster.js"
 	});
 	var log = function (text) {
 		console.log (text);
-		fs.appendFile ("./ocluster.log", "[" + me.currentTimestamp () + "] " + text + '\n');
+		fs.appendFile (config.rootDir + "/ocluster.log", "[" + currentTimestamp () + "] " + text + '\n');
 	};
 	var startWorker = function (port, mainWorker) {
-		var env = {config: config, port: port};
+		var env = {config: JSON.stringify (config), port: port};
 		if (mainWorker) {
 			env.mainWorker = "1";
 		};
@@ -112,10 +112,10 @@ var startCluster = function (config) {
 	};
 	var start = function () {
 		for (var i = 0; i < config.cluster.app.workers; i ++) {
-			me.startWorker (config.startPort + i + 1, i == 0);
+			startWorker (config.startPort + i + 1, i == 0);
 		};
 		for (var i = 0; i < config.cluster.www.workers; i ++) {
-			me.startWorker (config.cluster.www.port);
+			startWorker (config.cluster.www.port);
 		};
 		function startGC () {
 			if (global.gc) {
@@ -152,12 +152,14 @@ module.exports = {
 	start: start,
 	startMaster: startMaster,
 	startCluster: startCluster,
-	Objectum: require ("./objectum-debug").Objectum
+	Objectum: require (__dirname + "/objectum-debug").Objectum
 };
-if (process.argv [1].indexOf (__dirname) > -1) {
-	start (require ("./config"));
+try {
+	if (process.argv [1].indexOf (__dirname) > -1) {
+		start (require (__dirname + "/config"));
+	};
+} catch (e) {
+	if (!cluster.isMaster) {
+		start (JSON.parse (process.env.config));
+	};
 };
-if (!cluster.isMaster) {
-	start (JSON.parse (process.env.config));
-};
-
