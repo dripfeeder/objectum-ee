@@ -1,10 +1,9 @@
 /*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.
 */
-exports.Objectum = function () {
+exports.Objectum = function (config) {
 
 var _ = require ("underscore");
-var config = require ("./config").config;
 // default values
 if (!config.auth) {
 	config.auth = {multi: true};
@@ -28,6 +27,7 @@ if (!config.news) {
 		gcInterval: 300000
 	};
 }
+/*
 if (!config.rootDir) {
 	config.rootDir = config.objectumDir + "/node";
 }
@@ -37,7 +37,9 @@ if (!config.projectsDir) {
 if (!config.wwwRoot) {
 	config.wwwRoot = config.objectumDir + "/node/www";
 }
-if (_.isArray (config.storages)) {
+*/
+config.wwwRoot = __dirname + "/www";
+if (_.isArray (config.storages) && config.projectsDir) {
 	var storages = {};
 	_.each (config.storages, function (code) {
 		storages [code] = require (config.projectsDir + "/" + code + "/config.json");
@@ -4147,7 +4149,7 @@ projects.loadConfig = function (options) {
 	var storageCode = options.code;
 	var success = options.success;
 	var failure = options.failure;
-	if (!config.storages.hasOwnProperty (storageCode)) {
+	if (!config.storages.hasOwnProperty (storageCode) && config.projectsDir) {
 		fs.readFile (config.projectsDir + "/" + storageCode + "/config.json", function (err, data) {
 			if (err) {
 				failure ("Unknown storage: " + storageCode);
@@ -6177,7 +6179,7 @@ server.stat = function (options) {
 		return;
 	};
 	if (!request.query.data) {
-		fs.readFile (config.rootDir + "/www/client/stat/stat.html", function (err, data) {
+		fs.readFile (__dirname + "/www/client/stat/stat.html", function (err, data) {
 			response.writeHead (200, {"Content-Type": "text/html; charset=utf-8"});
 			response.end (data);
 		});
@@ -11577,13 +11579,15 @@ xmlss.report = function (request, response, next) {
 					});
 				} else
 				if (request.query.format == "ods") {
-					var AdmZip = require (config.rootDir + "/node_modules/adm-zip");
+//					var AdmZip = require (config.rootDir + "/node_modules/adm-zip");
+					var AdmZip = require ("adm-zip");
 					var zip = new AdmZip ();
 					var fs = require ("fs");
-					zip.addLocalFolder (config.rootDir + "/report/template.ods");
+					zip.addLocalFolder (__dirname + "/report/template.ods");
 					var fs = require ("fs");
-					fs.readFile (config.rootDir + "/report/template.ods/content.xml", "utf8", function (err, data) {
-						var xml2js = require (config.rootDir + "/node_modules/xml2js");
+					fs.readFile (__dirname + "/report/template.ods/content.xml", "utf8", function (err, data) {
+//						var xml2js = require (config.rootDir + "/node_modules/xml2js");
+						var xml2js = require ("xml2js");
 						var parser = new xml2js.Parser ({explicitArray: false});
 						parser.parseString (data, function (err, doc) {
 							doc ["office:document-content"]["office:body"]["office:spreadsheet"]["table:table"]["table:table-row"] = [];
@@ -11739,7 +11743,8 @@ xmlss.report = function (request, response, next) {
 						});
 					}
 				], function (err, results) {
-					var Docxtemplater = require (config.rootDir + "/node_modules/docxtemplater");
+//					var Docxtemplater = require (config.rootDir + "/node_modules/docxtemplater");
+					var Docxtemplater = require ("docxtemplater");
 					var doc = new Docxtemplater (data);
 					doc.setOptions ({parser: function (tag) {
 						return {
@@ -11841,20 +11846,20 @@ pdf.buildReportFromXMLSS = function (options, cb) {
 		html += r;
 	};
 	html += "</table>\n</body>\n</html>\n";
-	fs.writeFile (config.rootDir + "/report/pdf/" + session.id + ".html", html, function (err) {
+	fs.writeFile (__dirname + "/report/pdf/" + session.id + ".html", html, function (err) {
 		if (err) {
 			return cb (err);
 		};
 		var spawn = require ('child_process').spawn;
 		var args = [
 			"--orientation", orientation == "landscape" ? "Landscape" : "Portrait", "--dpi", 300, "--page-size", "A4",
-			config.rootDir + "/report/pdf/" + session.id + ".html",
-			config.rootDir + "/report/pdf/" + session.id + ".pdf"
+			__dirname + "/report/pdf/" + session.id + ".html",
+			__dirname + "/report/pdf/" + session.id + ".pdf"
 		];
 //		if (sheet.margins) {
 //			args = args.concat ("--margin-left", sheet.margins.left, "--margin-top", sheet.margins.top, "--margin-right", sheet.margins.right, "--margin-bottom", sheet.margins.bottom);
 //		};
-		var filePath = config.rootDir + "/report/pdf/wkhtmltopdf";
+		var filePath = __dirname + "/report/pdf/wkhtmltopdf";
 		if (config.report && config.report.pdf) {
 			filePath = config.report.pdf;
 		}
@@ -11866,15 +11871,15 @@ pdf.buildReportFromXMLSS = function (options, cb) {
 			console.log ("stderr: " + data);
 		});
 		cp.on ("close", function (code) {
-			fs.unlink (config.rootDir + "/report/pdf/" + session.id + ".html", function (err) {
+			fs.unlink (__dirname + "/report/pdf/" + session.id + ".html", function (err) {
 				if (err) {
 					return cb (err);
 				}
-				fs.readFile (config.rootDir + "/report/pdf/" + session.id + ".pdf", function (err, data) {
+				fs.readFile (__dirname + "/report/pdf/" + session.id + ".pdf", function (err, data) {
 					if (err) {
 						return cb (err);
 					}
-					fs.unlink (config.rootDir + "/report/pdf/" + session.id + ".pdf", function (err) {
+					fs.unlink (__dirname + "/report/pdf/" + session.id + ".pdf", function (err) {
 						if (err) {
 							return cb (err);
 						}

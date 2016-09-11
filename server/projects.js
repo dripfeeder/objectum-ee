@@ -79,7 +79,7 @@ projects.loadConfig = function (options) {
 	var storageCode = options.code;
 	var success = options.success;
 	var failure = options.failure;
-	if (!config.storages.hasOwnProperty (storageCode)) {
+	if (!config.storages.hasOwnProperty (storageCode) && config.projectsDir) {
 		fs.readFile (config.projectsDir + "/" + storageCode + "/config.json", function (err, data) {
 			if (err) {
 				failure ("Unknown storage: " + storageCode);

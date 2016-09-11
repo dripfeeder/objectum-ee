@@ -995,13 +995,15 @@ xmlss.report = function (request, response, next) {
 					});
 				} else
 				if (request.query.format == "ods") {
-					var AdmZip = require (config.rootDir + "/node_modules/adm-zip");
+//					var AdmZip = require (config.rootDir + "/node_modules/adm-zip");
+					var AdmZip = require ("adm-zip");
 					var zip = new AdmZip ();
 					var fs = require ("fs");
-					zip.addLocalFolder (config.rootDir + "/report/template.ods");
+					zip.addLocalFolder (__dirname + "/report/template.ods");
 					var fs = require ("fs");
-					fs.readFile (config.rootDir + "/report/template.ods/content.xml", "utf8", function (err, data) {
-						var xml2js = require (config.rootDir + "/node_modules/xml2js");
+					fs.readFile (__dirname + "/report/template.ods/content.xml", "utf8", function (err, data) {
+//						var xml2js = require (config.rootDir + "/node_modules/xml2js");
+						var xml2js = require ("xml2js");
 						var parser = new xml2js.Parser ({explicitArray: false});
 						parser.parseString (data, function (err, doc) {
 							doc ["office:document-content"]["office:body"]["office:spreadsheet"]["table:table"]["table:table-row"] = [];
@@ -1157,7 +1159,8 @@ xmlss.report = function (request, response, next) {
 						});
 					}
 				], function (err, results) {
-					var Docxtemplater = require (config.rootDir + "/node_modules/docxtemplater");
+//					var Docxtemplater = require (config.rootDir + "/node_modules/docxtemplater");
+					var Docxtemplater = require ("docxtemplater");
 					var doc = new Docxtemplater (data);
 					doc.setOptions ({parser: function (tag) {
 						return {

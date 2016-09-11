@@ -259,7 +259,7 @@ server.stat = function (options) {
 		return;
 	};
 	if (!request.query.data) {
-		fs.readFile (config.rootDir + "/www/client/stat/stat.html", function (err, data) {
+		fs.readFile (__dirname + "/www/client/stat/stat.html", function (err, data) {
 			response.writeHead (200, {"Content-Type": "text/html; charset=utf-8"});
 			response.end (data);
 		});

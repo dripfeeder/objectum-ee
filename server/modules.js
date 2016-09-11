@@ -1,5 +1,4 @@
 var _ = require ("underscore");
-var config = require ("./config").config;
 // default values
 if (!config.auth) {
 	config.auth = {multi: true};
@@ -23,6 +22,7 @@ if (!config.news) {
 		gcInterval: 300000
 	};
 }
+/*
 if (!config.rootDir) {
 	config.rootDir = config.objectumDir + "/node";
 }
@@ -32,7 +32,9 @@ if (!config.projectsDir) {
 if (!config.wwwRoot) {
 	config.wwwRoot = config.objectumDir + "/node/www";
 }
-if (_.isArray (config.storages)) {
+*/
+config.wwwRoot = __dirname + "/www";
+if (_.isArray (config.storages) && config.projectsDir) {
 	var storages = {};
 	_.each (config.storages, function (code) {
 		storages [code] = require (config.projectsDir + "/" + code + "/config.json");

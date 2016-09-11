@@ -67,20 +67,20 @@ pdf.buildReportFromXMLSS = function (options, cb) {
 		html += r;
 	};
 	html += "</table>\n</body>\n</html>\n";
-	fs.writeFile (config.rootDir + "/report/pdf/" + session.id + ".html", html, function (err) {
+	fs.writeFile (__dirname + "/report/pdf/" + session.id + ".html", html, function (err) {
 		if (err) {
 			return cb (err);
 		};
 		var spawn = require ('child_process').spawn;
 		var args = [
 			"--orientation", orientation == "landscape" ? "Landscape" : "Portrait", "--dpi", 300, "--page-size", "A4",
-			config.rootDir + "/report/pdf/" + session.id + ".html",
-			config.rootDir + "/report/pdf/" + session.id + ".pdf"
+			__dirname + "/report/pdf/" + session.id + ".html",
+			__dirname + "/report/pdf/" + session.id + ".pdf"
 		];
 //		if (sheet.margins) {
 //			args = args.concat ("--margin-left", sheet.margins.left, "--margin-top", sheet.margins.top, "--margin-right", sheet.margins.right, "--margin-bottom", sheet.margins.bottom);
 //		};
-		var filePath = config.rootDir + "/report/pdf/wkhtmltopdf";
+		var filePath = __dirname + "/report/pdf/wkhtmltopdf";
 		if (config.report && config.report.pdf) {
 			filePath = config.report.pdf;
 		}
@@ -92,15 +92,15 @@ pdf.buildReportFromXMLSS = function (options, cb) {
 			console.log ("stderr: " + data);
 		});
 		cp.on ("close", function (code) {
-			fs.unlink (config.rootDir + "/report/pdf/" + session.id + ".html", function (err) {
+			fs.unlink (__dirname + "/report/pdf/" + session.id + ".html", function (err) {
 				if (err) {
 					return cb (err);
 				}
-				fs.readFile (config.rootDir + "/report/pdf/" + session.id + ".pdf", function (err, data) {
+				fs.readFile (__dirname + "/report/pdf/" + session.id + ".pdf", function (err, data) {
 					if (err) {
 						return cb (err);
 					}
-					fs.unlink (config.rootDir + "/report/pdf/" + session.id + ".pdf", function (err) {
+					fs.unlink (__dirname + "/report/pdf/" + session.id + ".pdf", function (err) {
 						if (err) {
 							return cb (err);
 						}
