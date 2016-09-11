@@ -4,6 +4,9 @@
 exports.Objectum = function (config) {
 
 var _ = require ("underscore");
+if (!config) {
+	config = require ("./config");
+};
 // default values
 if (!config.auth) {
 	config.auth = {multi: true};
