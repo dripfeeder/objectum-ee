@@ -223,9 +223,9 @@ Ext.define ("$o.locale", {
 			var n = $o.locale.strings [s.toLowerCase ()] || s;
 			if (s && n) {
 				if (s [0].toUpperCase () == s [0]) {
-					n [0] = n [0].toUpperCase ();
+					n = n [0].toUpperCase () + n.substr (1);
 				} else {
-					n [0] = n [0].toLowerCase ();
+					n = n [0].toLowerCase () + n.substr (1);
 				};
 			};
 			return n;
