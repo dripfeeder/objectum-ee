@@ -31,7 +31,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 					xtype: "compositefield",
 					width: 375,
 					labelWidth: 100,
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					style: "margin-top: 5px;",
 					items: [{
 						xtype: "textfield",
@@ -43,7 +43,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 							}
 						}
 					}, {
-						xtype: "displayfield", value: "Только для чтения:", style: "margin-left: 5px;"
+						xtype: "displayfield", value: $o.getString ("Read only") + ":", style: "margin-left: 5px;"
 					}, {
 						xtype: "checkbox",
 						name: "readOnly",
@@ -58,7 +58,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 					xtype: "textfield",
 					labelWidth: 100,
 					width: 375,
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.card.title,
 					listeners: {
@@ -91,22 +91,22 @@ Ext.define ("$o.LayoutCard.Widget", {
 						data: []
 					},
 					columns: [{
-						text: "Класс объекта", dataIndex: "clsName", flex: 2
+						text: $o.getString ("Class of object"), dataIndex: "clsName", flex: 2
 					}, {
-						text: "Тэг объекта", dataIndex: "tag", flex: 1
+						text: $o.getString ("Tag of object"), dataIndex: "tag", flex: 1
 					}, {
-						text: "Объект по атрибуту компонента", dataIndex: "cmpAttrName", flex: 2
+						text: $o.getString ("Object by attribute of component"), dataIndex: "cmpAttrName", flex: 2
 					}, {
 						text: "cls", dataIndex: "cls", hidden: true
 					}, {
 						text: "cmpAttr", dataIndex: "cmpAttr", hidden: true
 					}],
 					tbar: [{
-						text: "Добавить",
+						text: $o.getString ("Add"),
 						iconCls: "gi_circle_plus",
 						handler: function () {
 							var win = Ext.create ("Ext.Window", {
-								title: "Добавление тэга",
+								title: $o.getString ("Tag", ":", "Adding"),
 								width: 600,
 								height: 400,
 								layout: "vbox",
@@ -117,7 +117,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 								style: "background-color: #ffffff",
 								bodyStyle: "background-color: #ffffff",
 								tbar: [{
-									text: "Добавить",
+									text: $o.getString ("Add"),
 									iconCls: "gi_circle_plus",
 									handler: function () {
 										var store = me.down ("*[name=tags]").getStore ();
@@ -139,7 +139,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 								}],
 								items: [{
 									xtype: "$conffield", 
-									fieldLabel: "Класс объекта",
+									fieldLabel: $o.getString ("Object class"),
 									labelWidth: 200,
 									name: "cls", 
 									width: "100%",
@@ -154,13 +154,13 @@ Ext.define ("$o.LayoutCard.Widget", {
 									}
 								}, {
 									xtype: "textfield",
-									fieldLabel: "Тэг объекта",
+									fieldLabel: $o.getString ("Tag of object"),
 									labelWidth: 200,
 									width: "100%",
 									name: "tag"
 								}, {
 									xtype: "combo",
-									fieldLabel: "Объект по атрибуту компонента",
+									fieldLabel: $o.getString ("Object by attribute of component"),
 									name: "cmpAttr",
 									anchor: "100%",
 									labelWidth: 200,
@@ -179,7 +179,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 							win.show ();							
 						}
 					}, {
-						text: "Удалить",
+						text: $o.getString ("Remove"),
 						iconCls: "gi_circle_minus",
 						handler: function () {
 							var grid = me.down ("*[name=tags]");
@@ -241,7 +241,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 		}];
 		items.push ({
 			layout: "fit",
-			title: "Атрибуты карточки",
+			title: $o.getString ("Card", ":", "Attributes"),
 			name: "cardDesigner",
 			width: "100%",
 			border: 1,
@@ -254,13 +254,13 @@ Ext.define ("$o.LayoutCard.Widget", {
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: items
 			}, {
 				layout: "fit",
-				title: "События",
+				title: $o.getString ("Events"),
 				iconCls: "gi_wifi_alt",
 				border: 0,
 				items: {

@@ -248,12 +248,12 @@ system.view.selectQuery = function (options) {
 		border: false,
 		style: "background-color: #ffffff",
 		bodyStyle: "background-color: #ffffff",
-		title: "Выберите запрос",
+		title: $o.getString ("Select", "query"),
 		iconCls: "gi_cogwheel",
 		bodyPadding: 5,
 		modal: 1,
 		tbar: [{
-			text: "Выбрать",
+			text: $o.getString ("Choose"),
 			iconCls: "gi_ok",
 			name: "ok",
 			disabled: 1,
@@ -262,7 +262,7 @@ system.view.selectQuery = function (options) {
 				win.close ();
 			}
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			iconCls: "gi_remove",
 			handler: function () {
 				win.close ();
@@ -275,7 +275,7 @@ system.view.selectQuery = function (options) {
 			layout: "fit",
 			items: {
 	    		xtype: "treepanel",
-	    		title: "Представления",
+	    		title: $o.getString ("Views"),
 	    		iconCls: "gi_eye_open",
 			    store: treeStore,
 			    rootVisible: false,
@@ -304,7 +304,7 @@ system.view.selectQuery = function (options) {
 		    region: "center",
 			layout: "fit",
 		    items: {
-		    	title: "Запрос",
+		    	title: $o.getString ("Query"),
 		    	name: "query",
 				iconCls: "gi_cogwheel",
 				xtype: "codemirrortextarea",
@@ -853,7 +853,7 @@ system.getObjNews = function (revision) {
 		system.xmlObj.onreadystatechange = function () {
 			if (system.xmlObj.readyState == 4) {
 				if (system.xmlObj.status == 401) {
-					common.message ("Сессия не авторизована. Пожалуйста, перезагрузите страницу браузера.");
+					common.message ($o.getString ("Session not authorized. Please, reload browser page"));
 				} else
 				if (system.xmlObj.responseText) {
 					var r = eval ("(" + system.xmlObj.responseText + ")");
@@ -1073,12 +1073,12 @@ system.vo.menuItems.card = function (options) {
     		items: [{
 				card: {
 					id: "system.vo.menu.card",
-					title: "Пункт меню",
+					title: $o.getString ("Menu item"),
 					items: [{
 						objectId: id, attr: "view", xtype: "numberfield", hideLabel: true, style: "display: none"
 					}, {
 						xtype: "$conffield", 
-						fieldLabel: "Представление",
+						fieldLabel: $o.getString ("View"),
 						name: "view", 
 						value: o.get ("view"), 
 						anchor: "-20",
@@ -1106,7 +1106,7 @@ system.vo.menuItems.card = function (options) {
 						objectId: id, attr: "action", xtype: "numberfield", hideLabel: true, style: "display: none"
 					}, {
 						xtype: "$conffield", 
-						fieldLabel: "Действие",
+						fieldLabel: $o.getString ("Action"),
 						name: "action", 
 						value: o.get ("action"), 
 						anchor: "-20",
@@ -1144,12 +1144,12 @@ system.vo.menuItems.card = function (options) {
 			}, {
 				"olap": {
 					"id": "olapMenuItems",
-					"title": "Дочерние пункты меню",
+					"title": $o.getString ("Child menu items"),
 					"view": "system.vo.menuItems",
 					"actions": [
 						{
 							"fn": "common.tpl.show",
-							"text": "Открыть",
+							"text": $o.getString ("Open"),
 							"arguments": {
 								"asWindow": 1,
 								"card": "system.vo.menuItems.card"
@@ -1159,7 +1159,7 @@ system.vo.menuItems.card = function (options) {
 						},
 						{
 							"fn": "common.tpl.create",
-							"text": "Добавить",
+							"text": $o.getString ("Add"),
 							"arguments": {
 								"asWindow": 1,
 								"classCode": "system.vo.menuItems",
@@ -1171,7 +1171,7 @@ system.vo.menuItems.card = function (options) {
 						},
 						{
 							"fn": "common.tpl.remove",
-							"text": "Удалить",
+							"text": $o.getString ("Remove"),
 							"iconCls": "gi_circle_minus",
 							"active": "common.recordSelected"
 						}
@@ -1199,16 +1199,16 @@ system.vo.menu.cellRenderer = function (value, metaData, record, rowIndex, colIn
 	if (record.get ("a_position") && metaData.column.dataIndex == "a_position") {
 		switch (record.get ("a_position")) {
 		case "top":
-			value = "Вверху";
+			value = $o.getString ("Top");
 			break;
 		case "left":
-			value = "Слева";
+			value = $o.getString ("Left");
 			break;
 		case "bottom":
-			value = "Внизу";
+			value = $o.getString ("Bottom");
 			break;
 		case "right":
-			value = "Справа";
+			value = $o.getString ("Right");
 			break;
 		};
 	};
@@ -1302,7 +1302,7 @@ system.vo.chooseAdminMenu = function () {
 		border: false,
 		style: "background-color: #ffffff",
 		bodyStyle: "background-color: #ffffff",
-		title: "Меню администратора",
+		title: $o.getString ("Admin menu"),
 		iconCls: "gi_list",
 		bodyPadding: 5,
 		modal: 1,
@@ -1311,13 +1311,13 @@ system.vo.chooseAdminMenu = function () {
 			iconCls: "gi_ok",
 			handler: function () {
 				common.setConf ("adminMenu", {
-					name: "Меню администратора",
+					name: $o.getString ("Admin menu"),
 					value: win.down ("*[name=menu]").getValue ()
 				});
 				win.close ();
 			}
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			iconCls: "gi_remove",
 			handler: function () {
 				win.close ();
@@ -1326,7 +1326,7 @@ system.vo.chooseAdminMenu = function () {
 		items: {
 			xtype: "$objectfield",
 			name: "menu",
-			fieldLabel: "Меню",
+			fieldLabel: $o.getString ("Menu"),
 			value: common.getConf ("adminMenu").value,
 			choose: {type: "layout", attr: "olap.a_id", layout: {
 		        olap: {
@@ -1359,10 +1359,10 @@ system.vo.buildMenu = function () {
 			if (oRole && oRole.get ("menu")) {
 				menuId = oRole.get ("menu");
 			} else {
-				return common.message ("Пользователю не назначена роль.");
+				return common.message ($o.getString ("User has no role"));
 			}
 		} else {
-			return common.message ("Пользователю не назначена роль.");
+			return common.message ($o.getString ("User has no role"));
 		}
 	};
 	var m = common.execSQL ({
@@ -1502,7 +1502,7 @@ system.vo.buildMenu = function () {
 	};
 	*/
 	var o = {
-		text: "Выход",
+		text: $o.getString ("Exit"),
 		iconCls: "gi_exit",
 		handler: function () {
 			if ($o.userId) {
@@ -1534,7 +1534,7 @@ system.vo.buildMenu = function () {
 		};
 		menu.push ({
 			xtype: "displayfield",
-			value: "Системная дата:"
+			value: $o.getString ("System date") + ":"
 		}, {
 			xtype: "datefield",
 			minValue: date1,
@@ -1545,7 +1545,7 @@ system.vo.buildMenu = function () {
 				render: function () {
 					Ext.tip.QuickTipManager.register ({
 						target: this.id,
-						text: "Просмотр данных в прошедших датах.",
+						text: $o.getString ("View data in last dates"),
 						width: 200,
 						dismissDelay: 3000
 					});			

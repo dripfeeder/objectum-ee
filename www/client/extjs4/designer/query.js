@@ -15,7 +15,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		me.items = {
 			xtype: "tabpanel",
 			items: [{
-				title: "Конструктор",
+				title: $o.getString ("Constructor"),
 				iconCls: "gi_adjust_alt",
 				layout: "border",
 				name: "constructor",
@@ -33,7 +33,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				    		xtype: "compositefield",
 				    		items: [{
 								xtype: "$conffield", 
-								fieldLabel: "Класс",
+								fieldLabel: $o.getString ("Class"),
 								name: "class", 
 								width: 400,
 								confRef: "class",
@@ -55,7 +55,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 								}
 							}, {
 								xtype: "displayfield",
-								value: "Псевдоним:",
+								value: $o.getString ("Alias") + ":",
 								style: "margin-left: 5px",
 								width: 70
 							}, {
@@ -72,7 +72,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 								}
 							}]
 						}, {
-							title: "Дополнительные классы",
+							title: $o.getString ("Additional classes"),
 					    	iconCls: "gi_cogwheels",
 							flex: 1,
 							width: "100%",
@@ -81,7 +81,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 							autoScroll: true,
 							bodyPadding: 5,
 					    	tbar: [{
-					    		text: "Добавить",
+					    		text: $o.getString ("Add"),
 					    		iconCls: "gi_circle_plus",
 					    		handler: me.addClass,
 					    		scope: me
@@ -100,7 +100,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 						border: 1,
 						bodyPadding: 1,
 					    items: {
-					    	title: "Атрибуты",
+					    	title: $o.getString ("Attributes"),
 					    	iconCls: "gi_file",
 					    	xtype: "$queryselect",
 							name: "attrs",
@@ -130,7 +130,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 								border: 1,
 								bodyPadding: 1,
 							    items: {
-							    	title: "Фильтр",
+							    	title: $o.getString ("Filter"),
 							    	iconCls: "gi_filter",
 									xtype: "$layoutfilter",
 									name: "filter",
@@ -146,7 +146,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 								border: 1,
 								bodyPadding: 1,
 							    items: {
-							    	title: "Сортировка",
+							    	title: $o.getString ("Sort"),
 							    	iconCls: "gi_sort-by-order",
 							    	name: "sort",
 							    	xtype: "$querysort",
@@ -167,7 +167,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				name: "source",
 				items: {
@@ -189,7 +189,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 			v = JSON.parse (v);
 			return v;
 		} catch (e) {
-			container.getEl ().mask ("Извините, не удалось декодировать исходный код макета.");
+			container.getEl ().mask ($o.getString ("Sorry, we could not decode the source code layout"));
 			me.down ("tabpanel").setActiveTab (me.down ("panel[name=source]"));
 		};
 	},
@@ -281,15 +281,15 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				listeners: {
 					change: function () {
 						me.updateAttrsStore ();
-						var attr1 = this.up ("*").down ("*[fieldLabel='Связующий атрибут 1']");
-						var attr2 = this.up ("*").down ("*[fieldLabel='Связующий атрибут 2']");
+						var attr1 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Attribute") + " 1']");
+						var attr2 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Attribute") + " 2']");
 						if (!attr1.getValue () && !attr2.getValue ()) {
 							var cls1 = me.down ("*[name=class]").getValue ();
 							var cls2 = this.getValue ();
 							if (cls1 && cls2) {
 								var attrs1 = $o.getClass (cls1).attrs;
 								var alias1 = me.down ("*[name=alias]").getValue ();
-								var alias2 = this.up ("*").down ("*[fieldLabel='Псевдоним']").getValue ();
+								var alias2 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Alias") + "']").getValue ();
 								for (var attr in attrs1) {
 									var ca = attrs1 [attr];
 									if (ca.get ("type") == cls2) {
@@ -307,7 +307,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}
 			}, {
 				xtype: "textfield",
-				fieldLabel: "Псевдоним",
+				fieldLabel: $o.getString ("Alias"),
 				name: "alias_" + n,
 				value: n,
 				listeners: {
@@ -320,7 +320,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}
 			}, {
 				xtype: "combo",
-				fieldLabel: "Связующий атрибут 1",
+				fieldLabel: $o.getString ("Attribute") + " 1",
 				name: "attr1_" + n,
 				width: "100%",
 				labelWidth: 100,
@@ -338,7 +338,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}
 			}, {
 				xtype: "combo",
-				fieldLabel: "Связующий атрибут 2",
+				fieldLabel: $o.getString ("Attribute") + " 2",
 				name: "attr2_" + n,
 				width: "100%",
 				labelWidth: 100,
@@ -356,7 +356,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}
 			}, {
 				xtype: "combo",
-				fieldLabel: "Объединение",
+				fieldLabel: $o.getString ("Union"),
 				name: "join_" + n,
 				width: "100%",
 				labelWidth: 100,
@@ -365,7 +365,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				editable: false,
 				store: new Ext.data.ArrayStore ({
 					fields: ["id", "text"],
-					data: [["left-join", "Внешнее"], ["inner-join", "Внутреннее"]]
+					data: [["left-join", $o.getString ("External")], ["inner-join", $o.getString ("Internal")]]
 				}),
 				value: "left-join",
 				valueField: "id",
@@ -378,7 +378,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}
 			}, {
 				xtype: "button",
-				text: "Удалить",
+				text: $o.getString ("Remove"),
 				iconCls: "gi_circle_minus",
 				style: "margin-top: 5px",
 				handler: function () {
@@ -548,7 +548,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 					throw "invalid";
 				};
 			} catch (e) {
-				container.getEl ().mask ("Извините, не удалось декодировать исходный код макета.");
+				container.getEl ().mask ($o.getString ("Sorry, we could not decode the source code layout"));
 				me.down ("tabpanel").setActiveTab (me.down ("panel[name=source]"));
 				return;
 			};
@@ -573,7 +573,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		var me = this;
 		var data = [];
 		var classes = me.query ("*[confRef=class]");
-		var aliases = [me.down ("*[name=alias]")].concat (me.query ("*[fieldLabel=Псевдоним]"));
+		var aliases = [me.down ("*[name=alias]")].concat (me.query ("*[fieldLabel=" + $o.getString ("Alias") + "]"));
 		for (var i = 0; i < classes.length; i ++) {
 			if (!classes [i].getValue () || !aliases [i].getValue ()) {
 				continue;

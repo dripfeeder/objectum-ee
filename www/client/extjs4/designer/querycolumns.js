@@ -48,7 +48,7 @@
 								}
 							}, {
 								split: {
-									title: "Столбцы",
+									title: $o.getString ("Columns"),
 									iconCls: "gi_file",
 									orientation: "vertical",
 									height: 185,
@@ -67,21 +67,21 @@
 										cardConf: {
 											id: "attrCard",
 											items: [{
-												conf: "viewAttr", id: "olapAttrs", attr: "id.name", fieldLabel: "Наименование"
+												conf: "viewAttr", id: "olapAttrs", attr: "id.name", fieldLabel: $o.getString ("Name")
 											}, {
-												conf: "viewAttr", id: "olapAttrs", attr: "id.code", fieldLabel: "Код", allowBlank: false, maskRe: /[A-Za-z0-9\_]/
+												conf: "viewAttr", id: "olapAttrs", attr: "id.code", fieldLabel: $o.getString ("Code"), allowBlank: false, maskRe: /[A-Za-z0-9\_]/
 											}, {
-												xtype: "compositefield", fieldLabel: "Видимый",
+												xtype: "compositefield", fieldLabel: $o.getString ("Visible"),
 												items: [{
 													conf: "viewAttr", id: "olapAttrs", attr: "id.area", xtype: "checkbox", width: 100
 												}]
 											}, {
-												xtype: "compositefield", fieldLabel: "№ пп",
+												xtype: "compositefield", fieldLabel: $o.getString ("N"),
 												items: [{
 													conf: "viewAttr", id: "olapAttrs", attr: "id.order", xtype: "numberfield", width: 100
 												}]
 											}, {
-												xtype: "compositefield", fieldLabel: "Ширина",
+												xtype: "compositefield", fieldLabel: $o.getString ("Width"),
 												items: [{
 													conf: "viewAttr", id: "olapAttrs", attr: "id.width", xtype: "numberfield", width: 100
 												}]
@@ -134,13 +134,13 @@
 				},
 				items: [{
 					xtype: "label",
-					text: "- Чтобы скрыть/отобразить столбец используйте контекстное меню любого столбца."
+					text: "- " + $o.getString ("To hide / show a column use context menu of any column")
 				}, {
 					xtype: "label",
-					text: "- Перетащите столбец мышью для изменения его местоположения."
+					text: "- " + $o.getString ("Drag the column to modify its location")
 				}, {
 					xtype: "label",
-					text: "- Ширина столбцов настраивается в заголовке таблицы на границах столбцов."
+					text: "- " + $o.getString ("Width of columns set in the header of table at the column boundaries")
 				}]
 			};
 		};
@@ -215,7 +215,7 @@
 				}, 
 				items: [{
 					xtype: "label",
-					text: "Извините, не удалось декодировать исходный код запроса"
+					text: $o.getString ("Sorry, we could not decode the source code query")
 				}]
 			};
 		};

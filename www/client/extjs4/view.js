@@ -15,10 +15,10 @@ Ext.define ("$o.app.view", {
 				bodyPadding: 5
 			},
 			items: [{
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				layout: "form",
 				tbar: [{
-					text: "Сохранить",
+					text: $o.getString ("Save"),
 					iconCls: "gi_floppy_save",
 					handler: me.saveCommon
 				}],
@@ -29,23 +29,23 @@ Ext.define ("$o.app.view", {
 					readOnly: true
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Наименование",
+					fieldLabel: $o.getString ("Name"),
 					value: record.get ("name")
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Код",
+					fieldLabel: $o.getString ("Code"),
 					value: record.get ("code")
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Родитель",
+					fieldLabel: $o.getString ("Parent"),
 					value: record.get ("parent") ? $o.getView (record.get ("parent")).toString () : ""
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Иконка",
+					fieldLabel: $o.getString ("Icon"),
 					value: record.get ("iconCls")
 				}, {
 					xtype: "textarea",
-					fieldLabel: "Описание",
+					fieldLabel: $o.getString ("Description"),
 					value: record.get ("description")
 				}]
 			}]

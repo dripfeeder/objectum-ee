@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 Ext.define ("$o.app", {
 	singleton: true,
@@ -78,7 +78,7 @@ Ext.define ("$o.app", {
 				}}));
 			}, failure: function (msg) {
 				loginDialog.getEl ().unmask (true);
-				$o.app.message ($o.locale.getString (msg) || "Ошибка аутентификации", function () {
+				$o.app.message ($o.locale.getString (msg) || $o.getString ("Authentication error"), function () {
 					Ext.getCmp ("$o.app.password.field").setValue ("");
 					Ext.getCmp ("$o.app.login.field").focus ();
 				});
@@ -86,7 +86,7 @@ Ext.define ("$o.app", {
 		};
 		var buttons = {
 			xtype: "button",
-			text: "Вход",
+			text: $o.getString ("Enter"),
 			iconCls: "gi_ok",
 			width: 100,
 			style: {
@@ -129,7 +129,7 @@ Ext.define ("$o.app", {
 			}
 		}
 		var loginDialog = Ext.create ("Ext.Window", {
-			title: me.name || "Авторизация",
+			title: me.name || $o.getString ("Authorization"),
 			iconCls: "gi_keys",
 			width: 300,
 			height: 200,
@@ -153,7 +153,7 @@ Ext.define ("$o.app", {
 			items: [{
 				xtype: "textfield",
 //				fieldLabel: "Логин",
-				emptyText: "Логин",
+				emptyText: $o.getString ("Login"),
 				id: "$o.app.login.field",
 				allowBlank: false,
 				msgTarget: "side",
@@ -164,7 +164,7 @@ Ext.define ("$o.app", {
 			}, {
 				xtype: "textfield",
 //				fieldLabel: "Пароль",
-				emptyText: "Пароль",
+				emptyText: $o.getString ("Password"),
 				id: "$o.app.password.field",
 				inputType: "password",
 				allowBlank: false,
@@ -175,7 +175,7 @@ Ext.define ("$o.app", {
 				}
 			}, {
 				xtype: "checkbox",
-				boxLabel: "Запомнить",
+				boxLabel: $o.getString ("Remember"),
 				id: "$o.app.remember",
 				width: 270,
 				style: {
@@ -324,25 +324,25 @@ Ext.define ("$o.app", {
 				style: "color: #CC0000; font-weight: bold; margin-left: 2px; margin-right: 10px;"
 				*/
 			}, {
-				text: "Классы",
+				text: $o.getString ("Classes"),
 				iconCls: "gi_cogwheels",
 				handler: function () {
 					$o.app.show ({items: {
 						id: "conf_classes",
 						xtype: "$o.classes",
-						title: "Классы",
+						title: $o.getString ("Classes"),
 					   	iconCls: "gi_cogwheels",
 						name: "classes"
 					}});
 				}
 			}, {
-		    	text: "Представления",
+		    	text: $o.getString ("Views"),
 		    	iconCls: "gi_eye_open",
 				handler: function () {
 					$o.app.show ({items: {
 						id: "conf_views",
 						xtype: "$o.views",
-						title: "Представления",
+						title: $o.getString ("Views"),
 						iconCls: "gi_eye_open",
 				    	name: "views"
 					}});
@@ -350,7 +350,7 @@ Ext.define ("$o.app", {
 			}];
 			if ($o.visualObjectum && $o.visualObjectum.menuConstructor) {
 				itemsVisual.push ({
-			    	text: "Меню",
+			    	text: $o.getString ("Menu"),
 			    	iconCls: "gi_list",
 					handler: function () {
 						$o.app.show.call ($o.app, {
@@ -361,7 +361,7 @@ Ext.define ("$o.app", {
 			};
 			if ($o.visualObjectum && $o.visualObjectum.accessConstructor) {
 				itemsVisual.push ({
-			    	text: "Доступ",
+			    	text: $o.getString ("Access"),
 			    	iconCls: "gi_keys",
 					handler: function () {
 						$o.app.show.call ($o.app, {
@@ -385,14 +385,14 @@ Ext.define ("$o.app", {
 			*/
 			if ($o.visualObjectum && $o.visualObjectum.projectConstructor) {
 				itemsVisual.push ({
-			    	text: "Проект",
+			    	text: $o.getString ("Project"),
 			    	iconCls: "gi_briefcase",
 			    	name: "project",
 					handler: function () {
 						$o.app.show ({items: {
 							id: "conf_project",
 							xtype: "$projectdesigner",
-					    	title: "Проект",
+					    	title: $o.getString ("Project"),
 					    	name: "project",
 					    	iconCls: "gi_briefcase"
 						}});
@@ -401,7 +401,7 @@ Ext.define ("$o.app", {
 			};
 			itemsVisual.push ("->");
 			itemsVisual.push ({
-		    	text: "Выход",
+		    	text: $o.getString ("Exit"),
 		    	iconCls: "gi_exit",
 				handler: function () {
 					$o.logout ({success: function () {
@@ -837,7 +837,7 @@ Ext.define ("$o.app", {
 					html: "<font color=red>" + $o.locale.translate (msg) + "</font>"
 				}],
 				buttons: [{
-					text: "Подробнее",
+					text: $o.getString ("More"),
 					iconCls: "gi_circle_question_mark",
 					handler: function () {
 						win.removeAll ();
@@ -982,9 +982,9 @@ Ext.define ("$o.app", {
 		if ($o.idleTimer > $o.maxIdleSec) {
 			return;
 		};
-		var err = response.responseText == "<html><head><title>Unauthenticated</title></head><body><h1>401 Unauthenticated</h1></body></html>" ? "Сессия не авторизована. Пожалуйста, перезагрузите страницу браузера." : response.responseText;
+		var err = response.responseText == "<html><head><title>Unauthenticated</title></head><body><h1>401 Unauthenticated</h1></body></html>" ? $o.getString ("Session not authorized. Please, reload browser page") : response.responseText;
 		if (!err) {
-			err = "Не удалось соединиться с сервером.<br>status: " + response.status + " " + response.statusText;
+			err = $o.getString ("Could not connect to server") + "<br>status: " + response.status + " " + response.statusText;
 		};
 		common.message ("<font color=red>" + err + "</font><br>url: " + options.url + "<br>params: " + options.params);
 	},
@@ -1004,7 +1004,10 @@ Ext.define ("$o.app", {
 		$pversion = options.version;
 		var useHash = options.useHash;
 		var go = function () {
-	    	$o.locale.load ("/client/extjs4/locale/" + meOptions.locale + ".xml");
+			if (meOptions.locale != "en") {
+	    		$o.locale.load ("/client/extjs4/locale/" + meOptions.locale + ".json");
+	    	};
+	    	$o.executeQueueFunctions ();
 			Ext.Ajax.on ("beforerequest", $o.app.beforerequest, $o.app);
 			Ext.Ajax.on ("requestcomplete", $o.app.requestcomplete, $o.app);
 			Ext.Ajax.on ("requestexception", $o.app.requestexception, $o.app);
@@ -1027,10 +1030,10 @@ Ext.define ("$o.app", {
 						var projectNeedBuild = common.getConf ("projectNeedBuild");
 						if (projectNeedBuild.used && $o.app.vp.down ("*[name=project]")) {
 							me.projectNeedBuildTooltip = Ext.create ("Ext.tip.ToolTip", {
-							    title: "Необходима сборка",
+							    title: $o.getString ("Need assembly"),
 							    target: $o.app.vp.down ("*[name=project]").id,
 							    anchor: 'top',
-							    html: 'Для актуализации действий',
+							    html: $o.getString ("To update actions"),
 							    width: 200,
 							    autoHide: true,
 							    autoShow: true,

@@ -195,6 +195,7 @@ Ext.define ("$o.locale", {
 	singleton: true,
 	strings: {},
 	load: function (url) {
+		/*
 		var r = Ext.Ajax.request ({
 			url: url,
 			async: false
@@ -205,13 +206,33 @@ Ext.define ("$o.locale", {
 			var text = nodes [i].textContent || nodes [i].text;
 			$o.locale.strings [id] = text;
 		};
+		*/
+		var r = Ext.Ajax.request ({
+			url: url,
+			async: false
+		});
+		_.each (JSON.parse (r.responseText), function (v, id) {
+			$o.locale.strings [id.toLowerCase ()] = v;
+		});
 	},
-	getString: function (s) {
-		if (!s) {
-			return "";
-		};
-		return $o.locale.strings [s] || s;
+	getString: function () {
+		var r = _.map (_.toArray (arguments), function (s) {
+			if (!s) {
+				return s;
+			};
+			var n = $o.locale.strings [s.toLowerCase ()] || s;
+			if (s && n) {
+				if (s [0].toUpperCase () == s [0]) {
+					n [0] = n [0].toUpperCase ();
+				} else {
+					n [0] = n [0].toLowerCase ();
+				};
+			};
+			return n;
+		});
+		return r.join (" ");
 	},
+	// deprecated
 	translate: function (s) {
 		if (s.indexOf ("connection limit exceeded") > -1) {
 			s = "Извините. Сервер в данный момент перегружен. Пожалуйста, повторите запрос позднее.";

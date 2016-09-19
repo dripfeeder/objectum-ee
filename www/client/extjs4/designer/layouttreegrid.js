@@ -14,13 +14,13 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.treegrid.id,
@@ -32,7 +32,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.treegrid.title,
 					listeners: {
@@ -53,7 +53,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 					}
 				}, {
 					xtype: "$conffield", 
-					fieldLabel: "Запрос",
+					fieldLabel: $o.getString ("Query"),
 					name: "view", 
 					value: me.value.treegrid.view, 
 					width: "100%",
@@ -80,7 +80,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 					}
 				}, {
 					xtype: "combo",
-					fieldLabel: "Идентификатор узла",
+					fieldLabel: $o.getString ("Node identifier"),
 					name: "idAttr",
 					width: "100%",
 					mode: "local",
@@ -96,7 +96,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 					validator: me.validator
 				}, {
 					xtype: "combo",
-					fieldLabel: "Идентификатор родительского узла",
+					fieldLabel: $o.getString ("Parent node identifier"),
 					name: "parent",
 					width: "100%",
 					mode: "local",
@@ -114,7 +114,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 					layout: "fit",
 					width: "100%",
 					flex: 1,
-					title: "Меню",
+					title: $o.getString ("Menu"),
 					iconCls: "gi_list",
 					bodyPadding: 2,
 					items: {
@@ -130,7 +130,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "События",
+				title: $o.getString ("Events"),
 				iconCls: "gi_wifi_alt",
 				border: 0,
 				items: {
@@ -146,7 +146,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 				}
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {
@@ -194,7 +194,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 		};
 		if (of.getValue ()) {
 			if (!$o.getView (of.getValue ()).get ("query")) {
-				common.message ("Выбранное представление не содержит запрос.");
+				common.message ($o.getString ("Selected view does not contain a query"));
 				me.down ("button[name='ok']").disable ();
 			} else {
 				me.down ("button[name='ok']").enable ();

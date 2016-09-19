@@ -23,7 +23,7 @@ Ext.define ("$o.Views.Widget", {
 						},
 						actions: [{
 							fn: function () {
-								$zu.dialog.getNameAndCode ({title: "Добавление представления", success: function (name, code) {
+								$zu.dialog.getNameAndCode ({title: $o.getString ("View", ":", "Adding"), success: function (name, code) {
 									var tr = $o.startTransaction ({description: 'Create view'});
 									var o = $o.createView ();
 									o.set ("parent", this.getCurrentValue ("id"));
@@ -76,7 +76,7 @@ Ext.define ("$o.Views.Widget", {
 									return r;
 								}
 							},
-							caption: "Просмотр",
+							caption: $o.getString ("Review"),
 							iconCls: "gi_eye_open"
 						}]
 					}
@@ -85,7 +85,7 @@ Ext.define ("$o.Views.Widget", {
 						listeners: {
 							tabchangeTODO: function (tabPanel, panel) {	
 								var me = this;
-								if (panel.title == "Запрос" || panel.title == "Макет") {
+								if (panel.title == $o.getString ("Query") || panel.title == $o.getString ("Layout")) {
 									var field = panel.getItems () [0];
 									var value = field.getValue ();
 									var dom = Ext.getDom (field.inputEl);
@@ -110,10 +110,10 @@ Ext.define ("$o.Views.Widget", {
 						pages: [{
 							cardConf: {
 								id: "commonCard",
-								title: "Общие",
+								title: $o.getString ("Commons"),
 								iconCls: "gi_edit",
 								tbar: [{
-									text: "Зависимости",
+									text: $o.getString ("Dependencies"),
 									iconCls: "gi_link",
 									handler: function () {
 										var viewId = this.up ("*[name=views]").relatives ["olap"].getValue ("id");
@@ -134,7 +134,7 @@ Ext.define ("$o.Views.Widget", {
 											border: false,
 											style: "background-color: #ffffff",
 											bodyStyle: "background-color: #ffffff",
-											title: "Зависимости: Представления",
+											title: $o.getString ("Dependencies") + ": " + $o.getString ("Views"),
 											iconCls: "gi_link",
 											bodyPadding: 5,
 											modal: 1,
@@ -150,10 +150,10 @@ Ext.define ("$o.Views.Widget", {
 													text: "id",
 													dataIndex: "id"
 												}, {
-													text: "Код",
+													text: $o.getString ("Code"),
 													dataIndex: "path"
 												}, {
-													text: "Наименование",
+													text: $o.getString ("Name"),
 													dataIndex: "name"
 												}],
 												width: "100%",
@@ -166,15 +166,15 @@ Ext.define ("$o.Views.Widget", {
 									}
 								}],
 								items: [{
-									conf: "view", id: "olap", attr: "id.name", fieldLabel: "Наименование"
+									conf: "view", id: "olap", attr: "id.name", fieldLabel: $o.getString ("Name")
 								}, {
-									conf: "view", id: "olap", attr: "id.code", fieldLabel: "Код", allowBlank: false, maskRe: /[A-Za-z0-9\_]/
+									conf: "view", id: "olap", attr: "id.code", fieldLabel: $o.getString ("Code"), allowBlank: false, maskRe: /[A-Za-z0-9\_]/
 								}, {
-									conf: "view", id: "olap", attr: "id.parent", fieldLabel: "Родитель", confRef: "view", choose: {type: "view", id: "system.views", attr: "olap.id", width: 500, height: 400}
+									conf: "view", id: "olap", attr: "id.parent", fieldLabel: $o.getString ("Parent"), confRef: "view", choose: {type: "view", id: "system.views", attr: "olap.id", width: 500, height: 400}
 								}, {
-									conf: "view", id: "olap", attr: "id.description", fieldLabel: "Описание", xtype: "textarea", height: 150
+									conf: "view", id: "olap", attr: "id.description", fieldLabel: $o.getString ("Description"), xtype: "textarea", height: 150
 								}, {
-									conf: "view", id: "olap", attr: "id.iconCls", fieldLabel: "Иконка", xtype: "$iconselector"
+									conf: "view", id: "olap", attr: "id.iconCls", fieldLabel: $o.getString ("Icon"), xtype: "$iconselector"
 								}],
 								active: {
 									fn: function () {
@@ -185,10 +185,10 @@ Ext.define ("$o.Views.Widget", {
 						}, {
 							cardConf: {
 								id: "queryCard",
-								title: "Запрос",
+								title: $o.getString ("Query"),
 								iconCls: "gi_cogwheel",
 								tbar: [{
-									text: "Настройка столбцов таблицы",
+									text: $o.getString ("Setting the table columns"),
 									iconCls: "gi_table",
 									handler: function () {
 										var win = Ext.create ("Ext.Window", {
@@ -199,7 +199,7 @@ Ext.define ("$o.Views.Widget", {
 											border: false,
 											style: "background-color: #ffffff",
 											bodyStyle: "background-color: #ffffff",
-											title: "Настройка столбцов таблицы",
+											title: $o.getString ("Setting the table columns"),
 											bodyPadding: 5,
 											modal: 1,
 											maximizable: true,
@@ -219,7 +219,7 @@ Ext.define ("$o.Views.Widget", {
 										query = eval ("(" + query + ")");
 										var r = $o.execute ({sql: query, noException: 1});
 										if (r.error) {
-											common.message ("Запрос составлен с ошибкой:\n" + r.error);
+											common.message ($o.getString ("Error in query") + ":\n" + r.error);
 										};
 									}
 								},
@@ -247,7 +247,7 @@ Ext.define ("$o.Views.Widget", {
 						}, {
 							cardConf: {
 								id: "layoutCard",
-								title: "Макет",
+								title: $o.getString ("Layout"),
 								iconCls: "gi_table",
 								items: [{
 									//anchor: "100% 100%",

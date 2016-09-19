@@ -18,7 +18,7 @@ Ext.define ("$o.ActionCard.Widget", {
 			disabled: 1,
 			scope: me
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			iconCls: "gi_remove",
 			handler: function () {
 				me.up ("window").close ();
@@ -27,7 +27,7 @@ Ext.define ("$o.ActionCard.Widget", {
 		}];
 		me.items = [{
 			xtype: "$conffield", 
-			fieldLabel: "Действие",
+			fieldLabel: $o.getString ("Action"),
 			name: "action", 
 			width: "100%",
 			confRef: "action",
@@ -102,14 +102,14 @@ Ext.define ("$o.ActionCard.Widget", {
 		}, {
 			xtype: "textfield",
 			width: "100%",
-			fieldLabel: "Функция",
+			fieldLabel: $o.getString ("Function"),
 			name: "fn",
 			value: me.value.actionId ? "" : me.value.fn,
 			validator: me.validator
 		}, {
 			xtype: "textfield",
 			width: "100%",
-			fieldLabel: "Наименование",
+			fieldLabel: $o.getString ("Name"),
 			name: "name",
 			value: me.value.text
 		}, {
@@ -120,10 +120,10 @@ Ext.define ("$o.ActionCard.Widget", {
 		}, {
 			xtype: "checkbox",
 			name: "activeRecordSelected",
-			fieldLabel: "Активно при выбранной записи",
+			fieldLabel: $o.getString ("Active when record selected"),
 			checked: me.value.active == "common.recordSelected"
 		}, {
-			title: "Параметры",
+			title: $o.getString ("Options"),
 			width: "100%",
 			flex: 1,
 			xtype: "$actionargs",

@@ -1,12 +1,12 @@
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 
 /*	
 	$o.events:
-		showPage // открылся новый tab
-		objectChanged // объект изменился
-		viewInit // инициализация представления (нужно для настройки панели представления например)
+		showPage // tab opened
+		objectChanged // object changed
+		viewInit
 */
 
 /*
@@ -39,15 +39,11 @@ Ext.define ("$o", {
 		observable: 'Ext.util.Observable'
 	},	
 	code: null,
-	// Текущий пользователь, который аутентифицировался
 	currentUser: null,
-	// Кэш объектов
+	// objects cache
 	objectsMap: {},
-	// Кэш действий
+	// actions cache
 	actionsMap: {},
-	/*
-		Конструктор
-	*/
 	constructor: function (config) {
 		this.mixins.observable.constructor.call (this, config);
 		this.addEvents (
@@ -71,11 +67,9 @@ Ext.define ("$o", {
 		}});
 	},
 	/*
-		Инициализация: {
-			login,
-			password, // SHA-1
-			success
-		}
+		login,
+		password, // SHA-1
+		success
 	*/
 	init: function (options) {
 		if (!options) {
@@ -99,10 +93,8 @@ Ext.define ("$o", {
 		};
 	},
 	/*
-		Аутентификация: {
-			login
-			password // SHA-1
-		}
+		login
+		password // SHA-1
 	*/
 	authorize: function (options) {
 		var mainOptions = options;
@@ -119,7 +111,7 @@ Ext.define ("$o", {
 				if (response.responseText.substr (0, 4) == "wait") {
 					if (mainOptions.failure) {
 						var secs = response.responseText.split (" ")[1];
-						mainOptions.failure.call (mainOptions.scope || this, "Ждите " + (secs / 60 | 0) + " мин. до следующей попытки входа.");
+						mainOptions.failure.call (mainOptions.scope || this, $o.getString ("Wait") + " " + (secs / 60 | 0) + $o.getString (" ", "min", "and", "try again"));
 					};
 					return;
 				};
@@ -137,7 +129,7 @@ Ext.define ("$o", {
 				};
 				if (response.responseText == "firewall denied") {
 					if (mainOptions.failure) {
-						mainOptions.failure.call (mainOptions.scope || this, "Запрещен доступ по данной ссылке.");
+						mainOptions.failure.call (mainOptions.scope || this, $o.getString ("Access denied"));
 					};
 					return;
 				};
@@ -174,7 +166,7 @@ Ext.define ("$o", {
 						if ($o.idleTimer > $o.maxIdleSec) {
 							clearInterval (timerIntervalId);
 							$o.logout ({success: function () {
-								Ext.Msg.alert ($ptitle, $zr.getString ('Session disabled'), function () {
+								Ext.Msg.alert ($ptitle, $o.getString ('Session disabled'), function () {
 									location.reload ();
 								});						
 							}});
@@ -236,9 +228,6 @@ Ext.define ("$o", {
 			go ();
 		}
 	},
-	/*
-		Инициализация моделей данных
-	*/
 	initModels: function () {
 		var storage = this;
 		Ext.define ("$o.Base.Model", {
@@ -727,9 +716,6 @@ Ext.define ("$o", {
 			}
 		});
 	},
-	/*
-		Инициализация хранилищ данных
-	*/
 	initStores: function (options) {
 		var me = this;
 		var mainOptions = options;
@@ -840,9 +826,6 @@ Ext.define ("$o", {
 			});
 		};
 	},
-	/*
-		Кидает исключение если есть
-	*/
 	checkException: function (options) {
 		if ($o.app) {
 			return; // $o.app.requestcomplete
@@ -986,8 +969,8 @@ Ext.define ("$o", {
 		    },
 		    remove: function () {
 				if ($o.isReadOnly ()) {
-					common.message ("Изменение данных недоступно.");
-					throw new Error ("Изменение данных недоступно.");
+					common.message ($o.getString ("Can't change data"));
+					throw new Error ($o.getString ("Can't change data"));
 				};
 		    	this.removed = true;
 		    },
@@ -1577,8 +1560,8 @@ Ext.define ("$o", {
 	},
 	createObject: function (classCode, options) {
 		if (this.isReadOnly ()) {
-			common.message ("Изменение данных недоступно.");
-			throw new Error ("Изменение данных недоступно.");
+			common.message ($o.getString ("Can't change data"));
+			throw new Error ($o.getString ("Can't change data"));
 		};
 		var classId = this.getClass (classCode).get ("id");
 		var local = options == "local" ? "root" : null;
@@ -1604,8 +1587,8 @@ Ext.define ("$o", {
 	},
 	removeObject: function (id) {
 		if (this.isReadOnly ()) {
-			common.message ("Изменение данных недоступно.");
-			throw new Error ("Изменение данных недоступно.");
+			common.message ($o.getString ("Can't change data"));
+			throw new Error ($o.getString ("Can't change data"));
 		};
 		if (id) {
 			this.fireEvent ("beforeRemoveObject", {
@@ -1886,7 +1869,7 @@ Ext.define ("$o", {
     	if (!actions.card) {
 	    	var aCard = $o.createAction ();
 	    	aCard.set ("class", me.get ("id"));
-	    	aCard.set ("name", "Открыть");
+	    	aCard.set ("name", $o.getString ("Open"));
 	    	aCard.set ("code", "card");
 	    	aCard.set ("layout", JSON.stringify ({
 	    		"type": "card",
@@ -1925,7 +1908,7 @@ Ext.define ("$o", {
     	if (!actions.create) {
     	 	aCreate = $o.createAction ();
 	    	aCreate.set ("class", me.get ("id"));
-	    	aCreate.set ("name", "Добавить");
+	    	aCreate.set ("name", $o.getString ("Add"));
 	    	aCreate.set ("code", "create");
 		    aCreate.set ("layout", '{"type": "create"}');
 	    	aCreate.set ("body", createBody);
@@ -1940,7 +1923,7 @@ Ext.define ("$o", {
     	if (!actions.remove) {
 	    	aRemove = $o.createAction ();
 	    	aRemove.set ("class", me.get ("id"));
-	    	aRemove.set ("name", "Удалить");
+	    	aRemove.set ("name", $o.getString ("Remove"));
 	    	aRemove.set ("code", "remove");
 	    	aRemove.set ("layout", '{"type": "remove"}');
 	    	aRemove.set ("body", removeBody);
@@ -2019,5 +2002,22 @@ Ext.define ("$o", {
 		} else {
 			return false;
 		};
-	}
+	},
+	getString: function (s) {
+		return $o.locale.getString (s);
+	},
+	queueFn: [],
+	pushFn: function (f) {
+		var me = this;
+		me.queueFn.push (f);
+	},
+	/*
+		Выполняет функции из очереди. Ext.define, ...
+	*/
+	executeQueueFunctions: function (options) {
+		var me = this;
+		_.each (me.queueFn, function (f) {
+			f ();
+		});
+	},
 });

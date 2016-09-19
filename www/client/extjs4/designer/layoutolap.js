@@ -17,14 +17,14 @@ Ext.define ("$o.LayoutOlap.Widget", {
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
 					labelWidth: 150,
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.olap.id,
@@ -38,7 +38,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 					xtype: "textfield",
 					labelWidth: 150,
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.olap.title,
 					listeners: {
@@ -59,7 +59,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 					}
 				}, {
 					xtype: "$conffield", 
-					fieldLabel: "Запрос",
+					fieldLabel: $o.getString ("Query"),
 					labelWidth: 150,
 					name: "view", 
 					value: me.value.olap.view, 
@@ -91,7 +91,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 					width: "100%", 
 					name: "wordWrap",
 					labelWidth: 150,
-					fieldLabel: "Перенос по словам",
+					fieldLabel: $o.getString ("Word wrap"),
 					checked: me.value.olap.wordWrap,
 					listeners: {
 						change: function () {
@@ -103,7 +103,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 					width: "100%", 
 					name: "groupedColumns",
 					labelWidth: 150,
-					fieldLabel: "Многоуровневый заголовок",
+					fieldLabel: $o.getString ("Grouped header"),
 					checked: me.value.olap.groupedColumns,
 					listeners: {
 						change: function () {
@@ -111,7 +111,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 						}
 					}
 				}, {
-					fieldLabel: "Фильтр из действия",
+					fieldLabel: $o.getString ("Filter from action"),
 					xtype: "$conffield", 
 					labelWidth: 150,
 					name: "filterAction", 
@@ -148,7 +148,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 						layout: "fit",
 						width: "30%",
 						height: "100%",
-						title: "Меню",
+						title: $o.getString ("Menu"),
 						iconCls: "gi_list",
 						bodyPadding: 2,
 						items: {
@@ -165,7 +165,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 						layout: "fit",
 						width: "40%",
 						height: "100%",
-						title: "Фильтр",
+						title: $o.getString ("Filter"),
 						iconCls: "gi_filter",
 						bodyPadding: 2,
 						style: "margin-left: 1px",
@@ -188,7 +188,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 						layout: "fit",
 						width: "30%",
 						height: "100%",
-						title: "Итоги",
+						title: $o.getString ("Totals"),
 						iconCls: "gi_calculator",
 						bodyPadding: 2,
 						style: "margin-left: 1px",
@@ -208,7 +208,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "События",
+				title: $o.getString ("Events"),
 				iconCls: "gi_wifi_alt",
 				border: 0,
 				items: {
@@ -224,7 +224,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 				}
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {
@@ -242,7 +242,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 		var of = me.down ("*[name='view']");
 		if (of.getValue ()) {
 			if (!$o.getView (of.getValue ()).get ("query")) {
-				common.message ("Выбранное представление не содержит запрос.");
+				common.message ($o.getString ("Selected view does not contain a query"));
 				me.down ("button[name='ok']").disable ();
 			} else {
 				me.down ("button[name='ok']").enable ();

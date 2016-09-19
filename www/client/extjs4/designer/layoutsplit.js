@@ -26,13 +26,13 @@
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.split.id,
@@ -44,7 +44,7 @@
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.split.title,
 					listeners: {
@@ -64,7 +64,7 @@
 					}
 				}, {
 					xtype: "combo",
-					fieldLabel: "Ориентация",
+					fieldLabel: $o.getString ("Orientation"),
 					name: "orientation",
 					width: "100%",
 					triggerAction: "all",
@@ -75,8 +75,8 @@
 					store: new Ext.data.ArrayStore ({
 						fields: ["id", "text"],
 						data: [
-							["horizontal", "Горизонтальный"],
-							["vertical", "Вертикальный"]
+							["horizontal", $o.getString ("Horizontal")],
+							["vertical", $o.getString ("Vertical")]
 						]
 					}),
 					valueField: "id",
@@ -90,7 +90,7 @@
 					}
 				}, {
 					xtype: "compositefield",
-					fieldLabel: "Ширина (высота) левого (верхнего) компонента",
+					fieldLabel: $o.getString ("Width (height) of left (top) component"),
 					items: [{
 						xtype: "numberfield",
 						name: "width",
@@ -145,7 +145,7 @@
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {

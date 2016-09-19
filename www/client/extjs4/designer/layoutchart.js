@@ -22,13 +22,13 @@
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.chart.id,
@@ -41,7 +41,7 @@
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.chart.title,
 					listeners: {
@@ -61,7 +61,7 @@
 					}
 				}, {
 					xtype: "$conffield", 
-					fieldLabel: "Запрос",
+					fieldLabel: $o.getString ("Query"),
 					name: "view", 
 					value: me.value.chart.view, 
 					width: "100%",
@@ -89,7 +89,7 @@
 					}
 				}, {
 					xtype: "combo",
-					fieldLabel: "Атрибут показателя",
+					fieldLabel: $o.getString ("Mark", ":", "Attribute"),
 					name: "attrMark",
 					width: "100%",
 					mode: "local",
@@ -107,7 +107,7 @@
 					}
 				}, {
 					xtype: "combo",
-					fieldLabel: "Атрибут значения",
+					fieldLabel: $o.getString ("Value", ":", "Attribute"),
 					name: "attrValue",
 					width: "100%",
 					mode: "local",
@@ -125,7 +125,7 @@
 					}
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Заголовок показателей",
+					fieldLabel: $o.getString ("Title of marks"),
 					width: "100%",
 					name: "titleMark",
 					validator: me.validator,
@@ -137,7 +137,7 @@
 					}
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Заголовок значений",
+					fieldLabel: $o.getString ("Title of values"),
 					width: "100%",
 					name: "titleValue",
 					validator: me.validator,
@@ -151,7 +151,7 @@
 					layout: "fit",
 					width: "100%",
 					flex: 1,
-					title: "Фильтр",
+					title: $o.getString ("Filter"),
 					iconCls: "gi_filter",
 					bodyPadding: 2,
 					items: {
@@ -171,7 +171,7 @@
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {

@@ -38,7 +38,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 				width: "50%",
 				layout: "fit",
 			    items: {
-			    	title: "Навигатор",
+			    	title: $o.getString ("Navigator"),
 			    	iconCls: "gi_search",
 					xtype: "treepanel",
 					name: "tree",
@@ -79,7 +79,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 			    region: "center",
 				layout: "fit",
 			    items: {
-			    	title: "Параметры",
+			    	title: $o.getString ("Options"),
 			    	iconCls: "gi_file",
 			    	layout: "vbox",
 			    	name: "card",
@@ -87,7 +87,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 			    	bodyPadding: 5,
 			    	items: [{
 						xtype: "combo",
-						fieldLabel: "Атрибут",
+						fieldLabel: $o.getString ("Attribute"),
 						name: "attr",
 						width: "100%",
 						mode: "local",
@@ -102,7 +102,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "textfield",
-						fieldLabel: "Наименование",
+						fieldLabel: $o.getString ("Name"),
 						width: "100%",
 						name: "name",
 						cardDesigner: me,
@@ -111,7 +111,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "numberfield",
-						fieldLabel: "Ширина наименования",
+						fieldLabel: $o.getString ("Name width"),
 						width: 200,
 						name: "labelWidth",
 						cardDesigner: me,
@@ -124,7 +124,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						width: "100%",
 						items: [{
 							xtype: "numberfield",
-							fieldLabel: "Ширина",
+							fieldLabel: $o.getString ("Width"),
 							width: 200,
 							name: "width",
 							cardDesigner: me,
@@ -133,7 +133,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 							}
 						}, {
 							xtype: "numberfield",
-							fieldLabel: "Высота",
+							fieldLabel: $o.getString ("Height"),
 							width: 150,
 							labelWidth: 50,
 							style: "margin-left: 5px",
@@ -145,7 +145,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}]
 					}, {
 						xtype: "numberfield",
-						fieldLabel: "Минимальное значение",
+						fieldLabel: $o.getString ("Min value"),
 						width: 200,
 						name: "minValue",
 						cardDesigner: me,
@@ -154,7 +154,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "numberfield",
-						fieldLabel: "Максимальное значение",
+						fieldLabel: $o.getString ("Max value"),
 						width: 200,
 						name: "maxValue",
 						cardDesigner: me,
@@ -163,7 +163,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "checkbox",
-						fieldLabel: "Только для чтения",
+						fieldLabel: $o.getString ("Read only"),
 						name: "readOnly",
 						cardDesigner: me,
 						listeners: {
@@ -171,7 +171,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "checkbox",
-						fieldLabel: "Отображать время",
+						fieldLabel: $o.getString ("Show time"),
 						name: "showTime",
 						cardDesigner: me,
 						listeners: {
@@ -179,7 +179,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "checkbox",
-						fieldLabel: "Редактор HTML",
+						fieldLabel: $o.getString ("Editor") + " HTML",
 						name: "htmlEditor",
 						cardDesigner: me,
 						listeners: {
@@ -187,13 +187,13 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "fieldset",
-						title: "Выбор объекта",
+						title: $o.getString ("Object selection"),
 						name: "choose",
 						width: "100%",
 						collapsible: 1,
 						items: [{
 							xtype: "$conffield", 
-							fieldLabel: "Представление",
+							fieldLabel: $o.getString ("View"),
 							labelWidth: 135,
 							name: "view", 
 							anchor: "100%",
@@ -212,7 +212,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 							}
 						}, {
 							xtype: "combo",
-							fieldLabel: "Атрибут представления",
+							fieldLabel: $o.getString ("View attribute"),
 							labelWidth: 135,
 							name: "viewAttr",
 							anchor: "100%",
@@ -227,7 +227,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 								change: me.onChange
 							}
 						}, {
-							fieldLabel: "Действие до выбора",
+							fieldLabel: $o.getString ("Action before selection"),
 							labelWidth: 135,
 							xtype: "$conffield", 
 							name: "filterAction", 
@@ -252,7 +252,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 							width: "100%",
 							items: [{
 								xtype: "numberfield",
-								fieldLabel: "Ширина",
+								fieldLabel: $o.getString ("Width"),
 								width: 190,
 								labelWidth: 90,
 								name: "viewWidth",
@@ -262,7 +262,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 								}
 							}, {
 								xtype: "numberfield",
-								fieldLabel: "Высота",
+								fieldLabel: $o.getString ("Height"),
 								width: 150,
 								labelWidth: 50,
 								style: "margin-left: 5px",
@@ -274,7 +274,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 							}]
 						}, {
 							xtype: "checkbox",
-							fieldLabel: "Скрыть действия",
+							fieldLabel: $o.getString ("Hide actions"),
 							name: "hideActions",
 							cardDesigner: me,
 							listeners: {
@@ -286,25 +286,25 @@ Ext.define ("$o.CardDesigner.Widget", {
 			}]
 		};
 		me.tbar = [{
-			text: "Добавить поле",
+			text: $o.getString ("Add field"),
 			name: "addField",
 			iconCls: "gi_circle_plus",
 			handler: me.addField,
 			scope: me
 		}, {
-			text: "Добавить составное поле",
+			text: $o.getString ("Add composite field"),
 			name: "addComposite",
 			iconCls: "gi_circle_plus",
 			handler: me.addComposite,
 			scope: me
 		}, {
-			text: "Добавить группу",
+			text: $o.getString ("Add group"),
 			name: "addGroup",
 			iconCls: "gi_circle_plus",
 			handler: me.addGroup,
 			scope: me
 		}, {
-			text: "Удалить",
+			text: $o.getString ("Remove"),
 			disabled: true,
 			name: "remove",
 			iconCls: "gi_circle_minus",
@@ -312,7 +312,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 			scope: me
 		}];
 		me.bbar = [{
-			text: "Предварительный просмотр",
+			text: $o.getString ("Preview"),
 			iconCls: "gi_search",
 			handler: me.preview,
 			scope: me
@@ -330,7 +330,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 		var node;
 		if (sm.hasSelection ()) {
             node = sm.getSelection ()[0];
-			if (node.get ("text").substr (0, 5) == "Поле:") {
+			if (node.get ("text").substr (0, 5) == ($o.getString ("Field") + ":")) {
 				node = node.parentNode;
 			};
             node.set ("leaf", false);
@@ -339,7 +339,7 @@ Ext.define ("$o.CardDesigner.Widget", {
         };
         node.expand ();
         var rec = {
-        	id: me.counter ++, text: "Поле:", leaf: true
+        	id: me.counter ++, text: $o.getString ("Field") + ":", leaf: true
         };
         node.appendChild (rec);
 	},
@@ -356,7 +356,7 @@ Ext.define ("$o.CardDesigner.Widget", {
         };
         node.expand ();
         var rec = {
-        	id: me.counter ++, text: "Составное:", leaf: true
+        	id: me.counter ++, text: $o.getString ("Composite") + ":", leaf: true
         };
         node.appendChild (rec);
 	},
@@ -373,7 +373,7 @@ Ext.define ("$o.CardDesigner.Widget", {
         };
         node.expand ();
         var rec = {
-        	id: me.counter ++, text: "Группа:", leaf: true
+        	id: me.counter ++, text: $o.getString ("Group") + ":", leaf: true
         };
         node.appendChild (rec);
 	},
@@ -389,10 +389,10 @@ Ext.define ("$o.CardDesigner.Widget", {
 			me.down ("*[name=card]").show ();
             var node = sm.getSelection ()[0];
             var kind = "field";
-            if (node.get ("text").substr (0, 10) == "Составное:") {
+            if (node.get ("text").substr (0, 10) == ($o.getString ("Composite") + ":")) {
             	kind = "composite";
 			};            
-            if (node.get ("text").substr (0, 7) == "Группа:") {
+            if (node.get ("text").substr (0, 7) == ($o.getString ("Group") + ":")) {
             	kind = "group";
             };
             if (node.get ("text").substr (0, 6) == "xtype:") {
@@ -649,7 +649,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 					oo.anchor = "100%";
 				};
 				switch (node.get ("text").split (":")[0]) {
-				case "Поле":
+				case $o.getString ("Field"):
 					if (o.attr) {
 						var cls = me.getClsByTag (o.tag);
 						var attrs = cls.attrs;
@@ -715,7 +715,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						oo.empty = 1;
 					};
 					break;
-				case "Составное":
+				case $o.getString ("Composite"):
 					oo.fieldLabel = o.name;
 					oo.xtype = "fieldcontainer";
 					oo.layout = "hbox";
@@ -723,7 +723,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						oo.labelWidth = o.labelWidth;
 					};
 					break;
-				case "Группа":
+				case $o.getString ("Group"):
 					oo.title = o.name;
 					oo.height = o.height ? o.height : undefined;
 					oo.xtype = "fieldset";
@@ -736,7 +736,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 				if (node.childNodes.length) {
 					oo.items = [];
 					getNodes (node, oo.items);
-					if (node.get ("text").split (":")[0] == "Составное") {
+					if (node.get ("text").split (":")[0] == $o.getString ("Composite")) {
 						for (var j = 0; j < oo.items.length; j ++) {
 							var b = oo.items [j];
 							//b.hideLabel = true;
@@ -785,7 +785,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 				var o;
 				if (item.xtype == "fieldcontainer") {
 					o = {
-				        id: id, text: "Составное: " + (item.fieldLabel || ""), leaf: !(item.items && item.items.length)
+				        id: id, text: $o.getString ("Composite") + ": " + (item.fieldLabel || ""), leaf: !(item.items && item.items.length)
 					};
 					me.data [id] = {
 						name: item.fieldLabel, width: item.width, labelWidth: item.labelWidth
@@ -793,7 +793,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 				} else
 				if (item.xtype == "fieldset") {
 					o = {
-				        id: id, text: "Группа: " + (item.title || ""), leaf: !(item.items && item.items.length)
+				        id: id, text: $o.getString ("Group") + ": " + (item.title || ""), leaf: !(item.items && item.items.length)
 					};
 					me.data [id] = {
 						name: item.title, width: item.width, height: item.height
@@ -811,7 +811,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 					var attrs = cls.attrs;
 					var attr = attrs [item.attr] || attrs [item.attr.split (".")[1]];
 			        o = {
-			        	id: id, text: "Поле: " + (item.fieldLabel || attr.get ("name")), leaf: true
+			        	id: id, text: $o.getString ("Field") + ": " + (item.fieldLabel || attr.get ("name")), leaf: true
 			        };
 					me.data [id] = {
 						name: item.fieldLabel, width: item.width, height: item.height, 

@@ -17,13 +17,13 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		grid.flex = 1;
 		me.items = grid;
     	me.tbar = [{
-    		text: "Добавить",
+    		text: $o.getString ("Add"),
     		name: "create",
     		iconCls: "gi_circle_plus",
     		handler: me.createCondition,
     		scope: me
     	}, {
-    		text: "Очистить",
+    		text: $o.getString ("Clear"),
     		name: "delete",
     		iconCls: "gi_circle_minus",
     		scope: me,
@@ -60,7 +60,7 @@ Ext.define ("$o.LayoutFilter.Widget", {
 			border: false,
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
-			title: "Условие",
+			title: $o.getString ("Condition"),
 			iconCls: "gi_filter",
 			bodyPadding: 5,
 			modal: 1,
@@ -139,11 +139,11 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		var grid = Ext.create ("Ext.grid.Panel", {
 			store: store,
 			columns: [{
-				header: "Атрибут", width: 100, dataIndex: "attr", renderer: me.cellRenderer
+				header: $o.getString ("Attribute"), width: 100, dataIndex: "attr", renderer: me.cellRenderer
 			}, {
-				header: "Оператор", width: 100, dataIndex: "oper", renderer: me.cellRenderer
+				header: $o.getString ("Operator"), width: 100, dataIndex: "oper", renderer: me.cellRenderer
 			}, {
-				header: "Значение", width: 100, dataIndex: "value", renderer: me.cellRenderer
+				header: $o.getString ("Value"), width: 100, dataIndex: "value", renderer: me.cellRenderer
 			}],
 			forceFit: true,
 			frame: false,
@@ -176,15 +176,15 @@ Ext.define ("$o.LayoutFilter.Widget", {
 	},
 	getOperName: function (oper) {
 		var o = {};
-		o ["="] = "равно (=)";
-		o ["<>"] = "не равно (<>)";
-		o ["<"] = "меньше (<)";
-		o [">"] = "больше (>)";
-		o ["<="] = "меньше или равно (<=)";
-		o [">="] = "больше или равно (>=)";
-		o ["is null"] = "пусто (is null)";
-		o ["is not null"] = "не пусто (is not null)";
-		o ["in"] = "одно из перечня (in)";
+		o ["="] = $o.getString ("equal") + " (=)";
+		o ["<>"] = $o.getString ("not equal") + " (<>)";
+		o ["<"] = $o.getString ("less") + " (<)";
+		o [">"] = $o.getString ("more") + " (>)";
+		o ["<="] = $o.getString ("less or equal") + " (<=)";
+		o [">="] = $o.getString ("more or equal") + " (>=)";
+		o ["is null"] = $o.getString ("empty") + " (is null)";
+		o ["is not null"] = $o.getString ("not null") + " (is not null)";
+		o ["in"] = $o.getString ("one of list") + " (in)";
 		return o [oper];
 	},
 	getValueName: function (v) {

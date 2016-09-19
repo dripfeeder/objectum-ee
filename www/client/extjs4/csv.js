@@ -22,7 +22,7 @@ Ext.define ("ImportCSVObjects.Widget", {
 		});
 		me.tbar = [{
 			xtype: "combo",
-			fieldLabel: "Кодировка",
+			fieldLabel: $o.getString ("Encoding"),
 			labelWidth: 65,
 			width: 150,
 			name: "coding",
@@ -40,7 +40,7 @@ Ext.define ("ImportCSVObjects.Widget", {
 			value: "utf8",
 			editable: false
 		}, filePanel, {
-			text: "Загрузить",
+			text: $o.getString ("Load"),
 			iconCls: "gi_table",
 			name: "load",
 			disabled: true,
@@ -126,7 +126,7 @@ Ext.define ("ImportCSVObjects.Widget", {
 				reader.readAsText (file, me.down ("*[name=coding]").getValue () == "utf8" ? "utf-8" : "windows-1251");
 			}
 		}, {
-			text: "Импорт",
+			text: $o.getString ("Import"),
 			iconCls: "gi_file_import",
 			name: "import",
 			disabled: true,
@@ -135,8 +135,8 @@ Ext.define ("ImportCSVObjects.Widget", {
 					me.importer (me.data);
 				} else {
 					Ext.MessageBox.show ({
-					    title: "Пожалуйста подождите",
-					    msg: "Действие выполняется ...",
+					    title: $o.getString ("Please wait"),
+					    msg: $o.getString ("Action in progress") + " ...",
 					    progressText: "",
 					    width: 300,
 					    progress: 1,
@@ -204,20 +204,20 @@ Ext.define ("ImportCSVObjects.Widget", {
 		me.items = {
 			xtype: "tabpanel",
 			items: [{
-				title: "Сопоставление полей",
+				title: $o.getString ("Field mapping"),
 				layout: "vbox",
 				name: "map",
 				bodyPadding: 5,
 				tbar: [{
 					xtype: "textfield",
-					fieldLabel: "Класс",
+					fieldLabel: $o.getString ("Class"),
 					labelWidth: 50,
 					width: 400,
 					disabled: true,
 					value: me.oCls.toString ()
 				}, {
 					xtype: "combo",
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "idAttr",
 					triggerAction: "all",
 					lazyRender: true,
@@ -245,7 +245,7 @@ Ext.define ("ImportCSVObjects.Widget", {
 					xtype: "textfield",
 					disabled: true,
 					name: "recNum",
-					fieldLabel: "Количество"
+					fieldLabel: $o.getString ("Amount")
 				}],
 				store: {
 					xtype: "store",
@@ -253,7 +253,7 @@ Ext.define ("ImportCSVObjects.Widget", {
 					data: []
 				},
 				columns: [{
-					text: "Наименование",
+					text: $o.getString ("Name"),
 					dataIndex: "name",
 					width: 90
 				}],

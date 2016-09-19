@@ -5,7 +5,7 @@
 	initComponent: function () {
 		var me = this;
 		var cmp = me.layoutDesigner.createEmpty ();
-		cmp.panel.title = "Закладка";
+		cmp.panel.title = $o.getString ("Tab");
 		me.value = me.value || {
 			tab: {
 				id: "cmp-" + (me.layoutDesigner.counter ++),
@@ -16,13 +16,13 @@
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.tab.id,
@@ -34,7 +34,7 @@
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.tab.title,
 					listeners: {
@@ -55,7 +55,7 @@
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {

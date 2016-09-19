@@ -18,13 +18,13 @@
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.frame.id,
@@ -38,7 +38,7 @@
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.frame.title,
 					listeners: {
@@ -59,7 +59,7 @@
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Ссылка (URL)",
+					fieldLabel: $o.getString ("Reference") + " (URL)",
 					name: "url",
 					value: me.value.frame.url,
 					validator: me.validator,
@@ -71,7 +71,7 @@
 					}
 				}, {
 					xtype: "combo",
-					fieldLabel: "Атрибут компонента",
+					fieldLabel: $o.getString ("Component attribute"),
 					name: "attr",
 					width: "100%",
 					mode: "local",
@@ -91,7 +91,7 @@
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {

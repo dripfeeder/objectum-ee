@@ -18,7 +18,7 @@ Ext.define ("$o.EventCard.Widget", {
 			disabled: 1,
 			scope: me
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			iconCls: "gi_remove",
 			handler: function () {
 				me.up ("window").close ();
@@ -33,7 +33,7 @@ Ext.define ("$o.EventCard.Widget", {
 		me.items = [{
 			xtype: "combo",
 			name: "event",
-			fieldLabel: "Событие",
+			fieldLabel: $o.getString ("Event"),
 			width: "100%",
 			triggerAction: "all",
 			lazyRender: true,
@@ -51,7 +51,7 @@ Ext.define ("$o.EventCard.Widget", {
 			displayField: "text"
 		}, {
 			xtype: "$conffield", 
-			fieldLabel: "Действие",
+			fieldLabel: $o.getString ("Action"),
 			name: "action", 
 			width: "100%",
 			confRef: "action",
@@ -107,12 +107,12 @@ Ext.define ("$o.EventCard.Widget", {
 		}, {
 			xtype: "textfield",
 			width: "100%",
-			fieldLabel: "Функция",
+			fieldLabel: $o.getString ("Function"),
 			name: "fn",
 			value: action ? "" : me.value.fn,
 			validator: me.validator
 		}, {
-			title: "Параметры",
+			title: $o.getString ("Options"),
 			width: "100%",
 			flex: 1,
 			xtype: "$actionargs",

@@ -14,14 +14,14 @@
 			handler: me.save,
 			scope: me
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			name: "cancel",
 			iconCls: "gi_remove",
 			handler: function () {
 				me.up ("window").close ();
 			}
 		}, {
-			text: "Преобразовать в разделитель",
+			text: $o.getString ("Convert to splitter"),
 			name: "make_split",
 			iconCls: "gi_share_alt",
 			handler: function () {
@@ -39,7 +39,7 @@
 			},
 			scope: me
 		}, {
-			text: "Преобразовать в закладки",
+			text: $o.getString ("Convert to tabs"),
 			name: "make_tab",
 			iconCls: "gi_bookmark",
 			handler: function () {

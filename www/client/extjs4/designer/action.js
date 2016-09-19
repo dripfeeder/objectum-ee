@@ -9,17 +9,17 @@ Ext.define ("$o.ActionDesigner.Widget", {
 	initComponent: function () {
 		var me = this;
 		me.tbar = [{
-			text: "Открыть",
+			text: $o.getString ("Open"),
 			iconCls: "gi_edit",
 			handler: me.edit,
 			scope: me
 		}, {
-			text: "Добавить",
+			text: $o.getString ("Add"),
 			iconCls: "gi_circle_plus",
 			handler: me.create,
 			scope: me
 		}, {
-			text: "Удалить",
+			text: $o.getString ("Remove"),
 			iconCls: "gi_circle_minus",
 			handler: me.remove,
 			scope: me
@@ -35,7 +35,7 @@ Ext.define ("$o.ActionDesigner.Widget", {
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Действие", width: 100, dataIndex: "action", renderer: me.cellRenderer
+				header: $o.getString ("Action"), width: 100, dataIndex: "action", renderer: me.cellRenderer
 			}, {
 				header: "id", width: 100, dataIndex: "id", hidden: true
 			}],
@@ -74,7 +74,7 @@ Ext.define ("$o.ActionDesigner.Widget", {
 	create: function () {
 		var me = this;
 		dialog.getObject ({
-			title: "Выберите действия",
+			title: $o.getString ("Select", "actions"),
 			width: 800,
 			height: 600,
 			layout: {
@@ -84,7 +84,7 @@ Ext.define ("$o.ActionDesigner.Widget", {
 					items: [{
 						treegrid: {
 							id: "olapClasses",
-							title: "Классы",
+							title: $o.getString ("Classes"),
 							view: "system.classes",
 						    fields: {
 						        id: "id",
@@ -95,7 +95,7 @@ Ext.define ("$o.ActionDesigner.Widget", {
 					}, {
 						olap: {
 							id: "olap",
-							title: "Действия",
+							title: $o.getString ("Actions"),
 							view: "system.actions",
 							singleSelect: false,
 							filter: ["class_id", "=", {id: "olapClasses", attr: "id"}]
@@ -160,7 +160,7 @@ Ext.define ("$o.ActionDesigner.Widget", {
 			border: false,
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
-			title: "Действие",
+			title: $o.getString ("Action"),
 			bodyPadding: 5,
 			modal: 1,
 			items: {

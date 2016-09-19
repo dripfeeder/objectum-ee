@@ -1,6 +1,5 @@
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
-	Преобразует макет Objectum 2.2 в ExtJS 4.2 items с виджетами $o
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 //Ext.require ([
 //    "Ext.ux.GroupTabRenderer",

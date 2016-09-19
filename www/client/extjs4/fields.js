@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 
 //Ext.require ([
@@ -8,6 +8,8 @@
 /*
 	compositefield -> fieldcontainer
 */
+$o.pushFn (function () {
+
 Ext.define ("$o.CompositeField.Widget", {
 	extend: "Ext.form.FieldContainer",
 	alias: "widget.compositefield",
@@ -132,7 +134,7 @@ Ext.define ("$o.ObjectField.Widget", {
 							if (me.choose.hideActions) {
 								var b = win.query ("button");
 								for (var i = 0; i < b.length; i ++) {
-									if (["Добавить", "Открыть", "Удалить"].indexOf (b [i].text) > -1) {
+									if ([$o.getString ("Add"), $o.getString ("Open"), $o.getString ("Remove")].indexOf (b [i].text) > -1) {
 										b [i].hide ();
 									}; 
 								};
@@ -142,7 +144,7 @@ Ext.define ("$o.ObjectField.Widget", {
 					}
 				});
 				var btnChoose = Ext.create ("Ext.Button", {
-					text: "Выбрать",
+					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
 					handler: function () {
@@ -152,14 +154,14 @@ Ext.define ("$o.ObjectField.Widget", {
 					scope: me
 				});
 				var btnCancel = Ext.create ("Ext.Button", {
-					text: "Отмена",
+					text: $o.getString ("Cancel"),
 					iconCls: "cancel",
 					handler: function () {
 						win.close ();
 					}
 				});
 				var win = Ext.create ("Ext.Window", {
-					title: "Выберите объект",
+					title: $o.getString ("Choose object"),
 					resizable: true,
 					closable: true,
 					height: winHeight,
@@ -409,15 +411,15 @@ Ext.define ("$o.FileField.Widget", {
 		me.items = [{
 			xtype: "button",
 			iconCls: "gi_upload",
-			tooltip: "Выбрать и отправить файл",
+			tooltip: $o.getString ("Choose and upload file"),
 			disabled: me.readOnly,
 			style: {
 				marginRight: 1
 			},
 			handler: function () {
 				var fileField = Ext.create ("Ext.form.field.File", {
-					fieldLabel: "Файл",
-					buttonText: "Выбрать",
+					fieldLabel: $o.getString ("File"),
+					buttonText: $o.getString ("Choose"),
 					name: 'file-path'
 				});
 				var fp = Ext.create ("Ext.form.Panel", {
@@ -441,31 +443,31 @@ Ext.define ("$o.FileField.Widget", {
 						fileField
 					],
 					buttons: [{
-						text: "Загрузить",
+						text: $o.getString ("Upload"),
 						iconCls: "gi_upload",
 						handler: function () {
 							me.card.save ({autoSave: true});
 							fp.down ("textfield[name=objectId]").setValue (me.objectId);
 							fp.getForm ().submit ({
 								url: 'upload?sessionId=' + $sessionId + "&username=" + $o.currentUser,
-								waitMsg: "Отправление файла ...",
+								waitMsg: $o.getString ("File uploading") + " ...",
 								success: function (fp, o) {
 									if (o.result.success) {
 										me.setValue (o.result.file);
 										me.card.save (/*{filefield: true}*/);
 										win.close ();
-										common.message ("Файл " + o.result.file + " отправлен.");
+										common.message ($o.getString ("File") + " " + o.result.file + " " + $o.getString ("uploaded"));
 									} else {
-										common.message ("Файл " + o.result.file + " не удалось отправить.");
+										common.message ($o.getString ("File") + " " + o.result.file + " " + $o.getString ("failed to send"));
 									};
 								},
 								failure: function (form, action) {
-									common.message ("Файл не удалось отправить. Ошибка: " + action.result.error);
+									common.message ($o.getString ("File", "failed to send", ".", "Error", ": ") + action.result.error);
 								}
 							});
 						}
 					},{
-						text: "Удалить",
+						text: $o.getString ("Remove"),
 						iconCls: "gi_remove",
 						handler: function () {
 							if (!me.getValue ()) {
@@ -481,7 +483,7 @@ Ext.define ("$o.FileField.Widget", {
 					}]
 				});	
 				var win = new Ext.Window ({
-					title: "Отправление файла",
+					title: $o.getString ("File uploading"),
 					resizable: false,
 					closable: true,
 					height: 114,
@@ -496,7 +498,7 @@ Ext.define ("$o.FileField.Widget", {
 		}, {
 			xtype: "button",
 			iconCls: "gi_download",
-			tooltip: "Скачать",
+			tooltip: $o.getString ("Download"),
 			disabled: me.readOnly,
 			style: {
 				marginRight: 1
@@ -659,7 +661,7 @@ Ext.define ("$o.IconSelector.Widget", {
 	extend: "Ext.form.FieldContainer",
 	alias: ["widget.$o.iconselector", "widget.$iconselector"],
 	layout: "hbox",
-	fieldLabel: "Иконка",
+	fieldLabel: $o.getString ("Icon"),
 	initComponent: function () {
 		var me = this;
 		me.items = [{
@@ -818,7 +820,7 @@ Ext.define ("$o.IconSelector.Widget", {
 			border: false,
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
-			title: "Выберите иконку",
+			title: $o.getString ("Choose icon"),
 			bodyPadding: 5,
 			modal: 1,
 			items: {
@@ -834,3 +836,4 @@ Ext.define ("$o.IconSelector.Widget", {
 	}
 });
 
+});

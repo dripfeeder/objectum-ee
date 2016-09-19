@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 
 /*
@@ -120,7 +120,7 @@ Ext.define ("$o.Card.Widget", {
 		if (container) {
 			var onBeforeClose = function () {
 				if (me.enabledUnloadMessage) {
-					common.confirm ({message: "Данные не сохранены. Закрыть?", scope: this, fn: function (btn) {
+					common.confirm ({message: $o.getString ("Data is not saved. Close?"), scope: this, fn: function (btn) {
 						if (btn == "yes") {
 							container.un ("beforeclose", onBeforeClose);
 							container.close ();
@@ -267,7 +267,7 @@ Ext.define ("$o.Card.Widget", {
 					labelStyle: "color: red;",
 					style: "color: red;",
 					readOnly: true,
-					value: "Атрибут отсутствует в хранилище."
+					value: $o.getString ("Attribute not exists in storage")
 				});
 			} else
 			if (ca) {
@@ -440,7 +440,7 @@ Ext.define ("$o.Card.Widget", {
 					if (me.getEl ()) {
 						me.getEl ().unmask (true);
 					};
-					common.message ("<font color=red>Не удалось сохранить данные</font><br>Error: " + e + "<br>Stack: " + e.stack);
+					common.message ("<font color=red>" + $o.getString ("Could not save data") + "</font><br>Error: " + e + "<br>Stack: " + e.stack);
 					$o.rollbackTransaction ();
 					throw e;
 				};
@@ -462,7 +462,7 @@ Ext.define ("$o.Card.Widget", {
 			};
 			if (me.up ("window") && common.getConf ({code: "closeWindowAfterSave"}).used) {
 				me.up ("window").close ();
-				common.message ("Информация сохранена.");
+				common.message ($o.getString ("Information saved"));
 			}
 		};
 		if (options.autoSave) {
@@ -481,7 +481,7 @@ Ext.define ("$o.Card.Widget", {
 				};
 			};
 			if (msg) {
-				common.message ("<font color=red>Форма содержит ошибки в заполнении:</font><br><br>" + msg);
+				common.message ("<font color=red>" + $o.getString ("Form contains errors") + ":</font><br><br>" + msg);
 			} else {
 				if (me.getEl ()) {
 					me.getEl ().mask ("Сохранение ...");
@@ -620,22 +620,22 @@ Ext.define ("$o.Card.Widget", {
 		var grid = Ext.create ("Ext.grid.Panel", {
 			store: store,
 			columns: [{
-				header: "Дата", width: 100, dataIndex: "date", renderer: cellRenderer
+				header: $o.getString ("Date"), width: 100, dataIndex: "date", renderer: cellRenderer
 			}, {
-				header: "Значение", width: 150, dataIndex: "value", renderer: cellRenderer
+				header: $o.getString ("Value"), width: 150, dataIndex: "value", renderer: cellRenderer
 			}, {
-				header: "Пользователь", width: 150, dataIndex: "subject", renderer: cellRenderer
+				header: $o.getString ("User"), width: 150, dataIndex: "subject", renderer: cellRenderer
 			}, {
-				header: "IP-адрес", width: 100, dataIndex: "ip", renderer: cellRenderer
+				header: "IP", width: 100, dataIndex: "ip", renderer: cellRenderer
 			}, {
-				header: "Комментарий ревизии", width: 150, dataIndex: "description", renderer: cellRenderer, hidden: true
+				header: $o.getString ("Revision comment"), width: 150, dataIndex: "description", renderer: cellRenderer, hidden: true
 			}],
 			forceFit: true,
 			frame: false,
 			deferRowRender: false
 		});
 		var win = new Ext.Window ({
-			title: "Хронология изменений",
+			title: $o.getString ("Revision History"),
 			resizable: true,
 			closable: true,
 			modal: true,
@@ -654,19 +654,19 @@ Ext.define ("$o.Card.Widget", {
 		me.tbar = [];
 		if (!me.hideToolbar && !me.readOnly && !me.autoSave && !$o.isReadOnly ()) {
 			me.tbar = [{
-				text: "Сохранить",
+				text: $o.getString ("Save"),
 				iconCls: "save",
 				handler: me.save,
 				scope: me
 			}, {
-				text: "Обновить",
+				text: $o.getString ("Refresh"),
 				iconCls: "refresh",
 				handler: me.refresh,
 				scope: me
 			}];
 			if (me.showSaveAndClose) {
 				me.tbar.push ({
-					text: "Сохранить и закрыть",
+					text: $o.getString ("Save and close"),
 					iconCls: "ok",
 					handler: function () {
 						this.save ({success: function () {
@@ -679,17 +679,17 @@ Ext.define ("$o.Card.Widget", {
 			if ($o.visualObjectum && $o.visualObjectum.timeMachine && $o.visualObjectum.timeMachine.cardButton) {
 				if ($o.visualObjectum.timeMachine.cardHighlight || window.monu) {
 					me.tbar.push ({
-						text: "Изменения",
+						text: $o.getString ("Changes"),
 						iconCls: "gi_history",
 						menu: [{
-							text: "Хронология изменений",
+							text: $o.getString ("Revision History"),
 							iconCls: "gi_history",
 							name: "fieldChanges",
 							disabled: 1,
 							handler: me.onFieldChanges,
 							scope: me
 						}, {
-							text: "Показать измененные поля",
+							text: $o.getString ("Show changed fields"),
 							iconCls: "gi_history",
 							handler: me.onHighlight,
 							scope: me
@@ -697,7 +697,7 @@ Ext.define ("$o.Card.Widget", {
 					});
 				} else {
 					me.tbar.push ({
-						text: "Изменения",
+						text: $o.getString ("Changes"),
 						iconCls: "gi_history",
 						name: "fieldChanges",
 						disabled: 1,
@@ -739,7 +739,7 @@ Ext.define ("$o.Card.Widget", {
 	enableUnloadMessage: function () {
 		this.enabledUnloadMessage = true;
 		window.onbeforeunload = function (evt) {
-		    var message = "Данные не сохранены. Вы потеряете изменения если покинете страницу.";
+		    var message = $o.getString ("Data is not saved. You will lose changes if you leave the page");
 		    if (typeof evt == "undefined") {
 		        evt = window.event;
 		    };

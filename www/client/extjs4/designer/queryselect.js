@@ -10,7 +10,7 @@
 		var me = this;
 		me.value = me.value || [];
 		me.tbar = [{
-    		text: "Выбрать",
+    		text: $o.getString ("Choose"),
     		iconCls: "gi_edit",
     		handler: me.addAttrs,
     		scope: me
@@ -38,11 +38,11 @@
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Атрибут", width: 100, dataIndex: "name", renderer: me.cellRenderer
+				header: $o.getString ("Attribute"), width: 100, dataIndex: "name", renderer: me.cellRenderer
 			}, {
-				header: "Псевдоним", width: 100, dataIndex: "alias", renderer: me.cellRenderer
+				header: $o.getString ("Alias"), width: 100, dataIndex: "alias", renderer: me.cellRenderer
 			}, {
-				header: "Класс", width: 100, dataIndex: "clsName", renderer: me.cellRenderer
+				header: $o.getString ("Class"), width: 100, dataIndex: "clsName", renderer: me.cellRenderer
 			}, {
 				header: "clsFrom", width: 100, dataIndex: "clsFrom", hidden: true
 			}, {
@@ -82,7 +82,7 @@
 	addAttrs: function () {
 		var me = this;
 		if (!me.$classes.length) {
-			common.message ("Необходимо выбрать класс.");
+			common.message ($o.getString ("Select", "class"));
 			return;
 		};
 		var tabs = [];
@@ -141,7 +141,7 @@
 			});
 			var grid = Ext.create ("Ext.grid.Panel", {
 				tbar: i ? [{
-					text: "Псевдонимы по коду атрибута",
+					text: $o.getString ("Aliases by attribute code"),
 					iconCls: "gi_sort-by-alphabet",
 					handler: function () {
 						var store = this.up ("grid").getStore ();
@@ -156,14 +156,14 @@
 				}] : [],
 				store: store,
 				columns: [{
-					header: "Атрибут", width: 100, dataIndex: "name", renderer: me.cellRenderer
+					header: $o.getString ("Attribute"), width: 100, dataIndex: "name", renderer: me.cellRenderer
 				}, {
-					header: "Псевдоним", width: 100, dataIndex: "alias", renderer: me.cellRenderer,
+					header: $o.getString ("Alias"), width: 100, dataIndex: "alias", renderer: me.cellRenderer,
 			        editor: {
 			            xtype: "textfield"
 			        }
 				}, {
-					header: "Класс", width: 100, dataIndex: "clsName", renderer: me.cellRenderer
+					header: $o.getString ("Class"), width: 100, dataIndex: "clsName", renderer: me.cellRenderer
 				}, {
 					header: "attr", width: 100, dataIndex: "attr", hidden: true
 				}],
@@ -195,7 +195,7 @@
 			height: 600,
 		    resizeable: false,
 			border: false,
-			title: "Выберите атрибуты (используйте указатель мыши и клавиши Shift, Ctrl)",
+			title: $o.getString ("Select attributes (use mouse and Shift, Ctrl)"),
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
 			modal: 1,
@@ -233,7 +233,7 @@
 					me.updateSelect ();
 				}
 			}, {
-				text: "Отмена",
+				text: $o.getString ("Cancel"),
 				iconCls: "gi_remove",
 				handler: function () {
 					win.close ();

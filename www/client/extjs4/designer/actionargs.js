@@ -10,12 +10,12 @@ Ext.define ("$o.ActionArgs.Widget", {
 		var me = this;
 		me.value = me.value || {};
 		me.tbar = [{
-			text: "Добавить",
+			text: $o.getString ("Add"),
 			iconCls: "gi_circle_plus",
 			handler: me.create,
 			scope: me
 		}, {
-			text: "Удалить",
+			text: $o.getString ("Remove"),
 			iconCls: "gi_circle_minus",
 			handler: me.remove,
 			scope: me
@@ -36,11 +36,11 @@ Ext.define ("$o.ActionArgs.Widget", {
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Параметр", width: 150, dataIndex: "arg", renderer: me.cellRenderer, editor: {
+				header: $o.getString ("Option"), width: 150, dataIndex: "arg", renderer: me.cellRenderer, editor: {
 		            xtype: "textfield"
 		        }
 			}, {
-				header: "Значение", flex: 1, dataIndex: "value", renderer: me.cellRenderer, editor: {
+				header: $o.getString ("Value"), flex: 1, dataIndex: "value", renderer: me.cellRenderer, editor: {
 		            xtype: "textfield"
 		        }
 			}],

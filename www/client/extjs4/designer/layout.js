@@ -19,7 +19,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		me.items = {
 			xtype: "tabpanel",
 			items: [{
-				title: "Конструктор",
+				title: $o.getString ("Constructor"),
 				iconCls: "gi_adjust_alt",
 				layout: "border",
 				name: "constructor",
@@ -33,18 +33,18 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 			    		xtype: "treepanel",
 					    store: me.treeStore,
 					    rootVisible: false,
-				    	title: "Навигатор",
+				    	title: $o.getString ("Navigator"),
 				    	iconCls: "gi_search",
 				    	border: 0,
 				    	tbar: [{
-				    		text: "Открыть",
+				    		text: $o.getString ("Open"),
 				    		iconCls: "gi_edit",
 				    		name: "edit",
 				    		handler: me.edit,
 				    		scope: me,
 				    		disabled: 1
 				    	}, {
-				    		text: "Добавить",
+				    		text: $o.getString ("Add"),
 				    		iconCls: "gi_circle_plus",
 				    		name: "create",
 				    		handler: function () {
@@ -57,7 +57,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				    		scope: me,
 				    		disabled: 1
 				    	}, {
-				    		text: "Удалить",
+				    		text: $o.getString ("Remove"),
 				    		iconCls: "gi_circle_minus",
 				    		name: "delete",
 				    		handler: function () {
@@ -81,7 +81,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				    		disabled: 1
 				    	}],
 				    	bbar: [{
-				    		text: "Отменить действие",
+				    		text: $o.getString ("Cancel action"),
 				    		iconCls: "gi_history",
 				    		name: "prevValue",
 				    		disabled: 1,
@@ -135,7 +135,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				name: "source",
 				items: {
@@ -238,31 +238,31 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 	getCmpName: function (code) {
 		switch (code) {
 		case "split":
-			return "Разделитель";
+			return $o.getString ("Splitter");
 			break;
 		case "tab":
-			return "Закладки";
+			return $o.getString ("Tabs");
 			break;
 		case "olap":
-			return "Таблица";
+			return $o.getString ("Table");
 			break;
 		case "treegrid":
-			return "Дерево";
+			return $o.getString ("Tree");
 			break;
 		case "card":
-			return "Карточка";
+			return $o.getString ("Card");
 			break;
 		case "chart":
-			return "Диаграмма";
+			return $o.getString ("Chart");
 			break;
 		case "image":
-			return "Изображение";
+			return $o.getString ("Image");
 			break;
 		case "frame":
-			return "Фрейм";
+			return $o.getString ("Frame");
 			break;
 		case "panel":
-			return "Пустой";
+			return $o.getString ("Empty");
 			break;
 		};
 	},
@@ -408,7 +408,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				}, 
 				items: [{
 					xtype: "button",
-					text: "Выберите компонент",
+					text: $o.getString ("Select", "component"),
 					iconCls: "gi_edit",
 					name: "selectCmp",
 					cmpId: id
@@ -453,14 +453,14 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		    bodyPadding: 5,
 		    resizeable: false,
 			border: false,
-			title: "Выберите компонент",
+			title: $o.getString ("Select", "component"),
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
 			modal: 1,
 			layout: "hbox",
 			items: [{
 				xtype: "button",
-				text: "Таблица",
+				text: $o.getString ("Table"),
 				cmpCode: "olap",
 				iconCls: "gib_table",
 				iconAlign: "top",
@@ -469,7 +469,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Дерево",
+				text: $o.getString ("Tree"),
 				cmpCode: "treegrid",
 				iconCls: "gib_leaf",
 				iconAlign: "top",
@@ -478,7 +478,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Карточка",
+				text: $o.getString ("Card"),
 				cmpCode: "card",
 				iconCls: "gib_edit",
 				iconAlign: "top",
@@ -487,7 +487,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Диаграмма",
+				text: $o.getString ("Chart"),
 				cmpCode: "chart",
 				iconCls: "gib_charts",
 				iconAlign: "top",
@@ -496,7 +496,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Изображение",
+				text: $o.getString ("Image"),
 				cmpCode: "image",
 				iconCls: "gib_picture",
 				iconAlign: "top",
@@ -505,7 +505,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Фрейм",
+				text: $o.getString ("Frame"),
 				cmpCode: "frame",
 				iconCls: "gib_globe_af",
 				iconAlign: "top",
@@ -514,7 +514,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Разделитель",
+				text: $o.getString ("Splitter"),
 				cmpCode: "split",
 				iconCls: "gib_share_alt",
 				iconAlign: "top",
@@ -523,7 +523,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Закладки",
+				text: $o.getString ("Tabs"),
 				cmpCode: "tab",
 				iconCls: "gib_bookmark",
 				iconAlign: "top",
@@ -661,7 +661,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 					}, 
 					items: [{
 						xtype: "label",
-						text: "Извините, не удалось декодировать исходный код макета."
+						text: $o.getString ("Sorry, we could not decode the source code layout")
 					}]
 				});
 				me.treeStore.getRootNode ().removeAll ();
@@ -761,7 +761,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		};
 		process (l);
 		if (noCls) {
-			common.message ("Не определен класс объекта в карточке: " + noCls);
+			common.message ($o.getString ("Class of object in the card is not defined") + ": " + noCls);
 		};
 		return l;
 	},

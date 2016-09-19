@@ -4570,14 +4570,14 @@ function binb2b64 (binarray) {
 }));
 
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 
 /*	
 	$o.events:
-		showPage // открылся новый tab
-		objectChanged // объект изменился
-		viewInit // инициализация представления (нужно для настройки панели представления например)
+		showPage // tab opened
+		objectChanged // object changed
+		viewInit
 */
 
 /*
@@ -4610,15 +4610,11 @@ Ext.define ("$o", {
 		observable: 'Ext.util.Observable'
 	},	
 	code: null,
-	// Текущий пользователь, который аутентифицировался
 	currentUser: null,
-	// Кэш объектов
+	// objects cache
 	objectsMap: {},
-	// Кэш действий
+	// actions cache
 	actionsMap: {},
-	/*
-		Конструктор
-	*/
 	constructor: function (config) {
 		this.mixins.observable.constructor.call (this, config);
 		this.addEvents (
@@ -4642,11 +4638,9 @@ Ext.define ("$o", {
 		}});
 	},
 	/*
-		Инициализация: {
-			login,
-			password, // SHA-1
-			success
-		}
+		login,
+		password, // SHA-1
+		success
 	*/
 	init: function (options) {
 		if (!options) {
@@ -4670,10 +4664,8 @@ Ext.define ("$o", {
 		};
 	},
 	/*
-		Аутентификация: {
-			login
-			password // SHA-1
-		}
+		login
+		password // SHA-1
 	*/
 	authorize: function (options) {
 		var mainOptions = options;
@@ -4690,7 +4682,7 @@ Ext.define ("$o", {
 				if (response.responseText.substr (0, 4) == "wait") {
 					if (mainOptions.failure) {
 						var secs = response.responseText.split (" ")[1];
-						mainOptions.failure.call (mainOptions.scope || this, "Ждите " + (secs / 60 | 0) + " мин. до следующей попытки входа.");
+						mainOptions.failure.call (mainOptions.scope || this, $o.getString ("Wait") + " " + (secs / 60 | 0) + $o.getString (" ", "min", "and", "try again"));
 					};
 					return;
 				};
@@ -4708,7 +4700,7 @@ Ext.define ("$o", {
 				};
 				if (response.responseText == "firewall denied") {
 					if (mainOptions.failure) {
-						mainOptions.failure.call (mainOptions.scope || this, "Запрещен доступ по данной ссылке.");
+						mainOptions.failure.call (mainOptions.scope || this, $o.getString ("Access denied"));
 					};
 					return;
 				};
@@ -4745,7 +4737,7 @@ Ext.define ("$o", {
 						if ($o.idleTimer > $o.maxIdleSec) {
 							clearInterval (timerIntervalId);
 							$o.logout ({success: function () {
-								Ext.Msg.alert ($ptitle, $zr.getString ('Session disabled'), function () {
+								Ext.Msg.alert ($ptitle, $o.getString ('Session disabled'), function () {
 									location.reload ();
 								});						
 							}});
@@ -4807,9 +4799,6 @@ Ext.define ("$o", {
 			go ();
 		}
 	},
-	/*
-		Инициализация моделей данных
-	*/
 	initModels: function () {
 		var storage = this;
 		Ext.define ("$o.Base.Model", {
@@ -5298,9 +5287,6 @@ Ext.define ("$o", {
 			}
 		});
 	},
-	/*
-		Инициализация хранилищ данных
-	*/
 	initStores: function (options) {
 		var me = this;
 		var mainOptions = options;
@@ -5411,9 +5397,6 @@ Ext.define ("$o", {
 			});
 		};
 	},
-	/*
-		Кидает исключение если есть
-	*/
 	checkException: function (options) {
 		if ($o.app) {
 			return; // $o.app.requestcomplete
@@ -5557,8 +5540,8 @@ Ext.define ("$o", {
 		    },
 		    remove: function () {
 				if ($o.isReadOnly ()) {
-					common.message ("Изменение данных недоступно.");
-					throw new Error ("Изменение данных недоступно.");
+					common.message ($o.getString ("Can't change data"));
+					throw new Error ($o.getString ("Can't change data"));
 				};
 		    	this.removed = true;
 		    },
@@ -6148,8 +6131,8 @@ Ext.define ("$o", {
 	},
 	createObject: function (classCode, options) {
 		if (this.isReadOnly ()) {
-			common.message ("Изменение данных недоступно.");
-			throw new Error ("Изменение данных недоступно.");
+			common.message ($o.getString ("Can't change data"));
+			throw new Error ($o.getString ("Can't change data"));
 		};
 		var classId = this.getClass (classCode).get ("id");
 		var local = options == "local" ? "root" : null;
@@ -6175,8 +6158,8 @@ Ext.define ("$o", {
 	},
 	removeObject: function (id) {
 		if (this.isReadOnly ()) {
-			common.message ("Изменение данных недоступно.");
-			throw new Error ("Изменение данных недоступно.");
+			common.message ($o.getString ("Can't change data"));
+			throw new Error ($o.getString ("Can't change data"));
 		};
 		if (id) {
 			this.fireEvent ("beforeRemoveObject", {
@@ -6457,7 +6440,7 @@ Ext.define ("$o", {
     	if (!actions.card) {
 	    	var aCard = $o.createAction ();
 	    	aCard.set ("class", me.get ("id"));
-	    	aCard.set ("name", "Открыть");
+	    	aCard.set ("name", $o.getString ("Open"));
 	    	aCard.set ("code", "card");
 	    	aCard.set ("layout", JSON.stringify ({
 	    		"type": "card",
@@ -6496,7 +6479,7 @@ Ext.define ("$o", {
     	if (!actions.create) {
     	 	aCreate = $o.createAction ();
 	    	aCreate.set ("class", me.get ("id"));
-	    	aCreate.set ("name", "Добавить");
+	    	aCreate.set ("name", $o.getString ("Add"));
 	    	aCreate.set ("code", "create");
 		    aCreate.set ("layout", '{"type": "create"}');
 	    	aCreate.set ("body", createBody);
@@ -6511,7 +6494,7 @@ Ext.define ("$o", {
     	if (!actions.remove) {
 	    	aRemove = $o.createAction ();
 	    	aRemove.set ("class", me.get ("id"));
-	    	aRemove.set ("name", "Удалить");
+	    	aRemove.set ("name", $o.getString ("Remove"));
 	    	aRemove.set ("code", "remove");
 	    	aRemove.set ("layout", '{"type": "remove"}');
 	    	aRemove.set ("body", removeBody);
@@ -6590,11 +6573,28 @@ Ext.define ("$o", {
 		} else {
 			return false;
 		};
-	}
+	},
+	getString: function (s) {
+		return $o.locale.getString (s);
+	},
+	queueFn: [],
+	pushFn: function (f) {
+		var me = this;
+		me.queueFn.push (f);
+	},
+	/*
+		Выполняет функции из очереди. Ext.define, ...
+	*/
+	executeQueueFunctions: function (options) {
+		var me = this;
+		_.each (me.queueFn, function (f) {
+			f ();
+		});
+	},
 });
 
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 
 $o.util = {};
@@ -7230,7 +7230,7 @@ Ext.define ("$o.Base.Grid", {
 					try {
 						_fn = typeof (_fn) == "string" ? eval ("(" + _fn + ")") : _fn;
 					} catch (e) {
-						common.message ("Функция отсутствует: " + _fn);
+						common.message ($o.getString ("Function not exists") + ": " + _fn);
 						throw new Error ("action.fn exception: " + _fn + "\nexception: " + e);
 					};
 					if (!item.noTransaction) {
@@ -7813,10 +7813,10 @@ Ext.define ("$o.Grid.Widget", {
 			if (f.type == "bool") {
 				column.renderer = function (v, meta, rec, row, col, store) {
 					if (v) {
-						v = "Да";
+						v = $o.getString ("Yes");
 					} else {
 //					if (v == 0 || v == false) {
-						v = "Нет";
+						v = $o.getString ("No");
 					};
 					return me.cellRenderer (v, meta, rec, row, col, store);
 				};
@@ -7872,19 +7872,19 @@ Ext.define ("$o.Grid.Widget", {
 					tooltip: "Печать",
 					menu: {
 						items: [{
-							text: "*.xml (Таблица XML - Microsoft Excel)",
+							text: "*.xml (" + $o.getString ("Table") + " XML - Microsoft Excel)",
 							iconCls: "gi_print",
 							handler: function () {
 								me.printOlap.call (this, "xmlss");
 							}
 						}, {
-							text: "*.csv (CSV - кодировка win-1251)",
+							text: "*.csv (CSV - " + $o.getString ("encoding") + " win-1251)",
 							iconCls: "gi_print",
 							handler: function () {
 								me.printOlap.call (this, "csv", "win1251");
 							}
 						}, {
-							text: "*.csv (CSV - кодировка utf-8)",
+							text: "*.csv (CSV - " + $o.getString ("encoding") + " utf-8)",
 							iconCls: "gi_print",
 							handler: function () {
 								me.printOlap.call (this, "csv", "utf8");
@@ -7915,7 +7915,7 @@ Ext.define ("$o.Grid.Widget", {
 			if (!me.hideHeaders) {
 				items.push ({
 					iconCls: "gi_restart",
-					tooltip: "Сброс фильтров и итогов",
+					tooltip: $o.getString ("Reset filters and totals"),
 					handler: function () {
 						me.filters.clearFilters ();
 						me.total = {};
@@ -7936,7 +7936,7 @@ Ext.define ("$o.Grid.Widget", {
 				store: me.store,
 				dock: "bottom",
 				beforePageText: "",
-				afterPageText: "из {0}",
+				afterPageText: $o.getString ("of") + " {0}",
 				items: items
 			});
 		};
@@ -7972,17 +7972,17 @@ Ext.define ("$o.Grid.Widget", {
 		me.relatives = me.relatives || {};
 		me.relatives [me.zid] = me;
 		me.targets = {};
-		Ext.ux.grid.FiltersFeature.prototype.menuFilterText = "Фильтр";
-		Ext.ux.grid.filter.BooleanFilter.prototype.yesText = "Да";
-		Ext.ux.grid.filter.BooleanFilter.prototype.noText = "Нет";
-		Ext.ux.grid.filter.DateFilter.prototype.beforeEqText = "Меньше или равно";
-		Ext.ux.grid.filter.DateFilter.prototype.beforeText = "Меньше";
-		Ext.ux.grid.filter.DateFilter.prototype.afterEqText = "Больше или равно";
-		Ext.ux.grid.filter.DateFilter.prototype.afterText = "Больше";
-		Ext.ux.grid.filter.DateFilter.prototype.nonText = "Не равно";
-		Ext.ux.grid.filter.DateFilter.prototype.onText = "Равно";
+		Ext.ux.grid.FiltersFeature.prototype.menuFilterText = $o.getString ("Filter");
+		Ext.ux.grid.filter.BooleanFilter.prototype.yesText = $o.getString ("Yes");
+		Ext.ux.grid.filter.BooleanFilter.prototype.noText = $o.getString ("No");
+		Ext.ux.grid.filter.DateFilter.prototype.beforeEqText = $o.getString ("Less or equal");
+		Ext.ux.grid.filter.DateFilter.prototype.beforeText = $o.getString ("Less");
+		Ext.ux.grid.filter.DateFilter.prototype.afterEqText = $o.getString ("More or equal");
+		Ext.ux.grid.filter.DateFilter.prototype.afterText = $o.getString ("More");
+		Ext.ux.grid.filter.DateFilter.prototype.nonText = $o.getString ("Not equal");
+		Ext.ux.grid.filter.DateFilter.prototype.onText = $o.getString ("Equal");
 		Ext.ux.grid.filter.DateFilter.prototype.dateFormat = "d.m.Y";
-		Ext.ux.grid.menu.RangeMenu.prototype.menuItemCfgs.emptyText = "Введите число ...",
+		Ext.ux.grid.menu.RangeMenu.prototype.menuItemCfgs.emptyText = $o.getString ("Enter number") + " ...",
 		me.on ("columnshow", function () {
 			me.needReconfigureColumns = true;
 		});
@@ -8021,7 +8021,7 @@ Ext.define ("$o.Grid.Widget", {
 			};
 			if (numberColumn) {
 				this.add ([{
-					text: "Итоги",
+					text: $o.getString ("Totals"),
 					name: "totals",
 					iconCls: "gi_calculator",
 					menu: {
@@ -8034,19 +8034,19 @@ Ext.define ("$o.Grid.Widget", {
 							}
 						},
 						items: [{
-							text: "Сумма",
+							text: $o.getString ("Sum"),
 							iconCls: "gi_calculator",
 							name: "sum"
 						}, {
-							text: "Среднее",
+							text: $o.getString ("Average"),
 							iconCls: "gi_calculator",
 							name: "avg"
 						}, {
-							text: "Максимальное",
+							text: $o.getString ("Max"),
 							iconCls: "gi_calculator",
 							name: "max"
 						}, {
-							text: "Минимальное",
+							text: $o.getString ("Min"),
 							iconCls: "gi_calculator",
 							name: "min"
 						}]
@@ -8205,7 +8205,7 @@ Ext.define ("$o.Grid.Widget", {
 });
 
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 
 //Ext.require ([
@@ -8214,6 +8214,8 @@ Ext.define ("$o.Grid.Widget", {
 /*
 	compositefield -> fieldcontainer
 */
+$o.pushFn (function () {
+
 Ext.define ("$o.CompositeField.Widget", {
 	extend: "Ext.form.FieldContainer",
 	alias: "widget.compositefield",
@@ -8338,7 +8340,7 @@ Ext.define ("$o.ObjectField.Widget", {
 							if (me.choose.hideActions) {
 								var b = win.query ("button");
 								for (var i = 0; i < b.length; i ++) {
-									if (["Добавить", "Открыть", "Удалить"].indexOf (b [i].text) > -1) {
+									if ([$o.getString ("Add"), $o.getString ("Open"), $o.getString ("Remove")].indexOf (b [i].text) > -1) {
 										b [i].hide ();
 									}; 
 								};
@@ -8348,7 +8350,7 @@ Ext.define ("$o.ObjectField.Widget", {
 					}
 				});
 				var btnChoose = Ext.create ("Ext.Button", {
-					text: "Выбрать",
+					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
 					handler: function () {
@@ -8358,14 +8360,14 @@ Ext.define ("$o.ObjectField.Widget", {
 					scope: me
 				});
 				var btnCancel = Ext.create ("Ext.Button", {
-					text: "Отмена",
+					text: $o.getString ("Cancel"),
 					iconCls: "cancel",
 					handler: function () {
 						win.close ();
 					}
 				});
 				var win = Ext.create ("Ext.Window", {
-					title: "Выберите объект",
+					title: $o.getString ("Choose object"),
 					resizable: true,
 					closable: true,
 					height: winHeight,
@@ -8615,15 +8617,15 @@ Ext.define ("$o.FileField.Widget", {
 		me.items = [{
 			xtype: "button",
 			iconCls: "gi_upload",
-			tooltip: "Выбрать и отправить файл",
+			tooltip: $o.getString ("Choose and upload file"),
 			disabled: me.readOnly,
 			style: {
 				marginRight: 1
 			},
 			handler: function () {
 				var fileField = Ext.create ("Ext.form.field.File", {
-					fieldLabel: "Файл",
-					buttonText: "Выбрать",
+					fieldLabel: $o.getString ("File"),
+					buttonText: $o.getString ("Choose"),
 					name: 'file-path'
 				});
 				var fp = Ext.create ("Ext.form.Panel", {
@@ -8647,31 +8649,31 @@ Ext.define ("$o.FileField.Widget", {
 						fileField
 					],
 					buttons: [{
-						text: "Загрузить",
+						text: $o.getString ("Upload"),
 						iconCls: "gi_upload",
 						handler: function () {
 							me.card.save ({autoSave: true});
 							fp.down ("textfield[name=objectId]").setValue (me.objectId);
 							fp.getForm ().submit ({
 								url: 'upload?sessionId=' + $sessionId + "&username=" + $o.currentUser,
-								waitMsg: "Отправление файла ...",
+								waitMsg: $o.getString ("File uploading") + " ...",
 								success: function (fp, o) {
 									if (o.result.success) {
 										me.setValue (o.result.file);
 										me.card.save (/*{filefield: true}*/);
 										win.close ();
-										common.message ("Файл " + o.result.file + " отправлен.");
+										common.message ($o.getString ("File") + " " + o.result.file + " " + $o.getString ("uploaded"));
 									} else {
-										common.message ("Файл " + o.result.file + " не удалось отправить.");
+										common.message ($o.getString ("File") + " " + o.result.file + " " + $o.getString ("failed to send"));
 									};
 								},
 								failure: function (form, action) {
-									common.message ("Файл не удалось отправить. Ошибка: " + action.result.error);
+									common.message ($o.getString ("File", "failed to send", ".", "Error", ": ") + action.result.error);
 								}
 							});
 						}
 					},{
-						text: "Удалить",
+						text: $o.getString ("Remove"),
 						iconCls: "gi_remove",
 						handler: function () {
 							if (!me.getValue ()) {
@@ -8687,7 +8689,7 @@ Ext.define ("$o.FileField.Widget", {
 					}]
 				});	
 				var win = new Ext.Window ({
-					title: "Отправление файла",
+					title: $o.getString ("File uploading"),
 					resizable: false,
 					closable: true,
 					height: 114,
@@ -8702,7 +8704,7 @@ Ext.define ("$o.FileField.Widget", {
 		}, {
 			xtype: "button",
 			iconCls: "gi_download",
-			tooltip: "Скачать",
+			tooltip: $o.getString ("Download"),
 			disabled: me.readOnly,
 			style: {
 				marginRight: 1
@@ -8865,7 +8867,7 @@ Ext.define ("$o.IconSelector.Widget", {
 	extend: "Ext.form.FieldContainer",
 	alias: ["widget.$o.iconselector", "widget.$iconselector"],
 	layout: "hbox",
-	fieldLabel: "Иконка",
+	fieldLabel: $o.getString ("Icon"),
 	initComponent: function () {
 		var me = this;
 		me.items = [{
@@ -9024,7 +9026,7 @@ Ext.define ("$o.IconSelector.Widget", {
 			border: false,
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
-			title: "Выберите иконку",
+			title: $o.getString ("Choose icon"),
 			bodyPadding: 5,
 			modal: 1,
 			items: {
@@ -9040,9 +9042,10 @@ Ext.define ("$o.IconSelector.Widget", {
 	}
 });
 
+});
 
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 
 /*
@@ -9163,7 +9166,7 @@ Ext.define ("$o.Card.Widget", {
 		if (container) {
 			var onBeforeClose = function () {
 				if (me.enabledUnloadMessage) {
-					common.confirm ({message: "Данные не сохранены. Закрыть?", scope: this, fn: function (btn) {
+					common.confirm ({message: $o.getString ("Data is not saved. Close?"), scope: this, fn: function (btn) {
 						if (btn == "yes") {
 							container.un ("beforeclose", onBeforeClose);
 							container.close ();
@@ -9310,7 +9313,7 @@ Ext.define ("$o.Card.Widget", {
 					labelStyle: "color: red;",
 					style: "color: red;",
 					readOnly: true,
-					value: "Атрибут отсутствует в хранилище."
+					value: $o.getString ("Attribute not exists in storage")
 				});
 			} else
 			if (ca) {
@@ -9483,7 +9486,7 @@ Ext.define ("$o.Card.Widget", {
 					if (me.getEl ()) {
 						me.getEl ().unmask (true);
 					};
-					common.message ("<font color=red>Не удалось сохранить данные</font><br>Error: " + e + "<br>Stack: " + e.stack);
+					common.message ("<font color=red>" + $o.getString ("Could not save data") + "</font><br>Error: " + e + "<br>Stack: " + e.stack);
 					$o.rollbackTransaction ();
 					throw e;
 				};
@@ -9505,7 +9508,7 @@ Ext.define ("$o.Card.Widget", {
 			};
 			if (me.up ("window") && common.getConf ({code: "closeWindowAfterSave"}).used) {
 				me.up ("window").close ();
-				common.message ("Информация сохранена.");
+				common.message ($o.getString ("Information saved"));
 			}
 		};
 		if (options.autoSave) {
@@ -9524,7 +9527,7 @@ Ext.define ("$o.Card.Widget", {
 				};
 			};
 			if (msg) {
-				common.message ("<font color=red>Форма содержит ошибки в заполнении:</font><br><br>" + msg);
+				common.message ("<font color=red>" + $o.getString ("Form contains errors") + ":</font><br><br>" + msg);
 			} else {
 				if (me.getEl ()) {
 					me.getEl ().mask ("Сохранение ...");
@@ -9663,22 +9666,22 @@ Ext.define ("$o.Card.Widget", {
 		var grid = Ext.create ("Ext.grid.Panel", {
 			store: store,
 			columns: [{
-				header: "Дата", width: 100, dataIndex: "date", renderer: cellRenderer
+				header: $o.getString ("Date"), width: 100, dataIndex: "date", renderer: cellRenderer
 			}, {
-				header: "Значение", width: 150, dataIndex: "value", renderer: cellRenderer
+				header: $o.getString ("Value"), width: 150, dataIndex: "value", renderer: cellRenderer
 			}, {
-				header: "Пользователь", width: 150, dataIndex: "subject", renderer: cellRenderer
+				header: $o.getString ("User"), width: 150, dataIndex: "subject", renderer: cellRenderer
 			}, {
-				header: "IP-адрес", width: 100, dataIndex: "ip", renderer: cellRenderer
+				header: "IP", width: 100, dataIndex: "ip", renderer: cellRenderer
 			}, {
-				header: "Комментарий ревизии", width: 150, dataIndex: "description", renderer: cellRenderer, hidden: true
+				header: $o.getString ("Revision comment"), width: 150, dataIndex: "description", renderer: cellRenderer, hidden: true
 			}],
 			forceFit: true,
 			frame: false,
 			deferRowRender: false
 		});
 		var win = new Ext.Window ({
-			title: "Хронология изменений",
+			title: $o.getString ("Revision History"),
 			resizable: true,
 			closable: true,
 			modal: true,
@@ -9697,19 +9700,19 @@ Ext.define ("$o.Card.Widget", {
 		me.tbar = [];
 		if (!me.hideToolbar && !me.readOnly && !me.autoSave && !$o.isReadOnly ()) {
 			me.tbar = [{
-				text: "Сохранить",
+				text: $o.getString ("Save"),
 				iconCls: "save",
 				handler: me.save,
 				scope: me
 			}, {
-				text: "Обновить",
+				text: $o.getString ("Refresh"),
 				iconCls: "refresh",
 				handler: me.refresh,
 				scope: me
 			}];
 			if (me.showSaveAndClose) {
 				me.tbar.push ({
-					text: "Сохранить и закрыть",
+					text: $o.getString ("Save and close"),
 					iconCls: "ok",
 					handler: function () {
 						this.save ({success: function () {
@@ -9722,17 +9725,17 @@ Ext.define ("$o.Card.Widget", {
 			if ($o.visualObjectum && $o.visualObjectum.timeMachine && $o.visualObjectum.timeMachine.cardButton) {
 				if ($o.visualObjectum.timeMachine.cardHighlight || window.monu) {
 					me.tbar.push ({
-						text: "Изменения",
+						text: $o.getString ("Changes"),
 						iconCls: "gi_history",
 						menu: [{
-							text: "Хронология изменений",
+							text: $o.getString ("Revision History"),
 							iconCls: "gi_history",
 							name: "fieldChanges",
 							disabled: 1,
 							handler: me.onFieldChanges,
 							scope: me
 						}, {
-							text: "Показать измененные поля",
+							text: $o.getString ("Show changed fields"),
 							iconCls: "gi_history",
 							handler: me.onHighlight,
 							scope: me
@@ -9740,7 +9743,7 @@ Ext.define ("$o.Card.Widget", {
 					});
 				} else {
 					me.tbar.push ({
-						text: "Изменения",
+						text: $o.getString ("Changes"),
 						iconCls: "gi_history",
 						name: "fieldChanges",
 						disabled: 1,
@@ -9782,7 +9785,7 @@ Ext.define ("$o.Card.Widget", {
 	enableUnloadMessage: function () {
 		this.enabledUnloadMessage = true;
 		window.onbeforeunload = function (evt) {
-		    var message = "Данные не сохранены. Вы потеряете изменения если покинете страницу.";
+		    var message = $o.getString ("Data is not saved. You will lose changes if you leave the page");
 		    if (typeof evt == "undefined") {
 		        evt = window.event;
 		    };
@@ -9799,7 +9802,7 @@ Ext.define ("$o.Card.Widget", {
 });
 
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 	Configurator card (class, classAttr, view, viewAttr)
 */
 Ext.define ("$o.CardConf.Widget", {
@@ -9952,10 +9955,10 @@ Ext.define ("$o.CardConf.Widget", {
 			};
 		};
 		if (msg) {
-			common.message ("<font color=red>Форма содержит ошибки в заполнении:</font><br><br>" + msg);
+			common.message ("<font color=red>" + $o.getString ("Form contains errors") + ":</font><br><br>" + msg);
 		} else {
 			if (me.getEl ()) {
-				me.getEl ().mask ("Сохранение ...");
+				me.getEl ().mask ($o.getString ("Saving") + " ...");
 			};
 			setTimeout (saveFn, 100);
 		};
@@ -10182,7 +10185,7 @@ Ext.define ("$o.Tree.Widget", {
 });
 
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 
 Ext.define ("$o.Chart.Widget", {
@@ -10390,8 +10393,7 @@ Ext.define ("$o.Frame.Widget", {
 });
 
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
-	Преобразует макет Objectum 2.2 в ExtJS 4.2 items с виджетами $o
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 //Ext.require ([
 //    "Ext.ux.GroupTabRenderer",
@@ -10691,13 +10693,13 @@ Ext.define ("$o.Classes.Widget", {
 					    actions: [{
 					        fn: function () {
 					        	var grid = this;
-								$zu.dialog.getNameAndCode ({title: "Добавление класса", success: function (name, code) {
+								$zu.dialog.getNameAndCode ({title: $o.getString ("Class", ":", "Adding"), success: function (name, code) {
 									var createSpr = false;
 									async.series ([
 										function (cb) {
 											var clsParent = $o.getClass (grid.getCurrentValue ("id"));
 											if (clsParent && clsParent.getFullCode ().split (".")[0] == "spr") {
-												common.confirm ({message: "Создать типовой справочник (карточка, представление)?", scope: this, fn: function (btn) {
+												common.confirm ({message: $o.getString ("Create standard dictionary (card, view)?"), scope: this, fn: function (btn) {
 													if (btn == "yes") {
 														createSpr = true;
 													}
@@ -10764,7 +10766,7 @@ Ext.define ("$o.Classes.Widget", {
 					            	return r;
 					            }
 					        },
-					        caption: "Объекты",
+					        caption: $o.getString ("Objects"),
 					        iconCls: "gi_file"
 					    }],
 					    listeners: {
@@ -10778,16 +10780,16 @@ Ext.define ("$o.Classes.Widget", {
 						pages: [{
 							cardConf: {
 								id: "commonCard",
-								title: "Общие",
+								title: $o.getString ("Commons"),
 								iconCls: "gi_edit",
 								items: [{
-									conf: "class", id: "olap", attr: "id.name", fieldLabel: "Наименование"
+									conf: "class", id: "olap", attr: "id.name", fieldLabel: $o.getString ("Name")
 								}, {
-									conf: "class", id: "olap", attr: "id.code", allowBlank: false, fieldLabel: "Код", readOnly: true, maskRe: /[A-Za-z0-9\_]/
+									conf: "class", id: "olap", attr: "id.code", allowBlank: false, fieldLabel: $o.getString ("Code"), readOnly: true, maskRe: /[A-Za-z0-9\_]/
 								}, {
-									conf: "class", id: "olap", attr: "id.description", fieldLabel: "Описание", xtype: "textarea", height: 150
+									conf: "class", id: "olap", attr: "id.description", fieldLabel: $o.getString ("Description"), xtype: "textarea", height: 150
 								}, {
-									conf: "class", id: "olap", attr: "id.format", fieldLabel: "Функция форматирования (по умолчанию: return this.get ('name');)", xtype: "textarea", height: 200
+									conf: "class", id: "olap", attr: "id.format", fieldLabel: $o.getString ("Format function (default: return this.get ('name');)"), xtype: "textarea", height: 200
 								}],
 								active: {
 									fn: function () {
@@ -10797,7 +10799,7 @@ Ext.define ("$o.Classes.Widget", {
 							}
 						}, {
 							split: {
-								title: "Атрибуты",
+								title: $o.getString ("Attributes"),
 								iconCls: "gi_file",
 								orientation: "vertical",
 								height: 400,
@@ -10808,11 +10810,11 @@ Ext.define ("$o.Classes.Widget", {
 										filter: ["class_id", "=", {id: "olap", attr: "id"}],
 									    actions: [{
 									        fn: function () {
-												$zu.dialog.getNameAndCodeAndType ({title: "Добавление атрибута класса", success: function (name, code, type) {
+												$zu.dialog.getNameAndCodeAndType ({title: $o.getString ("Class attribute", ":", "Adding"), success: function (name, code, type) {
 													var cls = $o.getClass (this.relatives ["olap"].getCurrentValue ("id"));
 													var cls2 = cls.hasAttrInHierarchy (code);
 													if (cls2) {
-														common.message ("Атрибут уже есть в классе: " + cls2.toString ());
+														common.message ($o.getString ("Attribute already exists in class") + ": " + cls2.toString ());
 														return;
 													};
 													var tr = $o.startTransaction ({description: 'Create class attr'});
@@ -10885,23 +10887,23 @@ Ext.define ("$o.Classes.Widget", {
 									cardConf: {
 										id: "attrCard",
 										items: [{
-											conf: "classAttr", id: "olapAttrs", attr: "id.name", fieldLabel: "Наименование"
+											conf: "classAttr", id: "olapAttrs", attr: "id.name", fieldLabel: $o.getString ("Name")
 										}, {
-											conf: "classAttr", id: "olapAttrs", attr: "id.code", fieldLabel: "Код", allowBlank: false, readOnly: true, maskRe: /[A-Za-z0-9\_]/
+											conf: "classAttr", id: "olapAttrs", attr: "id.code", fieldLabel: $o.getString ("Code"), allowBlank: false, readOnly: true, maskRe: /[A-Za-z0-9\_]/
 										}, {
-											conf: "classAttr", id: "olapAttrs", attr: "id.type", fieldLabel: "Тип", confRef: "class", readOnly: true
+											conf: "classAttr", id: "olapAttrs", attr: "id.type", fieldLabel: $o.getString ("Type"), confRef: "class", readOnly: true
 										}, {
 											"anchor": "100%",
 											"xtype": "fieldcontainer",
 											"layout": "hbox",
 											"items": [{
-												conf: "classAttr", id: "olapAttrs", attr: "id.secure", fieldLabel: "Пароль", xtype: "checkbox"
+												conf: "classAttr", id: "olapAttrs", attr: "id.secure", fieldLabel: $o.getString ("Password"), xtype: "checkbox"
 											}, {
-												conf: "classAttr", id: "olapAttrs", attr: "id.unique", fieldLabel: "Уникально", xtype: "checkbox", style: "margin-left: 10px"
+												conf: "classAttr", id: "olapAttrs", attr: "id.unique", fieldLabel: $o.getString ("Unique"), xtype: "checkbox", style: "margin-left: 10px"
 											}, {
-												conf: "classAttr", id: "olapAttrs", attr: "id.notNull", fieldLabel: "Обязательный", xtype: "checkbox", style: "margin-left: 10px"
+												conf: "classAttr", id: "olapAttrs", attr: "id.notNull", fieldLabel: $o.getString ("Not null"), xtype: "checkbox", style: "margin-left: 10px"
 											}, {
-												xtype: "compositefield", fieldLabel: "Правило удаления", style: "margin-left: 10px",
+												xtype: "compositefield", fieldLabel: $o.getString ("Remove rule"), style: "margin-left: 10px",
 												items: [{
 													xtype: "combo",
 													conf: "classAttr", 
@@ -10916,8 +10918,8 @@ Ext.define ("$o.Classes.Widget", {
 													store: new Ext.data.ArrayStore ({
 														fields: ["id", "text"],
 														data: [
-															["set null", "Очистить значение (set null)"],
-															["cascade", "Каскадное удаление (cascade)"]
+															["set null", "Set null)"],
+															["cascade", "Cascade"]
 														]
 													}),
 													valueField: "id",
@@ -10925,11 +10927,11 @@ Ext.define ("$o.Classes.Widget", {
 												}]
 											}]
 										}, {
-											conf: "classAttr", id: "olapAttrs", attr: "id.formatFunc", fieldLabel: "Параметры (JSON)", xtype: "textarea", height: 50
+											conf: "classAttr", id: "olapAttrs", attr: "id.formatFunc", fieldLabel: $o.getString ("Options") + " (JSON)", xtype: "textarea", height: 50
 										}, {
-											conf: "classAttr", id: "olapAttrs", attr: "id.validFunc", fieldLabel: "Функция валидации", xtype: "textarea", height: 30
+											conf: "classAttr", id: "olapAttrs", attr: "id.validFunc", fieldLabel: $o.getString ("Validation function"), xtype: "textarea", height: 30
 										}, {
-											conf: "classAttr", id: "olapAttrs", attr: "id.description", fieldLabel: "Описание", xtype: "textarea", height: 30
+											conf: "classAttr", id: "olapAttrs", attr: "id.description", fieldLabel: $o.getString ("Description"), xtype: "textarea", height: 30
 										}],
 										active: {
 											fn: function () {
@@ -10954,7 +10956,7 @@ Ext.define ("$o.Classes.Widget", {
 							}
 						}, {
 							split: {
-								title: "Действия",
+								title: $o.getString ("Actions"),
 								iconCls: "gi_wrench",
 								orientation: "vertical",
 								width: 400,
@@ -10965,7 +10967,7 @@ Ext.define ("$o.Classes.Widget", {
 										filter: ["class_id", "=", {id: "olap", attr: "id"}],
 									    actions: [{
 									        fn: function () {
-												$zu.dialog.getNameAndCode ({title: "Добавление действия", success: function (name, code) {
+												$zu.dialog.getNameAndCode ({title: $o.getString ("Action", ":", "Adding"), success: function (name, code) {
 													var tr = $o.startTransaction ({description: 'Create action'});
 										        	var o = $o.createAction ();
 										        	o.set ("class", this.relatives ["olap"].getCurrentValue ("id"));
@@ -11020,7 +11022,7 @@ Ext.define ("$o.Classes.Widget", {
 													frame: false, border: false, bodyPadding: 1,
 													modal: false,
 													maximizable: true,
-													title: "Исходный код действия: " + a.toString (),
+													title: $o.getString ("Action source code") + ": " + a.toString (),
 													iconCls: "gi_notes",
 													items: {
 														name: "body",
@@ -11032,7 +11034,7 @@ Ext.define ("$o.Classes.Widget", {
 														}
 													},
 													tbar: [{
-														text: "Сохранить",
+														text: $o.getString ("Save"),
 														iconCls: "gi_floppy_save",
 										            	disabled: this.relatives ["olap"].getCurrentValue ("schema_id"),
 														handler: function () {
@@ -11042,7 +11044,7 @@ Ext.define ("$o.Classes.Widget", {
 															win.close ();
 														}
 													}, {
-														text: "Отмена",
+														text: $o.getString ("Cancel"),
 														iconCls: "gi_remove",
 														handler: function () {
 															win.close ();
@@ -11056,7 +11058,7 @@ Ext.define ("$o.Classes.Widget", {
 									            	return this.getCurrentValue ("id");
 									            }
 									        },
-									        text: "Исходный код",
+									        text: $o.getString ("Source code"),
 									        iconCls: "gi_notes"
 									    }, {
 									    	fn: function () {
@@ -11071,7 +11073,7 @@ Ext.define ("$o.Classes.Widget", {
 													frame: false, border: false, bodyPadding: 1,
 													modal: false,
 													maximizable: true,
-													title: "Макет действия: " + a.toString (),
+													title: $o.getString ("Action layout") + ": " + a.toString (),
 													iconCls: "gi_table",
 													items: {
 														xtype: "$layoutdesigner",
@@ -11084,7 +11086,7 @@ Ext.define ("$o.Classes.Widget", {
 														}
 													},
 													tbar: [{
-														text: "Сохранить",
+														text: $o.getString ("Save"),
 														iconCls: "gi_floppy_save",
 										            	disabled: this.relatives ["olap"].getCurrentValue ("schema_id"),
 														handler: function () {
@@ -11094,7 +11096,7 @@ Ext.define ("$o.Classes.Widget", {
 																	try {
 																		l.layout = JSON.parse (layout);
 																	} catch (e) {
-																		common.message ("Парсинг макета завершился с ошибкой.");
+																		common.message ($o.getString ("Parsing layout ended with an error"));
 																		win.close ();
 																		return;
 																	};
@@ -11112,7 +11114,7 @@ Ext.define ("$o.Classes.Widget", {
 															win.close ();
 														}
 													}, {
-														text: "Отмена",
+														text: $o.getString ("Cancel"),
 														iconCls: "gi_remove",
 														handler: function () {
 															win.close ();
@@ -11126,8 +11128,9 @@ Ext.define ("$o.Classes.Widget", {
 									            	return this.getCurrentValue ("id");
 									            }
 									        },
-									        text: "Макет",
+									        text: $o.getString ("Layout"),
 									        iconCls: "gi_table"
+									        /*
 									    }, {
 									    	text: "Обновить действия по умолчанию",
 									    	iconCls: "gi_refresh",
@@ -11136,6 +11139,7 @@ Ext.define ("$o.Classes.Widget", {
 									    		var cls = $o.getClass (clsId);
 								    			cls.updateDefault ();
 									    	}
+									    	*/
 									    }],
 									    listeners: {
 									    	afterrender: function () {
@@ -11168,13 +11172,13 @@ Ext.define ("$o.Classes.Widget", {
 											}
 										},
 										items: [{
-											conf: "action", id: "olapActions", attr: "id.name", fieldLabel: "Наименование", labelWidth: 150
+											conf: "action", id: "olapActions", attr: "id.name", fieldLabel: $o.getString ("Name"), labelWidth: 150
 										}, {
-											conf: "action", id: "olapActions", attr: "id.code", fieldLabel: "Код", allowBlank: false, labelWidth: 150, maskRe: /[A-Za-z0-9\_]/
+											conf: "action", id: "olapActions", attr: "id.code", fieldLabel: $o.getString ("Code"), allowBlank: false, labelWidth: 150, maskRe: /[A-Za-z0-9\_]/
 										}, {
 											xtype: "combo",
 											name: "type",
-											fieldLabel: "Тип",
+											fieldLabel: $o.getString ("Type"),
 											triggerAction: "all",
 											lazyRender: true,
 											mode: "local",
@@ -11185,9 +11189,9 @@ Ext.define ("$o.Classes.Widget", {
 												fields: ["id", "text"],
 												data: [
 													[null, "-"],
-													["create", "Создание объекта"],
-													["remove", "Удаление объекта"],
-													["card", "Карточка объекта"]
+													["create", $o.getString ("Adding")],
+													["remove", $o.getString ("Removing")],
+													["card", $o.getString ("Card")]
 												]
 											}),
 											valueField: "id",
@@ -11240,7 +11244,7 @@ Ext.define ("$o.Classes.Widget", {
 											}
 										}, {
 											xtype: "compositefield",
-											fieldLabel: "Действие на сервере",
+											fieldLabel: $o.getString ("Server action"),
 											labelWidth: 150,
 											items: [{
 												xtype: "checkbox", name: "serverAction", listeners: {
@@ -11260,7 +11264,7 @@ Ext.define ("$o.Classes.Widget", {
 											}, {
 												xtype: "displayfield",
 												name: "displayNoAuth",
-												value: "Выполнять без аутентификации:",
+												value: $o.getString ("Execute no authentication") + ":",
 												style: "margin-left: 10px; margin-right: 5px"
 											}, {
 												xtype: "checkbox", name: "noAuth", labelWidth: 150, listeners: {
@@ -11311,7 +11315,7 @@ Ext.define ("$o.Classes.Widget", {
 						}, {
 							olap: {
 								id: "olapDependency",
-								title: "Зависимости",
+								title: $o.getString ("Dependencies"),
 								iconCls: "gi_link",
 								view: "system.typeClassAttrs",
 								filter: ["type_id", "=", {id: "olap", attr: "id"}],
@@ -11335,11 +11339,11 @@ Ext.define ("$o.Classes.Widget", {
 	showObjects: function (options) {
 		var cls = $o.getClass (options.classId);
 		if (!cls.attrsArray.length) {
-			common.message ("В классе отсутствуют атрибуты.");
+			common.message ($o.getString ("Class has no attributes"));
 			return;
 		};
 		var win = Ext.create ("Ext.Window", {
-			title: "Объекты класса: " + cls.toString (),
+			title: $o.getString ("Class objects") + ": " + cls.toString (),
 			iconCls: "gi_file",
 			width: 800,
 			height: 600,
@@ -11371,7 +11375,7 @@ Ext.define ("$o.Classes.Widget", {
 						actions: [{
 							fn: function () {
 								var me = this;
-								common.confirm ({message: "Вы уверены?", fn: function (btn) {
+								common.confirm ({message: $o.getString ("Are you sure?"), fn: function (btn) {
 									if (btn == "yes") {
 										$o.startTransaction ({description: "Remove by admin"});
 										_.each (me.getSelectionModel ().getSelection (), function (rec, i) {
@@ -11382,7 +11386,7 @@ Ext.define ("$o.Classes.Widget", {
 									};
 								}});
 							},
-							text: "Удалить",
+							text: $o.getString ("Remove"),
 							iconCls: "gi_circle_minus",
 							active: "common.recordSelected"
 						}, {
@@ -11405,11 +11409,11 @@ Ext.define ("$o.Classes.Widget", {
 								}
 								sql.asArray = true;
 								var recs = $o.execute (sql);
-								common.confirm ({message: "Будет удалено записей: " + recs.length + ". Вы уверены?", fn: function (btn) {
+								common.confirm ({message: $o.getString ("Entries will be deleted") + ": " + recs.length + ". " + $o.getString ("Are you sure?"), fn: function (btn) {
 									if (btn == "yes") {
 										Ext.MessageBox.show ({
-										    title: "Пожалуйста подождите",
-										    msg: "Действие выполняется ...",
+										    title: $o.getString ("Please wait"),
+										    msg: $o.getString ("Action in progress") + " ...",
 										    progressText: "",
 										    width: 300,
 										    progress: 1,
@@ -11432,7 +11436,7 @@ Ext.define ("$o.Classes.Widget", {
 									};
 								}});
 							},
-							text: "Удалить все",
+							text: $o.getString ("Remove all"),
 							iconCls: "gi_circle_minus"
 						}, {
 							fn: function () {
@@ -11455,7 +11459,7 @@ Ext.define ("$o.Classes.Widget", {
 								sql.asArray = true;
 								var recs = $o.execute (sql);
 								var win = Ext.create ("Ext.window.Window", {
-									title: "Изменение значения",
+									title: $o.getString ("Changing the value of"),
 									iconCls: "edit",
 									closable: true,
 									width: 600,
@@ -11468,11 +11472,11 @@ Ext.define ("$o.Classes.Widget", {
 									items: [{
 										xtype: "textfield",
 										disabled: true,
-										fieldLabel: "Будет изменено записей",
+										fieldLabel: $o.getString ("Entries will be changed"),
 										value: recs.length
 									}, {
 										xtype: "combo",
-										fieldLabel: "Атрибут",
+										fieldLabel: $o.getString ("Attribute"),
 										name: "attr",
 										triggerAction: "all",
 										lazyRender: true,
@@ -11492,21 +11496,21 @@ Ext.define ("$o.Classes.Widget", {
 									}, {
 										xtype: "textfield",
 										name: "value",
-										fieldLabel: "Значение",
+										fieldLabel: $o.getString ("Value"),
 										width: "100%"
 									}],
 									buttons: [{
-										text: "Изменить",
+										text: $o.getString ("Change"),
 										iconCls: "ok",
 										handler: function () {
 											var attr = win.down ("*[name=attr]").getValue ();
 											var value = win.down ("*[name=value]").getValue () || null;
 											if (!attr) {
-												return common.message ("Выберите атрибут");
+												return common.message ($o.getString ("Choose attribute"));
 											}
 											Ext.MessageBox.show ({
-											    title: "Пожалуйста подождите",
-											    msg: "Действие выполняется ...",
+											    title: $o.getString ("Please wait"),
+											    msg: $o.getString ("Action in progress") + " ...",
 											    progressText: "",
 											    width: 300,
 											    progress: 1,
@@ -11534,15 +11538,15 @@ Ext.define ("$o.Classes.Widget", {
 								});
 								win.show ();
 							},
-							text: "Изменить все",
+							text: $o.getString ("Change all"),
 							iconCls: "edit"
 						}, {
-							text: "Импорт из CSV",
+							text: $o.getString ("Import") + " CSV",
 							iconCls: "gi_disk_import",
 							fn: function () {
 								var olap = this;
 								var win = Ext.create ("Ext.window.Window", {
-									title: "Импорт из CSV",
+									title: $o.getString ("import") + " CSV",
 									iconCls: "gi_disk_import",
 									closable: true,
 									width: 800,
@@ -11585,17 +11589,17 @@ Ext.define ("$o.Classes.Widget", {
 					"id": "card",
 					"items": [{
 						"anchor": "100%",
-						"fieldLabel": "Наименование",
+						"fieldLabel": $o.getString ("Name"),
 						"attr": "name",
 						"objectId": "[#id]"
 					}, {
-						"fieldLabel": "№ пп",
+						"fieldLabel": $o.getString ("N"),
 						"attr": "npp",
 						"objectId": "[#id]",
 						"width": 200
 					}, {
 						"anchor": "100%",
-						"fieldLabel": "Код",
+						"fieldLabel": $o.getString ("Code"),
 						"attr": "code",
 						"objectId": "[#id]"
 					}],
@@ -11632,10 +11636,10 @@ Ext.define ("$o.Classes.Widget", {
 		try {
 			viewParent = $o.getView (codeParent);
 		} catch (e) {
-			return common.message ("Базовое представление отсутствует " + codeParent);
+			return common.message ($o.getString ("base view not exists") + " " + codeParent);
 		}
 		if (!viewParent) {
-			return common.message ("Базовое представление отсутствует " + codeParent);
+			return common.message ($o.getString ("base view not exists") + " " + codeParent);
 		}
 		var codeView = codeParent + "." + cls.get ("code");
 		var view = $o.createView ();
@@ -11665,18 +11669,18 @@ Ext.define ("$o.Classes.Widget", {
 				actions: [
 					{
 						"fn": codeView + ".card",
-						"text": "Открыть",
+						"text": $o.getString ("Open"),
 						"iconCls": "gi_edit",
 						"active": "common.recordSelected"
 					},
 					{
 						"fn": codeView + ".create",
-						"text": "Добавить",
+						"text": $o.getString ("Add"),
 						"iconCls": "gi_circle_plus"
 					},
 					{
 						"fn": codeView + ".remove",
-						"text": "Удалить",
+						"text": $o.getString ("Remove"),
 						"iconCls": "gi_circle_minus",
 						"active": "common.recordSelected"
 					}
@@ -11689,11 +11693,11 @@ Ext.define ("$o.Classes.Widget", {
 		_.each ([{
 			code: "id", name: "id", width: 75, area: 0
 		}, {
-			code: "name", name: "Наименование", width: 500, area: 1
+			code: "name", name: $o.getString ("Name"), width: 500, area: 1
 		}, {
-			code: "code", name: "Код", width: 75, area: 0
+			code: "code", name: $o.getString ("Code"), width: 75, area: 0
 		}, {
-			code: "npp", name: "№ пп", width: 75, area: 0
+			code: "npp", name: $o.getString ("N"), width: 75, area: 0
 		}], function (o, i) {
 			var va = $o.createViewAttr ();
 			va.set ("view", view.get ("id"));
@@ -11732,7 +11736,7 @@ Ext.define ("$o.Views.Widget", {
 						},
 						actions: [{
 							fn: function () {
-								$zu.dialog.getNameAndCode ({title: "Добавление представления", success: function (name, code) {
+								$zu.dialog.getNameAndCode ({title: $o.getString ("View", ":", "Adding"), success: function (name, code) {
 									var tr = $o.startTransaction ({description: 'Create view'});
 									var o = $o.createView ();
 									o.set ("parent", this.getCurrentValue ("id"));
@@ -11785,7 +11789,7 @@ Ext.define ("$o.Views.Widget", {
 									return r;
 								}
 							},
-							caption: "Просмотр",
+							caption: $o.getString ("Review"),
 							iconCls: "gi_eye_open"
 						}]
 					}
@@ -11794,7 +11798,7 @@ Ext.define ("$o.Views.Widget", {
 						listeners: {
 							tabchangeTODO: function (tabPanel, panel) {	
 								var me = this;
-								if (panel.title == "Запрос" || panel.title == "Макет") {
+								if (panel.title == $o.getString ("Query") || panel.title == $o.getString ("Layout")) {
 									var field = panel.getItems () [0];
 									var value = field.getValue ();
 									var dom = Ext.getDom (field.inputEl);
@@ -11819,10 +11823,10 @@ Ext.define ("$o.Views.Widget", {
 						pages: [{
 							cardConf: {
 								id: "commonCard",
-								title: "Общие",
+								title: $o.getString ("Commons"),
 								iconCls: "gi_edit",
 								tbar: [{
-									text: "Зависимости",
+									text: $o.getString ("Dependencies"),
 									iconCls: "gi_link",
 									handler: function () {
 										var viewId = this.up ("*[name=views]").relatives ["olap"].getValue ("id");
@@ -11843,7 +11847,7 @@ Ext.define ("$o.Views.Widget", {
 											border: false,
 											style: "background-color: #ffffff",
 											bodyStyle: "background-color: #ffffff",
-											title: "Зависимости: Представления",
+											title: $o.getString ("Dependencies") + ": " + $o.getString ("Views"),
 											iconCls: "gi_link",
 											bodyPadding: 5,
 											modal: 1,
@@ -11859,10 +11863,10 @@ Ext.define ("$o.Views.Widget", {
 													text: "id",
 													dataIndex: "id"
 												}, {
-													text: "Код",
+													text: $o.getString ("Code"),
 													dataIndex: "path"
 												}, {
-													text: "Наименование",
+													text: $o.getString ("Name"),
 													dataIndex: "name"
 												}],
 												width: "100%",
@@ -11875,15 +11879,15 @@ Ext.define ("$o.Views.Widget", {
 									}
 								}],
 								items: [{
-									conf: "view", id: "olap", attr: "id.name", fieldLabel: "Наименование"
+									conf: "view", id: "olap", attr: "id.name", fieldLabel: $o.getString ("Name")
 								}, {
-									conf: "view", id: "olap", attr: "id.code", fieldLabel: "Код", allowBlank: false, maskRe: /[A-Za-z0-9\_]/
+									conf: "view", id: "olap", attr: "id.code", fieldLabel: $o.getString ("Code"), allowBlank: false, maskRe: /[A-Za-z0-9\_]/
 								}, {
-									conf: "view", id: "olap", attr: "id.parent", fieldLabel: "Родитель", confRef: "view", choose: {type: "view", id: "system.views", attr: "olap.id", width: 500, height: 400}
+									conf: "view", id: "olap", attr: "id.parent", fieldLabel: $o.getString ("Parent"), confRef: "view", choose: {type: "view", id: "system.views", attr: "olap.id", width: 500, height: 400}
 								}, {
-									conf: "view", id: "olap", attr: "id.description", fieldLabel: "Описание", xtype: "textarea", height: 150
+									conf: "view", id: "olap", attr: "id.description", fieldLabel: $o.getString ("Description"), xtype: "textarea", height: 150
 								}, {
-									conf: "view", id: "olap", attr: "id.iconCls", fieldLabel: "Иконка", xtype: "$iconselector"
+									conf: "view", id: "olap", attr: "id.iconCls", fieldLabel: $o.getString ("Icon"), xtype: "$iconselector"
 								}],
 								active: {
 									fn: function () {
@@ -11894,10 +11898,10 @@ Ext.define ("$o.Views.Widget", {
 						}, {
 							cardConf: {
 								id: "queryCard",
-								title: "Запрос",
+								title: $o.getString ("Query"),
 								iconCls: "gi_cogwheel",
 								tbar: [{
-									text: "Настройка столбцов таблицы",
+									text: $o.getString ("Setting the table columns"),
 									iconCls: "gi_table",
 									handler: function () {
 										var win = Ext.create ("Ext.Window", {
@@ -11908,7 +11912,7 @@ Ext.define ("$o.Views.Widget", {
 											border: false,
 											style: "background-color: #ffffff",
 											bodyStyle: "background-color: #ffffff",
-											title: "Настройка столбцов таблицы",
+											title: $o.getString ("Setting the table columns"),
 											bodyPadding: 5,
 											modal: 1,
 											maximizable: true,
@@ -11928,7 +11932,7 @@ Ext.define ("$o.Views.Widget", {
 										query = eval ("(" + query + ")");
 										var r = $o.execute ({sql: query, noException: 1});
 										if (r.error) {
-											common.message ("Запрос составлен с ошибкой:\n" + r.error);
+											common.message ($o.getString ("Error in query") + ":\n" + r.error);
 										};
 									}
 								},
@@ -11956,7 +11960,7 @@ Ext.define ("$o.Views.Widget", {
 						}, {
 							cardConf: {
 								id: "layoutCard",
-								title: "Макет",
+								title: $o.getString ("Layout"),
 								iconCls: "gi_table",
 								items: [{
 									//anchor: "100% 100%",
@@ -12098,14 +12102,14 @@ Ext.define ("$o.LayoutEditor", {
 			handler: me.save,
 			scope: me
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			name: "cancel",
 			iconCls: "gi_remove",
 			handler: function () {
 				me.up ("window").close ();
 			}
 		}, {
-			text: "Преобразовать в разделитель",
+			text: $o.getString ("Convert to splitter"),
 			name: "make_split",
 			iconCls: "gi_share_alt",
 			handler: function () {
@@ -12123,7 +12127,7 @@ Ext.define ("$o.LayoutEditor", {
 			},
 			scope: me
 		}, {
-			text: "Преобразовать в закладки",
+			text: $o.getString ("Convert to tabs"),
 			name: "make_tab",
 			iconCls: "gi_bookmark",
 			handler: function () {
@@ -12206,14 +12210,14 @@ Ext.define ("$o.LayoutOlap.Widget", {
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
 					labelWidth: 150,
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.olap.id,
@@ -12227,7 +12231,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 					xtype: "textfield",
 					labelWidth: 150,
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.olap.title,
 					listeners: {
@@ -12248,7 +12252,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 					}
 				}, {
 					xtype: "$conffield", 
-					fieldLabel: "Запрос",
+					fieldLabel: $o.getString ("Query"),
 					labelWidth: 150,
 					name: "view", 
 					value: me.value.olap.view, 
@@ -12280,7 +12284,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 					width: "100%", 
 					name: "wordWrap",
 					labelWidth: 150,
-					fieldLabel: "Перенос по словам",
+					fieldLabel: $o.getString ("Word wrap"),
 					checked: me.value.olap.wordWrap,
 					listeners: {
 						change: function () {
@@ -12292,7 +12296,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 					width: "100%", 
 					name: "groupedColumns",
 					labelWidth: 150,
-					fieldLabel: "Многоуровневый заголовок",
+					fieldLabel: $o.getString ("Grouped header"),
 					checked: me.value.olap.groupedColumns,
 					listeners: {
 						change: function () {
@@ -12300,7 +12304,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 						}
 					}
 				}, {
-					fieldLabel: "Фильтр из действия",
+					fieldLabel: $o.getString ("Filter from action"),
 					xtype: "$conffield", 
 					labelWidth: 150,
 					name: "filterAction", 
@@ -12337,7 +12341,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 						layout: "fit",
 						width: "30%",
 						height: "100%",
-						title: "Меню",
+						title: $o.getString ("Menu"),
 						iconCls: "gi_list",
 						bodyPadding: 2,
 						items: {
@@ -12354,7 +12358,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 						layout: "fit",
 						width: "40%",
 						height: "100%",
-						title: "Фильтр",
+						title: $o.getString ("Filter"),
 						iconCls: "gi_filter",
 						bodyPadding: 2,
 						style: "margin-left: 1px",
@@ -12377,7 +12381,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 						layout: "fit",
 						width: "30%",
 						height: "100%",
-						title: "Итоги",
+						title: $o.getString ("Totals"),
 						iconCls: "gi_calculator",
 						bodyPadding: 2,
 						style: "margin-left: 1px",
@@ -12397,7 +12401,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "События",
+				title: $o.getString ("Events"),
 				iconCls: "gi_wifi_alt",
 				border: 0,
 				items: {
@@ -12413,7 +12417,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 				}
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {
@@ -12431,7 +12435,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 		var of = me.down ("*[name='view']");
 		if (of.getValue ()) {
 			if (!$o.getView (of.getValue ()).get ("query")) {
-				common.message ("Выбранное представление не содержит запрос.");
+				common.message ($o.getString ("Selected view does not contain a query"));
 				me.down ("button[name='ok']").disable ();
 			} else {
 				me.down ("button[name='ok']").enable ();
@@ -12459,13 +12463,13 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.treegrid.id,
@@ -12477,7 +12481,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.treegrid.title,
 					listeners: {
@@ -12498,7 +12502,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 					}
 				}, {
 					xtype: "$conffield", 
-					fieldLabel: "Запрос",
+					fieldLabel: $o.getString ("Query"),
 					name: "view", 
 					value: me.value.treegrid.view, 
 					width: "100%",
@@ -12525,7 +12529,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 					}
 				}, {
 					xtype: "combo",
-					fieldLabel: "Идентификатор узла",
+					fieldLabel: $o.getString ("Node identifier"),
 					name: "idAttr",
 					width: "100%",
 					mode: "local",
@@ -12541,7 +12545,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 					validator: me.validator
 				}, {
 					xtype: "combo",
-					fieldLabel: "Идентификатор родительского узла",
+					fieldLabel: $o.getString ("Parent node identifier"),
 					name: "parent",
 					width: "100%",
 					mode: "local",
@@ -12559,7 +12563,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 					layout: "fit",
 					width: "100%",
 					flex: 1,
-					title: "Меню",
+					title: $o.getString ("Menu"),
 					iconCls: "gi_list",
 					bodyPadding: 2,
 					items: {
@@ -12575,7 +12579,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "События",
+				title: $o.getString ("Events"),
 				iconCls: "gi_wifi_alt",
 				border: 0,
 				items: {
@@ -12591,7 +12595,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 				}
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {
@@ -12639,7 +12643,7 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 		};
 		if (of.getValue ()) {
 			if (!$o.getView (of.getValue ()).get ("query")) {
-				common.message ("Выбранное представление не содержит запрос.");
+				common.message ($o.getString ("Selected view does not contain a query"));
 				me.down ("button[name='ok']").disable ();
 			} else {
 				me.down ("button[name='ok']").enable ();
@@ -12679,13 +12683,13 @@ Ext.define ("$o.LayoutSplit.Widget", {
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.split.id,
@@ -12697,7 +12701,7 @@ Ext.define ("$o.LayoutSplit.Widget", {
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.split.title,
 					listeners: {
@@ -12717,7 +12721,7 @@ Ext.define ("$o.LayoutSplit.Widget", {
 					}
 				}, {
 					xtype: "combo",
-					fieldLabel: "Ориентация",
+					fieldLabel: $o.getString ("Orientation"),
 					name: "orientation",
 					width: "100%",
 					triggerAction: "all",
@@ -12728,8 +12732,8 @@ Ext.define ("$o.LayoutSplit.Widget", {
 					store: new Ext.data.ArrayStore ({
 						fields: ["id", "text"],
 						data: [
-							["horizontal", "Горизонтальный"],
-							["vertical", "Вертикальный"]
+							["horizontal", $o.getString ("Horizontal")],
+							["vertical", $o.getString ("Vertical")]
 						]
 					}),
 					valueField: "id",
@@ -12743,7 +12747,7 @@ Ext.define ("$o.LayoutSplit.Widget", {
 					}
 				}, {
 					xtype: "compositefield",
-					fieldLabel: "Ширина (высота) левого (верхнего) компонента",
+					fieldLabel: $o.getString ("Width (height) of left (top) component"),
 					items: [{
 						xtype: "numberfield",
 						name: "width",
@@ -12798,7 +12802,7 @@ Ext.define ("$o.LayoutSplit.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {
@@ -12820,7 +12824,7 @@ Ext.define ("$o.LayoutTab.Widget", {
 	initComponent: function () {
 		var me = this;
 		var cmp = me.layoutDesigner.createEmpty ();
-		cmp.panel.title = "Закладка";
+		cmp.panel.title = $o.getString ("Tab");
 		me.value = me.value || {
 			tab: {
 				id: "cmp-" + (me.layoutDesigner.counter ++),
@@ -12831,13 +12835,13 @@ Ext.define ("$o.LayoutTab.Widget", {
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.tab.id,
@@ -12849,7 +12853,7 @@ Ext.define ("$o.LayoutTab.Widget", {
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.tab.title,
 					listeners: {
@@ -12870,7 +12874,7 @@ Ext.define ("$o.LayoutTab.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {
@@ -12905,7 +12909,7 @@ Ext.define ("$o.LayoutCondition.Widget", {
 			handler: me.save,
 			scope: me
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			iconCls: "gi_remove",
 			name: "cancel",
 			handler: function () {
@@ -12919,7 +12923,7 @@ Ext.define ("$o.LayoutCondition.Widget", {
 		};
 		me.items = [{
 			xtype: "combo",
-			fieldLabel: "И/ИЛИ",
+			fieldLabel: $o.getString ("And", "/", "Or"),
 			labelWidth: 200,
 			name: "and_or",
 			width: 350,
@@ -12929,8 +12933,8 @@ Ext.define ("$o.LayoutCondition.Widget", {
 			store: new Ext.data.ArrayStore ({
 				fields: ["id", "text"],
 				data: [
-					["and", "И"],
-					["or", "ИЛИ"]
+					["and", $o.getString ("And")],
+					["or", $o.getString ("Or")]
 				]
 			}),
 			valueField: "id",
@@ -12944,7 +12948,7 @@ Ext.define ("$o.LayoutCondition.Widget", {
 			*/
 		}, {
 			xtype: "combo",
-			fieldLabel: "Атрибут этого компонента",
+			fieldLabel: $o.getString ("Attribute of this component"),
 			name: "attr",
 			width: "100%",
 			labelWidth: 200,
@@ -12960,7 +12964,7 @@ Ext.define ("$o.LayoutCondition.Widget", {
 			validator: me.validator
 		}, {
 			xtype: "combo",
-			fieldLabel: "Оператор",
+			fieldLabel: $o.getString ("Operator"),
 			labelWidth: 200,
 			name: "oper",
 			width: 350,
@@ -12970,15 +12974,15 @@ Ext.define ("$o.LayoutCondition.Widget", {
 			store: new Ext.data.ArrayStore ({
 				fields: ["id", "text"],
 				data: [
-					["=", "равно (=)"],
-					["<>", "не равно (<>)"],
-					["<", "меньше (<)"],
-					[">", "больше (>)"],
-					["<=", "меньше или равно (<=)"],
-					[">=", "больше или равно (>=)"],
-					["is null", "пусто (is null)"],
-					["is not null", "не пусто (is not null)"],
-					["in", "одно из перечня (in)"]
+					["=", $o.getString ("equal") + " (=)"],
+					["<>", $o.getString ("not equal") + " (<>)"],
+					["<", $o.getString ("less") + " (<)"],
+					[">", $o.getString ("more") + " (>)"],
+					["<=", $o.getString ("less or equal") + " (<=)"],
+					[">=", $o.getString ("more or equal") + " (>=)"],
+					["is null", $o.getString ("empty") + " (is null)"],
+					["is not null", $o.getString ("not null") + " (is not null)"],
+					["in", $o.getString ("one of list") + " (in)"]
 				]
 			}),
 			valueField: "id",
@@ -13002,14 +13006,14 @@ Ext.define ("$o.LayoutCondition.Widget", {
 			validator: me.validator
 		}, {
 			xtype: "textfield",
-			fieldLabel: "Значение",
+			fieldLabel: $o.getString ("Value"),
 			labelWidth: 200,
 			width: "100%",
 			name: "value",
 			validator: me.validator
 		}, {			
 			xtype: "combo",
-			fieldLabel: "Атрибут другого компонента",
+			fieldLabel: $o.getString ("Attribute of another component"),
 			name: "attrValue",
 			width: "100%",
 			labelWidth: 200,
@@ -13121,13 +13125,13 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		grid.flex = 1;
 		me.items = grid;
     	me.tbar = [{
-    		text: "Добавить",
+    		text: $o.getString ("Add"),
     		name: "create",
     		iconCls: "gi_circle_plus",
     		handler: me.createCondition,
     		scope: me
     	}, {
-    		text: "Очистить",
+    		text: $o.getString ("Clear"),
     		name: "delete",
     		iconCls: "gi_circle_minus",
     		scope: me,
@@ -13164,7 +13168,7 @@ Ext.define ("$o.LayoutFilter.Widget", {
 			border: false,
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
-			title: "Условие",
+			title: $o.getString ("Condition"),
 			iconCls: "gi_filter",
 			bodyPadding: 5,
 			modal: 1,
@@ -13243,11 +13247,11 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		var grid = Ext.create ("Ext.grid.Panel", {
 			store: store,
 			columns: [{
-				header: "Атрибут", width: 100, dataIndex: "attr", renderer: me.cellRenderer
+				header: $o.getString ("Attribute"), width: 100, dataIndex: "attr", renderer: me.cellRenderer
 			}, {
-				header: "Оператор", width: 100, dataIndex: "oper", renderer: me.cellRenderer
+				header: $o.getString ("Operator"), width: 100, dataIndex: "oper", renderer: me.cellRenderer
 			}, {
-				header: "Значение", width: 100, dataIndex: "value", renderer: me.cellRenderer
+				header: $o.getString ("Value"), width: 100, dataIndex: "value", renderer: me.cellRenderer
 			}],
 			forceFit: true,
 			frame: false,
@@ -13280,15 +13284,15 @@ Ext.define ("$o.LayoutFilter.Widget", {
 	},
 	getOperName: function (oper) {
 		var o = {};
-		o ["="] = "равно (=)";
-		o ["<>"] = "не равно (<>)";
-		o ["<"] = "меньше (<)";
-		o [">"] = "больше (>)";
-		o ["<="] = "меньше или равно (<=)";
-		o [">="] = "больше или равно (>=)";
-		o ["is null"] = "пусто (is null)";
-		o ["is not null"] = "не пусто (is not null)";
-		o ["in"] = "одно из перечня (in)";
+		o ["="] = $o.getString ("equal") + " (=)";
+		o ["<>"] = $o.getString ("not equal") + " (<>)";
+		o ["<"] = $o.getString ("less") + " (<)";
+		o [">"] = $o.getString ("more") + " (>)";
+		o ["<="] = $o.getString ("less or equal") + " (<=)";
+		o [">="] = $o.getString ("more or equal") + " (>=)";
+		o ["is null"] = $o.getString ("empty") + " (is null)";
+		o ["is not null"] = $o.getString ("not null") + " (is not null)";
+		o ["in"] = $o.getString ("one of list") + " (in)";
 		return o [oper];
 	},
 	getValueName: function (v) {
@@ -13378,7 +13382,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 					xtype: "compositefield",
 					width: 375,
 					labelWidth: 100,
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					style: "margin-top: 5px;",
 					items: [{
 						xtype: "textfield",
@@ -13390,7 +13394,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 							}
 						}
 					}, {
-						xtype: "displayfield", value: "Только для чтения:", style: "margin-left: 5px;"
+						xtype: "displayfield", value: $o.getString ("Read only") + ":", style: "margin-left: 5px;"
 					}, {
 						xtype: "checkbox",
 						name: "readOnly",
@@ -13405,7 +13409,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 					xtype: "textfield",
 					labelWidth: 100,
 					width: 375,
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.card.title,
 					listeners: {
@@ -13438,22 +13442,22 @@ Ext.define ("$o.LayoutCard.Widget", {
 						data: []
 					},
 					columns: [{
-						text: "Класс объекта", dataIndex: "clsName", flex: 2
+						text: $o.getString ("Class of object"), dataIndex: "clsName", flex: 2
 					}, {
-						text: "Тэг объекта", dataIndex: "tag", flex: 1
+						text: $o.getString ("Tag of object"), dataIndex: "tag", flex: 1
 					}, {
-						text: "Объект по атрибуту компонента", dataIndex: "cmpAttrName", flex: 2
+						text: $o.getString ("Object by attribute of component"), dataIndex: "cmpAttrName", flex: 2
 					}, {
 						text: "cls", dataIndex: "cls", hidden: true
 					}, {
 						text: "cmpAttr", dataIndex: "cmpAttr", hidden: true
 					}],
 					tbar: [{
-						text: "Добавить",
+						text: $o.getString ("Add"),
 						iconCls: "gi_circle_plus",
 						handler: function () {
 							var win = Ext.create ("Ext.Window", {
-								title: "Добавление тэга",
+								title: $o.getString ("Tag", ":", "Adding"),
 								width: 600,
 								height: 400,
 								layout: "vbox",
@@ -13464,7 +13468,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 								style: "background-color: #ffffff",
 								bodyStyle: "background-color: #ffffff",
 								tbar: [{
-									text: "Добавить",
+									text: $o.getString ("Add"),
 									iconCls: "gi_circle_plus",
 									handler: function () {
 										var store = me.down ("*[name=tags]").getStore ();
@@ -13486,7 +13490,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 								}],
 								items: [{
 									xtype: "$conffield", 
-									fieldLabel: "Класс объекта",
+									fieldLabel: $o.getString ("Object class"),
 									labelWidth: 200,
 									name: "cls", 
 									width: "100%",
@@ -13501,13 +13505,13 @@ Ext.define ("$o.LayoutCard.Widget", {
 									}
 								}, {
 									xtype: "textfield",
-									fieldLabel: "Тэг объекта",
+									fieldLabel: $o.getString ("Tag of object"),
 									labelWidth: 200,
 									width: "100%",
 									name: "tag"
 								}, {
 									xtype: "combo",
-									fieldLabel: "Объект по атрибуту компонента",
+									fieldLabel: $o.getString ("Object by attribute of component"),
 									name: "cmpAttr",
 									anchor: "100%",
 									labelWidth: 200,
@@ -13526,7 +13530,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 							win.show ();							
 						}
 					}, {
-						text: "Удалить",
+						text: $o.getString ("Remove"),
 						iconCls: "gi_circle_minus",
 						handler: function () {
 							var grid = me.down ("*[name=tags]");
@@ -13588,7 +13592,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 		}];
 		items.push ({
 			layout: "fit",
-			title: "Атрибуты карточки",
+			title: $o.getString ("Card", ":", "Attributes"),
 			name: "cardDesigner",
 			width: "100%",
 			border: 1,
@@ -13601,13 +13605,13 @@ Ext.define ("$o.LayoutCard.Widget", {
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: items
 			}, {
 				layout: "fit",
-				title: "События",
+				title: $o.getString ("Events"),
 				iconCls: "gi_wifi_alt",
 				border: 0,
 				items: {
@@ -13724,7 +13728,7 @@ Ext.define ("$o.LayoutTotal.Widget", {
 		var me = this;
 		me.value = me.value || {};
     	me.tbar = [{
-    		text: "Очистить",
+    		text: $o.getString ("Clear"),
     		name: "delete",
     		iconCls: "gi_circle_minus",
     		scope: me,
@@ -13753,9 +13757,9 @@ Ext.define ("$o.LayoutTotal.Widget", {
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Атрибут", dataIndex: "attr"
+				header: $o.getString ("Attribute"), dataIndex: "attr"
 			}, {
-				header: "Итог", width: 100, dataIndex: "total", editor: {
+				header: $o.getString ("Total"), width: 100, dataIndex: "total", editor: {
 					xtype: "combo",
 					mode: "local",
 					queryMode: "local",
@@ -13763,10 +13767,10 @@ Ext.define ("$o.LayoutTotal.Widget", {
 					store: new Ext.data.ArrayStore ({
 						fields: ["id", "text"],
 				        data: [
-				        	["sum", "Сумма"],
-				        	["avg", "Среднее"],
-				        	["max", "Максимальное"],
-				        	["min", "Минимальное"]
+				        	["sum", $o.getString ("Sum")],
+				        	["avg", $o.getString ("Average")],
+				        	["max", $o.getString ("Max")],
+				        	["min", $o.getString ("Min")]
 				        ]
 					}),
 					valueField: "id",
@@ -13775,16 +13779,16 @@ Ext.define ("$o.LayoutTotal.Widget", {
 					metaData.tdAttr += ' style=";border: 1px gray solid;"';
 					switch (value) {
 					case "sum":
-						value = "Сумма";
+						value = $o.getString ("Sum");
 						break;
 				    case "avg":
-				    	value = "Среднее";
+				    	value = $o.getString ("Average");
 				    	break;
 				    case "max":
-				    	value = "Максимальное";
+				    	value = $o.getString ("Max");
 				    	break;
 				    case "min":
-				    	value = "Минимальное";
+				    	value = $o.getString ("Min");
 				    };
 					return value;
 			    }
@@ -13857,13 +13861,13 @@ Ext.define ("$o.LayoutChart.Widget", {
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.chart.id,
@@ -13876,7 +13880,7 @@ Ext.define ("$o.LayoutChart.Widget", {
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.chart.title,
 					listeners: {
@@ -13896,7 +13900,7 @@ Ext.define ("$o.LayoutChart.Widget", {
 					}
 				}, {
 					xtype: "$conffield", 
-					fieldLabel: "Запрос",
+					fieldLabel: $o.getString ("Query"),
 					name: "view", 
 					value: me.value.chart.view, 
 					width: "100%",
@@ -13924,7 +13928,7 @@ Ext.define ("$o.LayoutChart.Widget", {
 					}
 				}, {
 					xtype: "combo",
-					fieldLabel: "Атрибут показателя",
+					fieldLabel: $o.getString ("Mark", ":", "Attribute"),
 					name: "attrMark",
 					width: "100%",
 					mode: "local",
@@ -13942,7 +13946,7 @@ Ext.define ("$o.LayoutChart.Widget", {
 					}
 				}, {
 					xtype: "combo",
-					fieldLabel: "Атрибут значения",
+					fieldLabel: $o.getString ("Value", ":", "Attribute"),
 					name: "attrValue",
 					width: "100%",
 					mode: "local",
@@ -13960,7 +13964,7 @@ Ext.define ("$o.LayoutChart.Widget", {
 					}
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Заголовок показателей",
+					fieldLabel: $o.getString ("Title of marks"),
 					width: "100%",
 					name: "titleMark",
 					validator: me.validator,
@@ -13972,7 +13976,7 @@ Ext.define ("$o.LayoutChart.Widget", {
 					}
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Заголовок значений",
+					fieldLabel: $o.getString ("Title of values"),
 					width: "100%",
 					name: "titleValue",
 					validator: me.validator,
@@ -13986,7 +13990,7 @@ Ext.define ("$o.LayoutChart.Widget", {
 					layout: "fit",
 					width: "100%",
 					flex: 1,
-					title: "Фильтр",
+					title: $o.getString ("Filter"),
 					iconCls: "gi_filter",
 					bodyPadding: 2,
 					items: {
@@ -14006,7 +14010,7 @@ Ext.define ("$o.LayoutChart.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {
@@ -14074,13 +14078,13 @@ Ext.define ("$o.LayoutImage.Widget", {
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.image.id,
@@ -14094,7 +14098,7 @@ Ext.define ("$o.LayoutImage.Widget", {
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.image.title,
 					listeners: {
@@ -14115,7 +14119,7 @@ Ext.define ("$o.LayoutImage.Widget", {
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Ссылка (URL)",
+					fieldLabel: $o.getString ("Reference") + " (URL)",
 					name: "url",
 					value: me.value.image.url,
 					validator: me.validator,
@@ -14127,7 +14131,7 @@ Ext.define ("$o.LayoutImage.Widget", {
 					}
 				}, {
 					xtype: "combo",
-					fieldLabel: "Атрибут компонента",
+					fieldLabel: $o.getString ("Component attribute"),
 					name: "attr",
 					width: "100%",
 					mode: "local",
@@ -14147,7 +14151,7 @@ Ext.define ("$o.LayoutImage.Widget", {
 				}, {
 					xtype: "numberfield",
 					width: 300, 
-					fieldLabel: "Ширина",
+					fieldLabel: $o.getString ("Width"),
 					name: "width",
 					value: me.value.image.width,
 					validator: me.validator,
@@ -14159,7 +14163,7 @@ Ext.define ("$o.LayoutImage.Widget", {
 				}, {
 					xtype: "numberfield",
 					width: 300, 
-					fieldLabel: "Высота",
+					fieldLabel: $o.getString ("Height"),
 					name: "height",
 					value: me.value.image.height,
 					validator: me.validator,
@@ -14171,7 +14175,7 @@ Ext.define ("$o.LayoutImage.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {
@@ -14262,13 +14266,13 @@ Ext.define ("$o.LayoutFrame.Widget", {
 			xtype: "tabpanel",
 			items: [{
 				layout: "vbox",
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				iconCls: "gi_edit",
 				bodyPadding: 5,
 				items: [{
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "id",
 					style: "margin-top: 5px;",
 					value: me.value.frame.id,
@@ -14282,7 +14286,7 @@ Ext.define ("$o.LayoutFrame.Widget", {
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Заголовок",
+					fieldLabel: $o.getString ("Title"),
 					name: "title",
 					value: me.value.frame.title,
 					listeners: {
@@ -14303,7 +14307,7 @@ Ext.define ("$o.LayoutFrame.Widget", {
 				}, {
 					xtype: "textfield",
 					width: "100%", 
-					fieldLabel: "Ссылка (URL)",
+					fieldLabel: $o.getString ("Reference") + " (URL)",
 					name: "url",
 					value: me.value.frame.url,
 					validator: me.validator,
@@ -14315,7 +14319,7 @@ Ext.define ("$o.LayoutFrame.Widget", {
 					}
 				}, {
 					xtype: "combo",
-					fieldLabel: "Атрибут компонента",
+					fieldLabel: $o.getString ("Component attribute"),
 					name: "attr",
 					width: "100%",
 					mode: "local",
@@ -14335,7 +14339,7 @@ Ext.define ("$o.LayoutFrame.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				border: 0,
 				items: {
@@ -14395,17 +14399,17 @@ Ext.define ("$o.ActionDesigner.Widget", {
 	initComponent: function () {
 		var me = this;
 		me.tbar = [{
-			text: "Открыть",
+			text: $o.getString ("Open"),
 			iconCls: "gi_edit",
 			handler: me.edit,
 			scope: me
 		}, {
-			text: "Добавить",
+			text: $o.getString ("Add"),
 			iconCls: "gi_circle_plus",
 			handler: me.create,
 			scope: me
 		}, {
-			text: "Удалить",
+			text: $o.getString ("Remove"),
 			iconCls: "gi_circle_minus",
 			handler: me.remove,
 			scope: me
@@ -14421,7 +14425,7 @@ Ext.define ("$o.ActionDesigner.Widget", {
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Действие", width: 100, dataIndex: "action", renderer: me.cellRenderer
+				header: $o.getString ("Action"), width: 100, dataIndex: "action", renderer: me.cellRenderer
 			}, {
 				header: "id", width: 100, dataIndex: "id", hidden: true
 			}],
@@ -14460,7 +14464,7 @@ Ext.define ("$o.ActionDesigner.Widget", {
 	create: function () {
 		var me = this;
 		dialog.getObject ({
-			title: "Выберите действия",
+			title: $o.getString ("Select", "actions"),
 			width: 800,
 			height: 600,
 			layout: {
@@ -14470,7 +14474,7 @@ Ext.define ("$o.ActionDesigner.Widget", {
 					items: [{
 						treegrid: {
 							id: "olapClasses",
-							title: "Классы",
+							title: $o.getString ("Classes"),
 							view: "system.classes",
 						    fields: {
 						        id: "id",
@@ -14481,7 +14485,7 @@ Ext.define ("$o.ActionDesigner.Widget", {
 					}, {
 						olap: {
 							id: "olap",
-							title: "Действия",
+							title: $o.getString ("Actions"),
 							view: "system.actions",
 							singleSelect: false,
 							filter: ["class_id", "=", {id: "olapClasses", attr: "id"}]
@@ -14546,7 +14550,7 @@ Ext.define ("$o.ActionDesigner.Widget", {
 			border: false,
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
-			title: "Действие",
+			title: $o.getString ("Action"),
 			bodyPadding: 5,
 			modal: 1,
 			items: {
@@ -14633,7 +14637,7 @@ Ext.define ("$o.ActionCard.Widget", {
 			disabled: 1,
 			scope: me
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			iconCls: "gi_remove",
 			handler: function () {
 				me.up ("window").close ();
@@ -14642,7 +14646,7 @@ Ext.define ("$o.ActionCard.Widget", {
 		}];
 		me.items = [{
 			xtype: "$conffield", 
-			fieldLabel: "Действие",
+			fieldLabel: $o.getString ("Action"),
 			name: "action", 
 			width: "100%",
 			confRef: "action",
@@ -14717,14 +14721,14 @@ Ext.define ("$o.ActionCard.Widget", {
 		}, {
 			xtype: "textfield",
 			width: "100%",
-			fieldLabel: "Функция",
+			fieldLabel: $o.getString ("Function"),
 			name: "fn",
 			value: me.value.actionId ? "" : me.value.fn,
 			validator: me.validator
 		}, {
 			xtype: "textfield",
 			width: "100%",
-			fieldLabel: "Наименование",
+			fieldLabel: $o.getString ("Name"),
 			name: "name",
 			value: me.value.text
 		}, {
@@ -14735,10 +14739,10 @@ Ext.define ("$o.ActionCard.Widget", {
 		}, {
 			xtype: "checkbox",
 			name: "activeRecordSelected",
-			fieldLabel: "Активно при выбранной записи",
+			fieldLabel: $o.getString ("Active when record selected"),
 			checked: me.value.active == "common.recordSelected"
 		}, {
-			title: "Параметры",
+			title: $o.getString ("Options"),
 			width: "100%",
 			flex: 1,
 			xtype: "$actionargs",
@@ -14805,12 +14809,12 @@ Ext.define ("$o.ActionArgs.Widget", {
 		var me = this;
 		me.value = me.value || {};
 		me.tbar = [{
-			text: "Добавить",
+			text: $o.getString ("Add"),
 			iconCls: "gi_circle_plus",
 			handler: me.create,
 			scope: me
 		}, {
-			text: "Удалить",
+			text: $o.getString ("Remove"),
 			iconCls: "gi_circle_minus",
 			handler: me.remove,
 			scope: me
@@ -14831,11 +14835,11 @@ Ext.define ("$o.ActionArgs.Widget", {
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Параметр", width: 150, dataIndex: "arg", renderer: me.cellRenderer, editor: {
+				header: $o.getString ("Option"), width: 150, dataIndex: "arg", renderer: me.cellRenderer, editor: {
 		            xtype: "textfield"
 		        }
 			}, {
-				header: "Значение", flex: 1, dataIndex: "value", renderer: me.cellRenderer, editor: {
+				header: $o.getString ("Value"), flex: 1, dataIndex: "value", renderer: me.cellRenderer, editor: {
 		            xtype: "textfield"
 		        }
 			}],
@@ -14906,17 +14910,17 @@ Ext.define ("$o.EventDesigner.Widget", {
 	initComponent: function () {
 		var me = this;
 		me.tbar = [{
-			text: "Открыть",
+			text: $o.getString ("Open"),
 			iconCls: "gi_edit",
 			handler: me.edit,
 			scope: me
 		}, {
-			text: "Добавить",
+			text: $o.getString ("Add"),
 			iconCls: "gi_circle_plus",
 			handler: me.create,
 			scope: me
 		}, {
-			text: "Удалить",
+			text: $o.getString ("Remove"),
 			iconCls: "gi_circle_minus",
 			handler: me.remove,
 			scope: me
@@ -14934,9 +14938,9 @@ Ext.define ("$o.EventDesigner.Widget", {
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Событие", flex: 1, dataIndex: "event", renderer: me.cellRenderer
+				header: $o.getString ("Event"), flex: 1, dataIndex: "event", renderer: me.cellRenderer
 			}, {
-				header: "Действие", flex: 2, dataIndex: "action", renderer: me.cellRenderer
+				header: $o.getString ("Action"), flex: 2, dataIndex: "action", renderer: me.cellRenderer
 			}, {
 				header: "fn", width: 100, dataIndex: "fn", hidden: true
 			}],
@@ -14998,7 +15002,7 @@ Ext.define ("$o.EventDesigner.Widget", {
 			border: false,
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
-			title: "Событие",
+			title: $o.getString ("Event"),
 			bodyPadding: 5,
 			modal: 1,
 			items: {
@@ -15079,7 +15083,7 @@ Ext.define ("$o.EventCard.Widget", {
 			disabled: 1,
 			scope: me
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			iconCls: "gi_remove",
 			handler: function () {
 				me.up ("window").close ();
@@ -15094,7 +15098,7 @@ Ext.define ("$o.EventCard.Widget", {
 		me.items = [{
 			xtype: "combo",
 			name: "event",
-			fieldLabel: "Событие",
+			fieldLabel: $o.getString ("Event"),
 			width: "100%",
 			triggerAction: "all",
 			lazyRender: true,
@@ -15112,7 +15116,7 @@ Ext.define ("$o.EventCard.Widget", {
 			displayField: "text"
 		}, {
 			xtype: "$conffield", 
-			fieldLabel: "Действие",
+			fieldLabel: $o.getString ("Action"),
 			name: "action", 
 			width: "100%",
 			confRef: "action",
@@ -15168,12 +15172,12 @@ Ext.define ("$o.EventCard.Widget", {
 		}, {
 			xtype: "textfield",
 			width: "100%",
-			fieldLabel: "Функция",
+			fieldLabel: $o.getString ("Function"),
 			name: "fn",
 			value: action ? "" : me.value.fn,
 			validator: me.validator
 		}, {
-			title: "Параметры",
+			title: $o.getString ("Options"),
 			width: "100%",
 			flex: 1,
 			xtype: "$actionargs",
@@ -15244,7 +15248,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		me.items = {
 			xtype: "tabpanel",
 			items: [{
-				title: "Конструктор",
+				title: $o.getString ("Constructor"),
 				iconCls: "gi_adjust_alt",
 				layout: "border",
 				name: "constructor",
@@ -15258,18 +15262,18 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 			    		xtype: "treepanel",
 					    store: me.treeStore,
 					    rootVisible: false,
-				    	title: "Навигатор",
+				    	title: $o.getString ("Navigator"),
 				    	iconCls: "gi_search",
 				    	border: 0,
 				    	tbar: [{
-				    		text: "Открыть",
+				    		text: $o.getString ("Open"),
 				    		iconCls: "gi_edit",
 				    		name: "edit",
 				    		handler: me.edit,
 				    		scope: me,
 				    		disabled: 1
 				    	}, {
-				    		text: "Добавить",
+				    		text: $o.getString ("Add"),
 				    		iconCls: "gi_circle_plus",
 				    		name: "create",
 				    		handler: function () {
@@ -15282,7 +15286,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				    		scope: me,
 				    		disabled: 1
 				    	}, {
-				    		text: "Удалить",
+				    		text: $o.getString ("Remove"),
 				    		iconCls: "gi_circle_minus",
 				    		name: "delete",
 				    		handler: function () {
@@ -15306,7 +15310,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				    		disabled: 1
 				    	}],
 				    	bbar: [{
-				    		text: "Отменить действие",
+				    		text: $o.getString ("Cancel action"),
 				    		iconCls: "gi_history",
 				    		name: "prevValue",
 				    		disabled: 1,
@@ -15360,7 +15364,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				name: "source",
 				items: {
@@ -15463,31 +15467,31 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 	getCmpName: function (code) {
 		switch (code) {
 		case "split":
-			return "Разделитель";
+			return $o.getString ("Splitter");
 			break;
 		case "tab":
-			return "Закладки";
+			return $o.getString ("Tabs");
 			break;
 		case "olap":
-			return "Таблица";
+			return $o.getString ("Table");
 			break;
 		case "treegrid":
-			return "Дерево";
+			return $o.getString ("Tree");
 			break;
 		case "card":
-			return "Карточка";
+			return $o.getString ("Card");
 			break;
 		case "chart":
-			return "Диаграмма";
+			return $o.getString ("Chart");
 			break;
 		case "image":
-			return "Изображение";
+			return $o.getString ("Image");
 			break;
 		case "frame":
-			return "Фрейм";
+			return $o.getString ("Frame");
 			break;
 		case "panel":
-			return "Пустой";
+			return $o.getString ("Empty");
 			break;
 		};
 	},
@@ -15633,7 +15637,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				}, 
 				items: [{
 					xtype: "button",
-					text: "Выберите компонент",
+					text: $o.getString ("Select", "component"),
 					iconCls: "gi_edit",
 					name: "selectCmp",
 					cmpId: id
@@ -15678,14 +15682,14 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		    bodyPadding: 5,
 		    resizeable: false,
 			border: false,
-			title: "Выберите компонент",
+			title: $o.getString ("Select", "component"),
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
 			modal: 1,
 			layout: "hbox",
 			items: [{
 				xtype: "button",
-				text: "Таблица",
+				text: $o.getString ("Table"),
 				cmpCode: "olap",
 				iconCls: "gib_table",
 				iconAlign: "top",
@@ -15694,7 +15698,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Дерево",
+				text: $o.getString ("Tree"),
 				cmpCode: "treegrid",
 				iconCls: "gib_leaf",
 				iconAlign: "top",
@@ -15703,7 +15707,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Карточка",
+				text: $o.getString ("Card"),
 				cmpCode: "card",
 				iconCls: "gib_edit",
 				iconAlign: "top",
@@ -15712,7 +15716,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Диаграмма",
+				text: $o.getString ("Chart"),
 				cmpCode: "chart",
 				iconCls: "gib_charts",
 				iconAlign: "top",
@@ -15721,7 +15725,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Изображение",
+				text: $o.getString ("Image"),
 				cmpCode: "image",
 				iconCls: "gib_picture",
 				iconAlign: "top",
@@ -15730,7 +15734,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Фрейм",
+				text: $o.getString ("Frame"),
 				cmpCode: "frame",
 				iconCls: "gib_globe_af",
 				iconAlign: "top",
@@ -15739,7 +15743,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Разделитель",
+				text: $o.getString ("Splitter"),
 				cmpCode: "split",
 				iconCls: "gib_share_alt",
 				iconAlign: "top",
@@ -15748,7 +15752,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				handler: onClick
 			}, {
 				xtype: "button",
-				text: "Закладки",
+				text: $o.getString ("Tabs"),
 				cmpCode: "tab",
 				iconCls: "gib_bookmark",
 				iconAlign: "top",
@@ -15886,7 +15890,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 					}, 
 					items: [{
 						xtype: "label",
-						text: "Извините, не удалось декодировать исходный код макета."
+						text: $o.getString ("Sorry, we could not decode the source code layout")
 					}]
 				});
 				me.treeStore.getRootNode ().removeAll ();
@@ -15986,7 +15990,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		};
 		process (l);
 		if (noCls) {
-			common.message ("Не определен класс объекта в карточке: " + noCls);
+			common.message ($o.getString ("Class of object in the card is not defined") + ": " + noCls);
 		};
 		return l;
 	},
@@ -16015,12 +16019,12 @@ Ext.define ("$o.QuerySort.Widget", {
 		var me = this;
 		me.value = me.value || [];
 		me.tbar = [{
-			text: "Добавить",
+			text: $o.getString ("Add"),
 			handler: me.create,
 			iconCls: "gi_circle_plus",
 			scope: me
 		}, {
-			text: "Очистить",
+			text: $o.getString ("Clear"),
 			iconCls: "gi_circle_minus",
 			handler: me.clear,
 			scope: me
@@ -16040,9 +16044,9 @@ Ext.define ("$o.QuerySort.Widget", {
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Атрибут", width: 100, dataIndex: "attr", renderer: me.cellRenderer
+				header: $o.getString ("Attribute"), width: 100, dataIndex: "attr", renderer: me.cellRenderer
 			}, {
-				header: "Сортировка", width: 100, dataIndex: "dir", renderer: me.cellRenderer
+				header: $o.getString ("Sort"), width: 100, dataIndex: "dir", renderer: me.cellRenderer
 			}, {
 				header: "alias", width: 100, dataIndex: "attr_id", hidden: true
 			}, {
@@ -16231,7 +16235,7 @@ Ext.define ("$o.QuerySort.Widget", {
 			border: false,
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
-			title: "Выберите атрибут",
+			title: $o.getString ("Select", "attribute"),
 			iconCls: "gi_file",
 			bodyPadding: 5,
 			modal: 1,
@@ -16259,7 +16263,7 @@ Ext.define ("$o.QuerySort.Widget", {
 					me.fireEvent ("change", me.value);
 				}
 			}, {
-				text: "Отмена",
+				text: $o.getString ("Cancel"),
 				iconCls: "gi_remove",
 				handler: function () {
 					win.close ();
@@ -16287,7 +16291,7 @@ Ext.define ("$o.QuerySort.Widget", {
 				}
 				*/
 				xtype: "combo",
-				fieldLabel: "Атрибут",
+				fieldLabel: $o.getString ("Attribute"),
 				name: "attr",
 				width: "100%",
 				mode: "local",
@@ -16310,7 +16314,7 @@ Ext.define ("$o.QuerySort.Widget", {
 				}
 			}, {
 				xtype: "combo",
-				fieldLabel: "Сортировка",
+				fieldLabel: $o.getString ("Sort"),
 				name: "dir",
 				width: "100%",
 				mode: "local",
@@ -16319,8 +16323,8 @@ Ext.define ("$o.QuerySort.Widget", {
 				store: new Ext.data.ArrayStore ({
 					fields: ["id", "text"],
 					data: [
-						["ASC", "По возрастанию"],
-						["DESC", "По убыванию"]
+						["ASC", $o.getString ("Sort ascending")],
+						["DESC", $o.getString ("Sort descending")]
 					]
 				}),
 				valueField: "id",
@@ -16343,10 +16347,10 @@ Ext.define ("$o.QuerySort.Widget", {
 				};
 				var r = {};
 				if (me.value [i + 1] == "DESC") {
-					r.dir = "По убыванию";
+					r.dir = $o.getString ("Sort descending");
 					r.dir_id = "DESC";
 				} else {
-					r.dir = "По возрастанию";
+					r.dir = $o.getString ("Sort ascending");
 					r.dir_id = "ASC";
 				};
 				var alias; for (alias in me.value [i]) {break;};
@@ -16388,7 +16392,7 @@ Ext.define ("$o.QuerySelect.Widget", {
 		var me = this;
 		me.value = me.value || [];
 		me.tbar = [{
-    		text: "Выбрать",
+    		text: $o.getString ("Choose"),
     		iconCls: "gi_edit",
     		handler: me.addAttrs,
     		scope: me
@@ -16416,11 +16420,11 @@ Ext.define ("$o.QuerySelect.Widget", {
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Атрибут", width: 100, dataIndex: "name", renderer: me.cellRenderer
+				header: $o.getString ("Attribute"), width: 100, dataIndex: "name", renderer: me.cellRenderer
 			}, {
-				header: "Псевдоним", width: 100, dataIndex: "alias", renderer: me.cellRenderer
+				header: $o.getString ("Alias"), width: 100, dataIndex: "alias", renderer: me.cellRenderer
 			}, {
-				header: "Класс", width: 100, dataIndex: "clsName", renderer: me.cellRenderer
+				header: $o.getString ("Class"), width: 100, dataIndex: "clsName", renderer: me.cellRenderer
 			}, {
 				header: "clsFrom", width: 100, dataIndex: "clsFrom", hidden: true
 			}, {
@@ -16460,7 +16464,7 @@ Ext.define ("$o.QuerySelect.Widget", {
 	addAttrs: function () {
 		var me = this;
 		if (!me.$classes.length) {
-			common.message ("Необходимо выбрать класс.");
+			common.message ($o.getString ("Select", "class"));
 			return;
 		};
 		var tabs = [];
@@ -16519,7 +16523,7 @@ Ext.define ("$o.QuerySelect.Widget", {
 			});
 			var grid = Ext.create ("Ext.grid.Panel", {
 				tbar: i ? [{
-					text: "Псевдонимы по коду атрибута",
+					text: $o.getString ("Aliases by attribute code"),
 					iconCls: "gi_sort-by-alphabet",
 					handler: function () {
 						var store = this.up ("grid").getStore ();
@@ -16534,14 +16538,14 @@ Ext.define ("$o.QuerySelect.Widget", {
 				}] : [],
 				store: store,
 				columns: [{
-					header: "Атрибут", width: 100, dataIndex: "name", renderer: me.cellRenderer
+					header: $o.getString ("Attribute"), width: 100, dataIndex: "name", renderer: me.cellRenderer
 				}, {
-					header: "Псевдоним", width: 100, dataIndex: "alias", renderer: me.cellRenderer,
+					header: $o.getString ("Alias"), width: 100, dataIndex: "alias", renderer: me.cellRenderer,
 			        editor: {
 			            xtype: "textfield"
 			        }
 				}, {
-					header: "Класс", width: 100, dataIndex: "clsName", renderer: me.cellRenderer
+					header: $o.getString ("Class"), width: 100, dataIndex: "clsName", renderer: me.cellRenderer
 				}, {
 					header: "attr", width: 100, dataIndex: "attr", hidden: true
 				}],
@@ -16573,7 +16577,7 @@ Ext.define ("$o.QuerySelect.Widget", {
 			height: 600,
 		    resizeable: false,
 			border: false,
-			title: "Выберите атрибуты (используйте указатель мыши и клавиши Shift, Ctrl)",
+			title: $o.getString ("Select attributes (use mouse and Shift, Ctrl)"),
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
 			modal: 1,
@@ -16611,7 +16615,7 @@ Ext.define ("$o.QuerySelect.Widget", {
 					me.updateSelect ();
 				}
 			}, {
-				text: "Отмена",
+				text: $o.getString ("Cancel"),
 				iconCls: "gi_remove",
 				handler: function () {
 					win.close ();
@@ -16682,7 +16686,7 @@ Ext.define ("$o.QueryCondition.Widget", {
 			handler: me.save,
 			scope: me
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			iconCls: "gi_remove",
 			name: "cancel",
 			handler: function () {
@@ -16699,7 +16703,7 @@ Ext.define ("$o.QueryCondition.Widget", {
 		};
 		me.items = [{
 			xtype: "combo",
-			fieldLabel: "И/ИЛИ",
+			fieldLabel: $o.getString ("And/or"),
 			name: "and_or",
 			width: 250,
 			mode: "local",
@@ -16708,8 +16712,8 @@ Ext.define ("$o.QueryCondition.Widget", {
 			store: new Ext.data.ArrayStore ({
 				fields: ["id", "text"],
 				data: [
-					["and", "И"],
-					["or", "ИЛИ"]
+					["and", $o.getString ("and")],
+					["or", $o.getString ("or")]
 				]
 			}),
 			valueField: "id",
@@ -16724,7 +16728,7 @@ Ext.define ("$o.QueryCondition.Widget", {
 			*/
 		}, {
 			xtype: "combo",
-			fieldLabel: "Атрибут 1",
+			fieldLabel: $o.getString ("Attribute") + " 1",
 			name: "attr1",
 			width: "100%",
 			mode: "local",
@@ -16739,7 +16743,7 @@ Ext.define ("$o.QueryCondition.Widget", {
 			validator: me.validator
 		}, {
 			xtype: "combo",
-			fieldLabel: "Оператор",
+			fieldLabel: $o.getString ("Operator"),
 			name: "oper",
 			width: 250,
 			mode: "local",
@@ -16748,15 +16752,15 @@ Ext.define ("$o.QueryCondition.Widget", {
 			store: new Ext.data.ArrayStore ({
 				fields: ["id", "text"],
 				data: [
-					["=", "равно (=)"],
-					["<>", "не равно (<>)"],
-					["<", "меньше (<)"],
-					[">", "больше (>)"],
-					["<=", "меньше или равно (<=)"],
-					[">=", "больше или равно (>=)"],
-					["is null", "пусто (is null)"],
-					["is not null", "не пусто (is not null)"],
-					["in", "одно из перечня (in)"]
+					["=", $o.getString ("equal") + " (=)"],
+					["<>", $o.getString ("not equal") + " (<>)"],
+					["<", $o.getString ("less") + " (<)"],
+					[">", $o.getString ("more") + " (>)"],
+					["<=", $o.getString ("less or equal") + " (<=)"],
+					[">=", $o.getString ("more  or equal") + " (>=)"],
+					["is null", $o.getString ("null") + " (is null)"],
+					["is not null", $o.getString ("not null") + " (is not null)"],
+					["in", $o.getString ("one of list") + " (in)"]
 				]
 			}),
 			valueField: "id",
@@ -16780,13 +16784,13 @@ Ext.define ("$o.QueryCondition.Widget", {
 			validator: me.validator
 		}, {
 			xtype: "textfield",
-			fieldLabel: "Значение",
+			fieldLabel: $o.getString ("Value"),
 			width: "100%",
 			name: "value",
 			validator: me.validator
 		}, {
 			xtype: "combo",
-			fieldLabel: "Атрибут 2",
+			fieldLabel: $o.getString ("Attribute") + " 2",
 			name: "attr2",
 			width: "100%",
 			mode: "local",
@@ -16886,7 +16890,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		me.items = {
 			xtype: "tabpanel",
 			items: [{
-				title: "Конструктор",
+				title: $o.getString ("Constructor"),
 				iconCls: "gi_adjust_alt",
 				layout: "border",
 				name: "constructor",
@@ -16904,7 +16908,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				    		xtype: "compositefield",
 				    		items: [{
 								xtype: "$conffield", 
-								fieldLabel: "Класс",
+								fieldLabel: $o.getString ("Class"),
 								name: "class", 
 								width: 400,
 								confRef: "class",
@@ -16926,7 +16930,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 								}
 							}, {
 								xtype: "displayfield",
-								value: "Псевдоним:",
+								value: $o.getString ("Alias") + ":",
 								style: "margin-left: 5px",
 								width: 70
 							}, {
@@ -16943,7 +16947,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 								}
 							}]
 						}, {
-							title: "Дополнительные классы",
+							title: $o.getString ("Additional classes"),
 					    	iconCls: "gi_cogwheels",
 							flex: 1,
 							width: "100%",
@@ -16952,7 +16956,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 							autoScroll: true,
 							bodyPadding: 5,
 					    	tbar: [{
-					    		text: "Добавить",
+					    		text: $o.getString ("Add"),
 					    		iconCls: "gi_circle_plus",
 					    		handler: me.addClass,
 					    		scope: me
@@ -16971,7 +16975,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 						border: 1,
 						bodyPadding: 1,
 					    items: {
-					    	title: "Атрибуты",
+					    	title: $o.getString ("Attributes"),
 					    	iconCls: "gi_file",
 					    	xtype: "$queryselect",
 							name: "attrs",
@@ -17001,7 +17005,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 								border: 1,
 								bodyPadding: 1,
 							    items: {
-							    	title: "Фильтр",
+							    	title: $o.getString ("Filter"),
 							    	iconCls: "gi_filter",
 									xtype: "$layoutfilter",
 									name: "filter",
@@ -17017,7 +17021,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 								border: 1,
 								bodyPadding: 1,
 							    items: {
-							    	title: "Сортировка",
+							    	title: $o.getString ("Sort"),
 							    	iconCls: "gi_sort-by-order",
 							    	name: "sort",
 							    	xtype: "$querysort",
@@ -17038,7 +17042,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}]
 			}, {
 				layout: "fit",
-				title: "Исходный код",
+				title: $o.getString ("Source code"),
 				iconCls: "gi_notes",
 				name: "source",
 				items: {
@@ -17060,7 +17064,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 			v = JSON.parse (v);
 			return v;
 		} catch (e) {
-			container.getEl ().mask ("Извините, не удалось декодировать исходный код макета.");
+			container.getEl ().mask ($o.getString ("Sorry, we could not decode the source code layout"));
 			me.down ("tabpanel").setActiveTab (me.down ("panel[name=source]"));
 		};
 	},
@@ -17152,15 +17156,15 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				listeners: {
 					change: function () {
 						me.updateAttrsStore ();
-						var attr1 = this.up ("*").down ("*[fieldLabel='Связующий атрибут 1']");
-						var attr2 = this.up ("*").down ("*[fieldLabel='Связующий атрибут 2']");
+						var attr1 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Attribute") + " 1']");
+						var attr2 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Attribute") + " 2']");
 						if (!attr1.getValue () && !attr2.getValue ()) {
 							var cls1 = me.down ("*[name=class]").getValue ();
 							var cls2 = this.getValue ();
 							if (cls1 && cls2) {
 								var attrs1 = $o.getClass (cls1).attrs;
 								var alias1 = me.down ("*[name=alias]").getValue ();
-								var alias2 = this.up ("*").down ("*[fieldLabel='Псевдоним']").getValue ();
+								var alias2 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Alias") + "']").getValue ();
 								for (var attr in attrs1) {
 									var ca = attrs1 [attr];
 									if (ca.get ("type") == cls2) {
@@ -17178,7 +17182,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}
 			}, {
 				xtype: "textfield",
-				fieldLabel: "Псевдоним",
+				fieldLabel: $o.getString ("Alias"),
 				name: "alias_" + n,
 				value: n,
 				listeners: {
@@ -17191,7 +17195,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}
 			}, {
 				xtype: "combo",
-				fieldLabel: "Связующий атрибут 1",
+				fieldLabel: $o.getString ("Attribute") + " 1",
 				name: "attr1_" + n,
 				width: "100%",
 				labelWidth: 100,
@@ -17209,7 +17213,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}
 			}, {
 				xtype: "combo",
-				fieldLabel: "Связующий атрибут 2",
+				fieldLabel: $o.getString ("Attribute") + " 2",
 				name: "attr2_" + n,
 				width: "100%",
 				labelWidth: 100,
@@ -17227,7 +17231,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}
 			}, {
 				xtype: "combo",
-				fieldLabel: "Объединение",
+				fieldLabel: $o.getString ("Union"),
 				name: "join_" + n,
 				width: "100%",
 				labelWidth: 100,
@@ -17236,7 +17240,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				editable: false,
 				store: new Ext.data.ArrayStore ({
 					fields: ["id", "text"],
-					data: [["left-join", "Внешнее"], ["inner-join", "Внутреннее"]]
+					data: [["left-join", $o.getString ("External")], ["inner-join", $o.getString ("Internal")]]
 				}),
 				value: "left-join",
 				valueField: "id",
@@ -17249,7 +17253,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				}
 			}, {
 				xtype: "button",
-				text: "Удалить",
+				text: $o.getString ("Remove"),
 				iconCls: "gi_circle_minus",
 				style: "margin-top: 5px",
 				handler: function () {
@@ -17419,7 +17423,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 					throw "invalid";
 				};
 			} catch (e) {
-				container.getEl ().mask ("Извините, не удалось декодировать исходный код макета.");
+				container.getEl ().mask ($o.getString ("Sorry, we could not decode the source code layout"));
 				me.down ("tabpanel").setActiveTab (me.down ("panel[name=source]"));
 				return;
 			};
@@ -17444,7 +17448,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		var me = this;
 		var data = [];
 		var classes = me.query ("*[confRef=class]");
-		var aliases = [me.down ("*[name=alias]")].concat (me.query ("*[fieldLabel=Псевдоним]"));
+		var aliases = [me.down ("*[name=alias]")].concat (me.query ("*[fieldLabel=" + $o.getString ("Alias") + "]"));
 		for (var i = 0; i < classes.length; i ++) {
 			if (!classes [i].getValue () || !aliases [i].getValue ()) {
 				continue;
@@ -17523,7 +17527,7 @@ Ext.define ("$o.QueryColumns.Widget", {
 								}
 							}, {
 								split: {
-									title: "Столбцы",
+									title: $o.getString ("Columns"),
 									iconCls: "gi_file",
 									orientation: "vertical",
 									height: 185,
@@ -17542,21 +17546,21 @@ Ext.define ("$o.QueryColumns.Widget", {
 										cardConf: {
 											id: "attrCard",
 											items: [{
-												conf: "viewAttr", id: "olapAttrs", attr: "id.name", fieldLabel: "Наименование"
+												conf: "viewAttr", id: "olapAttrs", attr: "id.name", fieldLabel: $o.getString ("Name")
 											}, {
-												conf: "viewAttr", id: "olapAttrs", attr: "id.code", fieldLabel: "Код", allowBlank: false, maskRe: /[A-Za-z0-9\_]/
+												conf: "viewAttr", id: "olapAttrs", attr: "id.code", fieldLabel: $o.getString ("Code"), allowBlank: false, maskRe: /[A-Za-z0-9\_]/
 											}, {
-												xtype: "compositefield", fieldLabel: "Видимый",
+												xtype: "compositefield", fieldLabel: $o.getString ("Visible"),
 												items: [{
 													conf: "viewAttr", id: "olapAttrs", attr: "id.area", xtype: "checkbox", width: 100
 												}]
 											}, {
-												xtype: "compositefield", fieldLabel: "№ пп",
+												xtype: "compositefield", fieldLabel: $o.getString ("N"),
 												items: [{
 													conf: "viewAttr", id: "olapAttrs", attr: "id.order", xtype: "numberfield", width: 100
 												}]
 											}, {
-												xtype: "compositefield", fieldLabel: "Ширина",
+												xtype: "compositefield", fieldLabel: $o.getString ("Width"),
 												items: [{
 													conf: "viewAttr", id: "olapAttrs", attr: "id.width", xtype: "numberfield", width: 100
 												}]
@@ -17609,13 +17613,13 @@ Ext.define ("$o.QueryColumns.Widget", {
 				},
 				items: [{
 					xtype: "label",
-					text: "- Чтобы скрыть/отобразить столбец используйте контекстное меню любого столбца."
+					text: "- " + $o.getString ("To hide / show a column use context menu of any column")
 				}, {
 					xtype: "label",
-					text: "- Перетащите столбец мышью для изменения его местоположения."
+					text: "- " + $o.getString ("Drag the column to modify its location")
 				}, {
 					xtype: "label",
-					text: "- Ширина столбцов настраивается в заголовке таблицы на границах столбцов."
+					text: "- " + $o.getString ("Width of columns set in the header of table at the column boundaries")
 				}]
 			};
 		};
@@ -17690,7 +17694,7 @@ Ext.define ("$o.QueryColumns.Widget", {
 				}, 
 				items: [{
 					xtype: "label",
-					text: "Извините, не удалось декодировать исходный код запроса"
+					text: $o.getString ("Sorry, we could not decode the source code query")
 				}]
 			};
 		};
@@ -18887,13 +18891,13 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 	    	name: "errors",
 	        store: store,
 	        columns: [{
-				text: "Сообщение", dataIndex: "msg", flex: 3, renderer: me.cellRenderer
+				text: $o.getString ("Message"), dataIndex: "msg", flex: 3, renderer: me.cellRenderer
 			}, {
-				text: "Действие", dataIndex: "action", width: 250, renderer: me.cellRenderer
+				text: $o.getString ("Action"), dataIndex: "action", width: 250, renderer: me.cellRenderer
 			}, {
-				text: "Строка", dataIndex: "line", width: 80
+				text: $o.getString ("String"), dataIndex: "line", width: 80
 			}, {
-				text: "Исходный код", dataIndex: "src", flex: 2, renderer: me.cellRenderer
+				text: $o.getString ("Source code"), dataIndex: "src", flex: 2, renderer: me.cellRenderer
 	        }],
 	        width: "100%",
 			forceFit: true,
@@ -18907,7 +18911,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				}
 			}),
 	        tbar: [{
-	        	text: "Исходный код действия",
+	        	text: $o.getString ("Action", ":", "Source code"),
 	        	iconCls: "gi_notes",
 	        	name: "showAction",
 	        	disabled: 1,
@@ -18923,7 +18927,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 							frame: false, border: false, bodyPadding: 1,
 							modal: false,
 							maximizable: true,
-							title: "Исходный код действия: " + a.toString (),
+							title: $o.getString ("Action", ":", "Source code") + ": " + a.toString (),
 							iconCls: "gi_notes",
 							items: {
 								name: "body",
@@ -18935,7 +18939,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 								}
 							},
 							tbar: [{
-								text: "Сохранить",
+								text: $o.getString ("Save"),
 								iconCls: "gi_floppy_save",
 								handler: function () {
 									a.set ("body", win.down ("*[name=body]").getValue ());
@@ -18944,7 +18948,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 									win.close ();
 								}
 							}, {
-								text: "Отмена",
+								text: $o.getString ("Cancel"),
 								iconCls: "gi_remove",
 								handler: function () {
 									win.close ();
@@ -18987,12 +18991,12 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 			}
 		};
 		me.items = [{
-			title: "Общие",
+			title: $o.getString ("Commons"),
 			iconCls: "gi_file",
 			layout: "vbox",
 			items: [{
 				xtype: "textfield",
-				fieldLabel: "Ревизия проекта",
+				fieldLabel: $o.getString ("Project revision"),
 				name: "revision",
 				labelWidth: 200,
 				width: 355,
@@ -19000,13 +19004,13 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				disabled: true
 			}, {
 				xtype: "textfield",
-				fieldLabel: "Наименование проекта",
+				fieldLabel: $o.getString ("Project name"),
 				labelWidth: 200,
 				name: "name",
 				width: "100%"
 			}, {
 				xtype: "compositefield",
-				fieldLabel: "Пароль администратора",
+				fieldLabel: $o.getString ("Admin password"),
 				labelWidth: 200,
 				items: [{
 					xtype: "textfield",
@@ -19015,7 +19019,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					width: 150
 				}, {
 					xtype: "displayfield",
-					value: "Введите пароль еще раз:",
+					value: $o.getString ("enter password again") + ":",
 					style: "margin-left: 5px; margin-right: 2px"
 				}, {
 					xtype: "textfield",
@@ -19034,23 +19038,23 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					items: [{
 						xtype: "textfield",
 						name: "smtpHost",
-						fieldLabel: "Хост"
+						fieldLabel: $o.getString ("Host")
 					}, {
 						xtype: "textfield",
 						name: "smtpUsername",
 						style: "margin-left: 10px",
-						fieldLabel: "Пользователь"
+						fieldLabel: $o.getString ("User")
 					}, {
 						xtype: "textfield",
 						name: "smtpPassword",
 						style: "margin-left: 10px",
-						fieldLabel: "Пароль",
+						fieldLabel: $o.getString ("Password"),
 						inputType: "password"
 					}, {
 						xtype: "textfield",
 						name: "smtpSender",
 						style: "margin-left: 10px",
-						fieldLabel: "Отправитель"
+						fieldLabel: $o.getString ("Sender")
 					}]
 				}
 			}, {
@@ -19064,8 +19068,9 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					items: [{
 						xtype: "checkbox",
 						name: "timeMachineCardButton",
-						fieldLabel: "Отобразить кнопку 'Изменения' в карточке",
+						fieldLabel: $o.getString ("Show button 'Changes' in card"),
 						labelWidth: 250
+						/*
 					}, {
 						xtype: "checkbox",
 						name: "timeMachineShowDates",
@@ -19080,6 +19085,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 						labelWidth: 150,
 						width: 230,
 						editable: false
+						*/
 					}]
 				}
 			}, {
@@ -19089,11 +19095,11 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				width: "100%",
 				items: [{
 					xtype: "button",
-					text: "Сборка проекта",
+					text: $o.getString ("Build project"),
 					iconCls: "gi_settings",
 					handler: function () {
-						me.down ("*[name=time]").setValue ("Сборка ...");
-						me.down ("*[name=errNum]").setValue ("Сборка ...");
+						me.down ("*[name=time]").setValue ($o.getString ("building") + " ...");
+						me.down ("*[name=errNum]").setValue ($o.getString ("building") + " ...");
 						me.down ("*[name=showAction]").disable ();
 						$o.app.name = $ptitle = me.down ("*[name=name]").getValue ();
 						var args = {
@@ -19103,7 +19109,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 						};
 						if (me.down ("*[name=password]").getValue ()) {
 							if (me.down ("*[name=password]").getValue () != me.down ("*[name=password2]").getValue ()) {
-								common.message ("Введенные пароли не совпадают.");
+								common.message ($o.getString ("Passwords not equal"));
 								return;
 							};
 							args.password = $o.util.sha1 (me.down ("*[name=password]").getValue ());
@@ -19162,9 +19168,9 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 			        columns: 2,
 			        style: "margin-left: 25px",
 			        items: [{
-			        	boxLabel: "Тестовая", name: "rgBuild", inputValue: "test", width: 90, checked: true
+			        	boxLabel: $o.getString ("Test"), name: "rgBuild", inputValue: "test", width: 90, checked: true
 			        }, {
-			        	boxLabel: "Продуктивная", name: "rgBuild", inputValue: "prod"
+			        	boxLabel: $o.getString ("Production"), name: "rgBuild", inputValue: "prod"
 			        }]
 			    }]
 			}, {
@@ -19178,14 +19184,14 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					disabled: 1,
 					name: "errNum",
 					width: 300,
-					fieldLabel: "Количество ошибок"
+					fieldLabel: $o.getString ("Errors num")
 				}, {
 					xtype: "textfield",
 					disabled: 1,
 					name: "time",
 					style: "margin-left: 10px",
 					width: 200,
-					fieldLabel: "Время сборки"
+					fieldLabel: $o.getString ("building duration")
 				}]
 				/*
 			}, {
@@ -19207,34 +19213,34 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				grid
 			]
 		}, {
-			title: "Дополнительно",
+			title: $o.getString ("Additional"),
 			iconCls: "gi_file",
 			layout: "vbox",
 			items: [{
 				xtype: "grid",
-				title: "Клиентские скрипты",
+				title: $o.getString ("Client scripts"),
 		    	name: "clientScripts",
 		        store: Ext.create ("Ext.data.Store", {
 			        fields: ["name"],
 			        data: []
 			    }),
 		        columns: [{
-					text: "Путь к скрипту на сервере", dataIndex: "name"
+					text: $o.getString ("Script location on server"), dataIndex: "name"
 		        }],
 		        width: "100%",
 				forceFit: true,
 				height: 150,
 		        tbar: [{
-		        	text: "Добавить",
+		        	text: $o.getString ("Add"),
 		        	iconCls: "gi_circle_plus",
 		        	handler: function () {
 		        		var grid = this.up ("grid");
-		        		dialog.getString ({fieldLabel: "Введите путь к скрипту на сервере", success: function (text) {
+		        		dialog.getString ({fieldLabel: $o.getString ("Enter script location on server"), success: function (text) {
 		        			grid.getStore ().add ({name: text});
 		        		}});
 		        	}
 		        }, {
-		        	text: "Удалить",
+		        	text: $o.getString ("Remove"),
 		        	iconCls: "gi_circle_minus",
 		        	handler: function () {
 		        		var grid = this.up ("grid");
@@ -19246,7 +19252,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 		        	}
 		        }]
 		    }, {
-				fieldLabel: "Действие инициализации клиента",
+				fieldLabel: $o.getString ("Action of client initialization"),
 				labelWidth: 200,
 				width: 600,
 				xtype: "$conffield", 
@@ -19265,7 +19271,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				}
 		    }, {
 				xtype: "fieldset",
-				title: "Логотип",
+				title: $o.getString ("Logo"),
 				width: "100%",
 				items: {
 					layout: "vbox",
@@ -19274,26 +19280,26 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					items: [{
 						xtype: "textfield",
 						name: "logoLeft",
-						fieldLabel: "Изображение слева",
+						fieldLabel: $o.getString ("Left image"),
 						width: "100%"
 				    }, {
 						xtype: "textfield",
 						name: "logoRight",
-						fieldLabel: "Изображение справа",
+						fieldLabel: $o.getString ("Right image"),
 						width: "100%"
 				    }, {
 						xtype: "numberfield",
 						name: "logoHeight",
-						fieldLabel: "Высота полосы"
+						fieldLabel: $o.getString ("Strip height")
 					}]
 				}
 			}]
 		}, {
-			title: "Серверные действия",
+			title: $o.getString ("Server actions"),
 			iconCls: "gi_notes",
 			layout: "fit",
 			tbar: [{
-				text: "Обновить",
+				text: $o.getString ("Refresh"),
 				iconCls: "gi_refresh",
 				handler: function () {
 					$o.execute ({fn: "vo.getActions", success: function (o) {
@@ -19369,7 +19375,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 				width: "50%",
 				layout: "fit",
 			    items: {
-			    	title: "Навигатор",
+			    	title: $o.getString ("Navigator"),
 			    	iconCls: "gi_search",
 					xtype: "treepanel",
 					name: "tree",
@@ -19410,7 +19416,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 			    region: "center",
 				layout: "fit",
 			    items: {
-			    	title: "Параметры",
+			    	title: $o.getString ("Options"),
 			    	iconCls: "gi_file",
 			    	layout: "vbox",
 			    	name: "card",
@@ -19418,7 +19424,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 			    	bodyPadding: 5,
 			    	items: [{
 						xtype: "combo",
-						fieldLabel: "Атрибут",
+						fieldLabel: $o.getString ("Attribute"),
 						name: "attr",
 						width: "100%",
 						mode: "local",
@@ -19433,7 +19439,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "textfield",
-						fieldLabel: "Наименование",
+						fieldLabel: $o.getString ("Name"),
 						width: "100%",
 						name: "name",
 						cardDesigner: me,
@@ -19442,7 +19448,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "numberfield",
-						fieldLabel: "Ширина наименования",
+						fieldLabel: $o.getString ("Name width"),
 						width: 200,
 						name: "labelWidth",
 						cardDesigner: me,
@@ -19455,7 +19461,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						width: "100%",
 						items: [{
 							xtype: "numberfield",
-							fieldLabel: "Ширина",
+							fieldLabel: $o.getString ("Width"),
 							width: 200,
 							name: "width",
 							cardDesigner: me,
@@ -19464,7 +19470,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 							}
 						}, {
 							xtype: "numberfield",
-							fieldLabel: "Высота",
+							fieldLabel: $o.getString ("Height"),
 							width: 150,
 							labelWidth: 50,
 							style: "margin-left: 5px",
@@ -19476,7 +19482,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}]
 					}, {
 						xtype: "numberfield",
-						fieldLabel: "Минимальное значение",
+						fieldLabel: $o.getString ("Min value"),
 						width: 200,
 						name: "minValue",
 						cardDesigner: me,
@@ -19485,7 +19491,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "numberfield",
-						fieldLabel: "Максимальное значение",
+						fieldLabel: $o.getString ("Max value"),
 						width: 200,
 						name: "maxValue",
 						cardDesigner: me,
@@ -19494,7 +19500,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "checkbox",
-						fieldLabel: "Только для чтения",
+						fieldLabel: $o.getString ("Read only"),
 						name: "readOnly",
 						cardDesigner: me,
 						listeners: {
@@ -19502,7 +19508,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "checkbox",
-						fieldLabel: "Отображать время",
+						fieldLabel: $o.getString ("Show time"),
 						name: "showTime",
 						cardDesigner: me,
 						listeners: {
@@ -19510,7 +19516,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "checkbox",
-						fieldLabel: "Редактор HTML",
+						fieldLabel: $o.getString ("Editor") + " HTML",
 						name: "htmlEditor",
 						cardDesigner: me,
 						listeners: {
@@ -19518,13 +19524,13 @@ Ext.define ("$o.CardDesigner.Widget", {
 						}
 					}, {
 						xtype: "fieldset",
-						title: "Выбор объекта",
+						title: $o.getString ("Object selection"),
 						name: "choose",
 						width: "100%",
 						collapsible: 1,
 						items: [{
 							xtype: "$conffield", 
-							fieldLabel: "Представление",
+							fieldLabel: $o.getString ("View"),
 							labelWidth: 135,
 							name: "view", 
 							anchor: "100%",
@@ -19543,7 +19549,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 							}
 						}, {
 							xtype: "combo",
-							fieldLabel: "Атрибут представления",
+							fieldLabel: $o.getString ("View attribute"),
 							labelWidth: 135,
 							name: "viewAttr",
 							anchor: "100%",
@@ -19558,7 +19564,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 								change: me.onChange
 							}
 						}, {
-							fieldLabel: "Действие до выбора",
+							fieldLabel: $o.getString ("Action before selection"),
 							labelWidth: 135,
 							xtype: "$conffield", 
 							name: "filterAction", 
@@ -19583,7 +19589,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 							width: "100%",
 							items: [{
 								xtype: "numberfield",
-								fieldLabel: "Ширина",
+								fieldLabel: $o.getString ("Width"),
 								width: 190,
 								labelWidth: 90,
 								name: "viewWidth",
@@ -19593,7 +19599,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 								}
 							}, {
 								xtype: "numberfield",
-								fieldLabel: "Высота",
+								fieldLabel: $o.getString ("Height"),
 								width: 150,
 								labelWidth: 50,
 								style: "margin-left: 5px",
@@ -19605,7 +19611,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 							}]
 						}, {
 							xtype: "checkbox",
-							fieldLabel: "Скрыть действия",
+							fieldLabel: $o.getString ("Hide actions"),
 							name: "hideActions",
 							cardDesigner: me,
 							listeners: {
@@ -19617,25 +19623,25 @@ Ext.define ("$o.CardDesigner.Widget", {
 			}]
 		};
 		me.tbar = [{
-			text: "Добавить поле",
+			text: $o.getString ("Add field"),
 			name: "addField",
 			iconCls: "gi_circle_plus",
 			handler: me.addField,
 			scope: me
 		}, {
-			text: "Добавить составное поле",
+			text: $o.getString ("Add composite field"),
 			name: "addComposite",
 			iconCls: "gi_circle_plus",
 			handler: me.addComposite,
 			scope: me
 		}, {
-			text: "Добавить группу",
+			text: $o.getString ("Add group"),
 			name: "addGroup",
 			iconCls: "gi_circle_plus",
 			handler: me.addGroup,
 			scope: me
 		}, {
-			text: "Удалить",
+			text: $o.getString ("Remove"),
 			disabled: true,
 			name: "remove",
 			iconCls: "gi_circle_minus",
@@ -19643,7 +19649,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 			scope: me
 		}];
 		me.bbar = [{
-			text: "Предварительный просмотр",
+			text: $o.getString ("Preview"),
 			iconCls: "gi_search",
 			handler: me.preview,
 			scope: me
@@ -19661,7 +19667,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 		var node;
 		if (sm.hasSelection ()) {
             node = sm.getSelection ()[0];
-			if (node.get ("text").substr (0, 5) == "Поле:") {
+			if (node.get ("text").substr (0, 5) == ($o.getString ("Field") + ":")) {
 				node = node.parentNode;
 			};
             node.set ("leaf", false);
@@ -19670,7 +19676,7 @@ Ext.define ("$o.CardDesigner.Widget", {
         };
         node.expand ();
         var rec = {
-        	id: me.counter ++, text: "Поле:", leaf: true
+        	id: me.counter ++, text: $o.getString ("Field") + ":", leaf: true
         };
         node.appendChild (rec);
 	},
@@ -19687,7 +19693,7 @@ Ext.define ("$o.CardDesigner.Widget", {
         };
         node.expand ();
         var rec = {
-        	id: me.counter ++, text: "Составное:", leaf: true
+        	id: me.counter ++, text: $o.getString ("Composite") + ":", leaf: true
         };
         node.appendChild (rec);
 	},
@@ -19704,7 +19710,7 @@ Ext.define ("$o.CardDesigner.Widget", {
         };
         node.expand ();
         var rec = {
-        	id: me.counter ++, text: "Группа:", leaf: true
+        	id: me.counter ++, text: $o.getString ("Group") + ":", leaf: true
         };
         node.appendChild (rec);
 	},
@@ -19720,10 +19726,10 @@ Ext.define ("$o.CardDesigner.Widget", {
 			me.down ("*[name=card]").show ();
             var node = sm.getSelection ()[0];
             var kind = "field";
-            if (node.get ("text").substr (0, 10) == "Составное:") {
+            if (node.get ("text").substr (0, 10) == ($o.getString ("Composite") + ":")) {
             	kind = "composite";
 			};            
-            if (node.get ("text").substr (0, 7) == "Группа:") {
+            if (node.get ("text").substr (0, 7) == ($o.getString ("Group") + ":")) {
             	kind = "group";
             };
             if (node.get ("text").substr (0, 6) == "xtype:") {
@@ -19980,7 +19986,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 					oo.anchor = "100%";
 				};
 				switch (node.get ("text").split (":")[0]) {
-				case "Поле":
+				case $o.getString ("Field"):
 					if (o.attr) {
 						var cls = me.getClsByTag (o.tag);
 						var attrs = cls.attrs;
@@ -20046,7 +20052,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						oo.empty = 1;
 					};
 					break;
-				case "Составное":
+				case $o.getString ("Composite"):
 					oo.fieldLabel = o.name;
 					oo.xtype = "fieldcontainer";
 					oo.layout = "hbox";
@@ -20054,7 +20060,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						oo.labelWidth = o.labelWidth;
 					};
 					break;
-				case "Группа":
+				case $o.getString ("Group"):
 					oo.title = o.name;
 					oo.height = o.height ? o.height : undefined;
 					oo.xtype = "fieldset";
@@ -20067,7 +20073,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 				if (node.childNodes.length) {
 					oo.items = [];
 					getNodes (node, oo.items);
-					if (node.get ("text").split (":")[0] == "Составное") {
+					if (node.get ("text").split (":")[0] == $o.getString ("Composite")) {
 						for (var j = 0; j < oo.items.length; j ++) {
 							var b = oo.items [j];
 							//b.hideLabel = true;
@@ -20116,7 +20122,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 				var o;
 				if (item.xtype == "fieldcontainer") {
 					o = {
-				        id: id, text: "Составное: " + (item.fieldLabel || ""), leaf: !(item.items && item.items.length)
+				        id: id, text: $o.getString ("Composite") + ": " + (item.fieldLabel || ""), leaf: !(item.items && item.items.length)
 					};
 					me.data [id] = {
 						name: item.fieldLabel, width: item.width, labelWidth: item.labelWidth
@@ -20124,7 +20130,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 				} else
 				if (item.xtype == "fieldset") {
 					o = {
-				        id: id, text: "Группа: " + (item.title || ""), leaf: !(item.items && item.items.length)
+				        id: id, text: $o.getString ("Group") + ": " + (item.title || ""), leaf: !(item.items && item.items.length)
 					};
 					me.data [id] = {
 						name: item.title, width: item.width, height: item.height
@@ -20142,7 +20148,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 					var attrs = cls.attrs;
 					var attr = attrs [item.attr] || attrs [item.attr.split (".")[1]];
 			        o = {
-			        	id: id, text: "Поле: " + (item.fieldLabel || attr.get ("name")), leaf: true
+			        	id: id, text: $o.getString ("Field") + ": " + (item.fieldLabel || attr.get ("name")), leaf: true
 			        };
 					me.data [id] = {
 						name: item.fieldLabel, width: item.width, height: item.height, 
@@ -20223,7 +20229,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 });
 
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 */
 Ext.define ("$o.app", {
 	singleton: true,
@@ -20302,7 +20308,7 @@ Ext.define ("$o.app", {
 				}}));
 			}, failure: function (msg) {
 				loginDialog.getEl ().unmask (true);
-				$o.app.message ($o.locale.getString (msg) || "Ошибка аутентификации", function () {
+				$o.app.message ($o.locale.getString (msg) || $o.getString ("Authentication error"), function () {
 					Ext.getCmp ("$o.app.password.field").setValue ("");
 					Ext.getCmp ("$o.app.login.field").focus ();
 				});
@@ -20310,7 +20316,7 @@ Ext.define ("$o.app", {
 		};
 		var buttons = {
 			xtype: "button",
-			text: "Вход",
+			text: $o.getString ("Enter"),
 			iconCls: "gi_ok",
 			width: 100,
 			style: {
@@ -20353,7 +20359,7 @@ Ext.define ("$o.app", {
 			}
 		}
 		var loginDialog = Ext.create ("Ext.Window", {
-			title: me.name || "Авторизация",
+			title: me.name || $o.getString ("Authorization"),
 			iconCls: "gi_keys",
 			width: 300,
 			height: 200,
@@ -20377,7 +20383,7 @@ Ext.define ("$o.app", {
 			items: [{
 				xtype: "textfield",
 //				fieldLabel: "Логин",
-				emptyText: "Логин",
+				emptyText: $o.getString ("Login"),
 				id: "$o.app.login.field",
 				allowBlank: false,
 				msgTarget: "side",
@@ -20388,7 +20394,7 @@ Ext.define ("$o.app", {
 			}, {
 				xtype: "textfield",
 //				fieldLabel: "Пароль",
-				emptyText: "Пароль",
+				emptyText: $o.getString ("Password"),
 				id: "$o.app.password.field",
 				inputType: "password",
 				allowBlank: false,
@@ -20399,7 +20405,7 @@ Ext.define ("$o.app", {
 				}
 			}, {
 				xtype: "checkbox",
-				boxLabel: "Запомнить",
+				boxLabel: $o.getString ("Remember"),
 				id: "$o.app.remember",
 				width: 270,
 				style: {
@@ -20548,25 +20554,25 @@ Ext.define ("$o.app", {
 				style: "color: #CC0000; font-weight: bold; margin-left: 2px; margin-right: 10px;"
 				*/
 			}, {
-				text: "Классы",
+				text: $o.getString ("Classes"),
 				iconCls: "gi_cogwheels",
 				handler: function () {
 					$o.app.show ({items: {
 						id: "conf_classes",
 						xtype: "$o.classes",
-						title: "Классы",
+						title: $o.getString ("Classes"),
 					   	iconCls: "gi_cogwheels",
 						name: "classes"
 					}});
 				}
 			}, {
-		    	text: "Представления",
+		    	text: $o.getString ("Views"),
 		    	iconCls: "gi_eye_open",
 				handler: function () {
 					$o.app.show ({items: {
 						id: "conf_views",
 						xtype: "$o.views",
-						title: "Представления",
+						title: $o.getString ("Views"),
 						iconCls: "gi_eye_open",
 				    	name: "views"
 					}});
@@ -20574,7 +20580,7 @@ Ext.define ("$o.app", {
 			}];
 			if ($o.visualObjectum && $o.visualObjectum.menuConstructor) {
 				itemsVisual.push ({
-			    	text: "Меню",
+			    	text: $o.getString ("Menu"),
 			    	iconCls: "gi_list",
 					handler: function () {
 						$o.app.show.call ($o.app, {
@@ -20585,7 +20591,7 @@ Ext.define ("$o.app", {
 			};
 			if ($o.visualObjectum && $o.visualObjectum.accessConstructor) {
 				itemsVisual.push ({
-			    	text: "Доступ",
+			    	text: $o.getString ("Access"),
 			    	iconCls: "gi_keys",
 					handler: function () {
 						$o.app.show.call ($o.app, {
@@ -20609,14 +20615,14 @@ Ext.define ("$o.app", {
 			*/
 			if ($o.visualObjectum && $o.visualObjectum.projectConstructor) {
 				itemsVisual.push ({
-			    	text: "Проект",
+			    	text: $o.getString ("Project"),
 			    	iconCls: "gi_briefcase",
 			    	name: "project",
 					handler: function () {
 						$o.app.show ({items: {
 							id: "conf_project",
 							xtype: "$projectdesigner",
-					    	title: "Проект",
+					    	title: $o.getString ("Project"),
 					    	name: "project",
 					    	iconCls: "gi_briefcase"
 						}});
@@ -20625,7 +20631,7 @@ Ext.define ("$o.app", {
 			};
 			itemsVisual.push ("->");
 			itemsVisual.push ({
-		    	text: "Выход",
+		    	text: $o.getString ("Exit"),
 		    	iconCls: "gi_exit",
 				handler: function () {
 					$o.logout ({success: function () {
@@ -21061,7 +21067,7 @@ Ext.define ("$o.app", {
 					html: "<font color=red>" + $o.locale.translate (msg) + "</font>"
 				}],
 				buttons: [{
-					text: "Подробнее",
+					text: $o.getString ("More"),
 					iconCls: "gi_circle_question_mark",
 					handler: function () {
 						win.removeAll ();
@@ -21206,9 +21212,9 @@ Ext.define ("$o.app", {
 		if ($o.idleTimer > $o.maxIdleSec) {
 			return;
 		};
-		var err = response.responseText == "<html><head><title>Unauthenticated</title></head><body><h1>401 Unauthenticated</h1></body></html>" ? "Сессия не авторизована. Пожалуйста, перезагрузите страницу браузера." : response.responseText;
+		var err = response.responseText == "<html><head><title>Unauthenticated</title></head><body><h1>401 Unauthenticated</h1></body></html>" ? $o.getString ("Session not authorized. Please, reload browser page") : response.responseText;
 		if (!err) {
-			err = "Не удалось соединиться с сервером.<br>status: " + response.status + " " + response.statusText;
+			err = $o.getString ("Could not connect to server") + "<br>status: " + response.status + " " + response.statusText;
 		};
 		common.message ("<font color=red>" + err + "</font><br>url: " + options.url + "<br>params: " + options.params);
 	},
@@ -21228,7 +21234,10 @@ Ext.define ("$o.app", {
 		$pversion = options.version;
 		var useHash = options.useHash;
 		var go = function () {
-	    	$o.locale.load ("/client/extjs4/locale/" + meOptions.locale + ".xml");
+			if (meOptions.locale != "en") {
+	    		$o.locale.load ("/client/extjs4/locale/" + meOptions.locale + ".json");
+	    	};
+	    	$o.executeQueueFunctions ();
 			Ext.Ajax.on ("beforerequest", $o.app.beforerequest, $o.app);
 			Ext.Ajax.on ("requestcomplete", $o.app.requestcomplete, $o.app);
 			Ext.Ajax.on ("requestexception", $o.app.requestexception, $o.app);
@@ -21251,10 +21260,10 @@ Ext.define ("$o.app", {
 						var projectNeedBuild = common.getConf ("projectNeedBuild");
 						if (projectNeedBuild.used && $o.app.vp.down ("*[name=project]")) {
 							me.projectNeedBuildTooltip = Ext.create ("Ext.tip.ToolTip", {
-							    title: "Необходима сборка",
+							    title: $o.getString ("Need assembly"),
 							    target: $o.app.vp.down ("*[name=project]").id,
 							    anchor: 'top',
-							    html: 'Для актуализации действий',
+							    html: $o.getString ("To update actions"),
 							    width: 200,
 							    autoHide: true,
 							    autoShow: true,
@@ -21373,10 +21382,10 @@ Ext.define ("$o.app.view", {
 				bodyPadding: 5
 			},
 			items: [{
-				title: "Общие",
+				title: $o.getString ("Commons"),
 				layout: "form",
 				tbar: [{
-					text: "Сохранить",
+					text: $o.getString ("Save"),
 					iconCls: "gi_floppy_save",
 					handler: me.saveCommon
 				}],
@@ -21387,23 +21396,23 @@ Ext.define ("$o.app.view", {
 					readOnly: true
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Наименование",
+					fieldLabel: $o.getString ("Name"),
 					value: record.get ("name")
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Код",
+					fieldLabel: $o.getString ("Code"),
 					value: record.get ("code")
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Родитель",
+					fieldLabel: $o.getString ("Parent"),
 					value: record.get ("parent") ? $o.getView (record.get ("parent")).toString () : ""
 				}, {
 					xtype: "textfield",
-					fieldLabel: "Иконка",
+					fieldLabel: $o.getString ("Icon"),
 					value: record.get ("iconCls")
 				}, {
 					xtype: "textarea",
-					fieldLabel: "Описание",
+					fieldLabel: $o.getString ("Description"),
 					value: record.get ("description")
 				}]
 			}]
@@ -21613,6 +21622,7 @@ Ext.define ("$o.locale", {
 	singleton: true,
 	strings: {},
 	load: function (url) {
+		/*
 		var r = Ext.Ajax.request ({
 			url: url,
 			async: false
@@ -21623,13 +21633,33 @@ Ext.define ("$o.locale", {
 			var text = nodes [i].textContent || nodes [i].text;
 			$o.locale.strings [id] = text;
 		};
+		*/
+		var r = Ext.Ajax.request ({
+			url: url,
+			async: false
+		});
+		_.each (JSON.parse (r.responseText), function (v, id) {
+			$o.locale.strings [id.toLowerCase ()] = v;
+		});
 	},
-	getString: function (s) {
-		if (!s) {
-			return "";
-		};
-		return $o.locale.strings [s] || s;
+	getString: function () {
+		var r = _.map (_.toArray (arguments), function (s) {
+			if (!s) {
+				return s;
+			};
+			var n = $o.locale.strings [s.toLowerCase ()] || s;
+			if (s && n) {
+				if (s [0].toUpperCase () == s [0]) {
+					n [0] = n [0].toUpperCase ();
+				} else {
+					n [0] = n [0].toLowerCase ();
+				};
+			};
+			return n;
+		});
+		return r.join (" ");
 	},
+	// deprecated
 	translate: function (s) {
 		if (s.indexOf ("connection limit exceeded") > -1) {
 			s = "Извините. Сервер в данный момент перегружен. Пожалуйста, повторите запрос позднее.";
@@ -21934,6 +21964,7 @@ obj.create = function (options) {
     return id;
 };
 // options {id, objects, refresh}
+// deprecated
 obj.remove = function (options) {
     if (options.id == null ) {
     	common.message ($zr.getString ("object must be selected"));
@@ -22920,7 +22951,7 @@ dialog.selectObject = function (options) {
 		olap.selModel.on ('selectionchange', onSelectionChange, this);
 	}, this);
 	var win = new Ext.Window ({
-		code: "Выберите объект",
+		code: $o.getString ("Choose object"),
 		resizable: true,
 		closable: true,
 		width: options.width || 600,
@@ -23019,7 +23050,7 @@ dialog.getString = function (options) {
 	});
 	var fieldName = new Ext.form.TextField ({
 		selectOnFocus: true,
-		fieldLabel: options.fieldLabel || 'Введите строку',
+		fieldLabel: options.fieldLabel || $o.getString ("Enter string"),
 		allowBlank: false,
 		msgTarget: 'side',
 		anchor: '95%',
@@ -23098,7 +23129,7 @@ dialog.getNumber = function (options) {
 	});
 	var fieldName = new Ext.form.NumberField ({
 		selectOnFocus: true,
-		fieldLabel: options.fieldLabel || 'Введите число',
+		fieldLabel: options.fieldLabel || $o.getString ("Enter number"),
 		allowBlank: false,
 		msgTarget: 'side',
 		anchor: '95%',
@@ -23297,7 +23328,7 @@ $report.xmlss = function (options) {
 		options = options || {};
 		me.title = options.title;
 		var win = new Ext.Window ({
-			title: "Предварительный просмотр",
+			title: $o.getString ("Preview"),
 			resizable: true,
 			closable: true,
 			maximizable: true,
@@ -23600,7 +23631,7 @@ common.balloon = function (t, m) {
 };
 common.rowLinks = function (value, metaData, record, rowIndex, colIndex, store, args) {
 	if (metaData.id == (args.fieldName || "name") || (metaData.column && metaData.column.dataIndex == (args.fieldName || "name"))) {
-		value = value || args.nullText || 'Без названия';
+		value = value || args.nullText || $o.getString ("Untitled");
 		args.id = record.data [args.fieldId || "id"];
 		value = "<a href='#' onclick='" + args.fn + '.call (Ext.getCmp ("' + this.id + '"), ' + JSON.stringify (args) + ")'>" + value + "</a>";
 	};
@@ -23750,7 +23781,7 @@ common.updateRecord = function (options) {
 common.tpl.remove = function (options) {
 	options = options || {};
 	var me = this;
-	common.confirm ({message: "Вы уверены?", fn: function (btn) {
+	common.confirm ({message: $o.getString ("Are you sure?"), fn: function (btn) {
 		if (btn == "yes") {
 			var id = options.id || me.getValue ("a_id") || me.getValue ("id");
 			if (id) {
@@ -23788,7 +23819,7 @@ common.tpl.show = function (options) {
 	options.title = options.title || "";
 	if (options.id) {
 		var o = $s.getObject (options.id);
-		options.title = o.get ("name") || "ID: " + (options.id < 0 ? "Добавление" : options.id);
+		options.title = o.get ("name") || "ID: " + (options.id < 0 ? $o.getString ("Adding") : options.id);
 	};
 	var map = options.map || me.map || {};
 	var sql = eval ("(" + me.$view.get ("query") + ")");
@@ -23982,7 +24013,7 @@ common.tpl.updateTags = function (r, args) {
 dialog.getClass = function (options) {
 	var success = options.success;
 	var win = Ext.create ("Ext.Window", {
-		title: "Выберите класс",
+		title: $o.getString ("Choose", "class"),
 		width: 900,
 		height: 700,
 		layout: "fit",
@@ -23998,7 +24029,7 @@ dialog.getClass = function (options) {
 				var olap = win.down ("*[zid=olap]");
 				var id;
 				var btnChoose = Ext.create ("Ext.Button", {
-					text: "Выбрать",
+					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
 					handler: function () {
@@ -24032,7 +24063,7 @@ dialog.getClass = function (options) {
 dialog.getView = function (options) {
 	var success = options.success;
 	var win = Ext.create ("Ext.Window", {
-		title: "Выберите " + (options.hasQuery ? "запрос" : "представление"),
+		title: $o.getString ("Select") + " " + (options.hasQuery ? $o.getString ("query") : $o.getString ("view")),
 		width: 900,
 		height: 700,
 		layout: "fit",
@@ -24048,7 +24079,7 @@ dialog.getView = function (options) {
 				var olap = win.down ("*[zid=olap]");
 				var id;
 				var btnChoose = Ext.create ("Ext.Button", {
-					text: "Выбрать",
+					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
 					handler: function () {
@@ -24081,7 +24112,7 @@ dialog.getView = function (options) {
 dialog.getAction = function (options) {
 	var success = options.success;
 	var win = Ext.create ("Ext.Window", {
-		title: "Выберите действие",
+		title: $o.getString ("Select", "action"),
 		width: 900,
 		height: 700,
 		layout: "fit",
@@ -24098,7 +24129,7 @@ dialog.getAction = function (options) {
 				olap.up ("tabpanel").setActiveTab (2);
 				var id;
 				var btnChoose = Ext.create ("Ext.Button", {
-					text: "Выбрать",
+					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
 					handler: function () {
@@ -24133,7 +24164,7 @@ common.report.show = function (options) {
 	var success = options.success;
 	var value = o.get ("options") ? JSON.parse (o.get ("options")) : null;
 	var win = Ext.create ("Ext.Window", {
-		title: "Отчет",
+		title: $o.getString ("Report"),
 		iconCls: "gi_print",
 		width: 800,
 		height: 600,
@@ -24144,13 +24175,13 @@ common.report.show = function (options) {
 		modal: true,
 		maximizable: true,
 		tbar: [{
-			text: "Сохранить",
+			text: $o.getString ("Save"),
 			iconCls: "save",
 			handler: function () {
 				var rd = win.down ("*[name=reportdesigner]");
 				var v = rd.getValue ();
 				if (!v.code) {
-					common.message ("Введите код отчета.");
+					common.message ($o.getString ("Enter report code"));
 					return;
 				};
 				$o.startTransaction ();
@@ -24164,7 +24195,7 @@ common.report.show = function (options) {
 				};
 			}
 		}, {
-			text: "Предварительный просмотр",
+			text: $o.getString ("Preview"),
 			iconCls: "gi_search",
 			handler: function () {
 				var value = JSON.parse (o.get ("options"));
@@ -24196,7 +24227,7 @@ common.report.build = function (options) {
 		]
 	});
 	if (!r.length) {
-		common.message ("Отчет '" + code + "' отсутствует.");
+		common.message ($o.getString ("Report") + " '" + code + "' " + $o.getString ("not exists"));
 		return;
 	};
 	var o = $o.getObject (r.get (0, "id"));
@@ -24228,11 +24259,11 @@ common.makeReadOnlyLayout = function (layout) {
 	        if (typeof (l [key]) == "object") {
 		        if (key == "actions" && Ext.isArray (l [key])) {
 		            for (var i = l [key].length - 1; i >= 0; i --) {
-		                if (["Открыть"].indexOf (l [key][i].text) > -1 || ["open"].indexOf (l [key][i].caption) > -1) {
+		                if ([$o.getString ("Open")].indexOf (l [key][i].text) > -1 || ["open"].indexOf (l [key][i].caption) > -1) {
 		                    l [key][i].arguments = l [key][i].arguments || {};
 		                    l [key][i].arguments.readOnly = true;
 		                } else
-		                if (["Добавить", "Удалить"].indexOf (l [key][i].text) > -1 || ["create", "delete"].indexOf (l [key][i].caption) > -1) {
+		                if ([$o.getString ("Add"), $o.getString ("Remove")].indexOf (l [key][i].text) > -1 || ["create", "delete"].indexOf (l [key][i].caption) > -1) {
 		                    l [key][i].active = function () {return false;};
 		                } else {
 		                    l [key][i].arguments = l [key][i].arguments || {};
@@ -24631,12 +24662,12 @@ system.view.selectQuery = function (options) {
 		border: false,
 		style: "background-color: #ffffff",
 		bodyStyle: "background-color: #ffffff",
-		title: "Выберите запрос",
+		title: $o.getString ("Select", "query"),
 		iconCls: "gi_cogwheel",
 		bodyPadding: 5,
 		modal: 1,
 		tbar: [{
-			text: "Выбрать",
+			text: $o.getString ("Choose"),
 			iconCls: "gi_ok",
 			name: "ok",
 			disabled: 1,
@@ -24645,7 +24676,7 @@ system.view.selectQuery = function (options) {
 				win.close ();
 			}
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			iconCls: "gi_remove",
 			handler: function () {
 				win.close ();
@@ -24658,7 +24689,7 @@ system.view.selectQuery = function (options) {
 			layout: "fit",
 			items: {
 	    		xtype: "treepanel",
-	    		title: "Представления",
+	    		title: $o.getString ("Views"),
 	    		iconCls: "gi_eye_open",
 			    store: treeStore,
 			    rootVisible: false,
@@ -24687,7 +24718,7 @@ system.view.selectQuery = function (options) {
 		    region: "center",
 			layout: "fit",
 		    items: {
-		    	title: "Запрос",
+		    	title: $o.getString ("Query"),
 		    	name: "query",
 				iconCls: "gi_cogwheel",
 				xtype: "codemirrortextarea",
@@ -25236,7 +25267,7 @@ system.getObjNews = function (revision) {
 		system.xmlObj.onreadystatechange = function () {
 			if (system.xmlObj.readyState == 4) {
 				if (system.xmlObj.status == 401) {
-					common.message ("Сессия не авторизована. Пожалуйста, перезагрузите страницу браузера.");
+					common.message ($o.getString ("Session not authorized. Please, reload browser page"));
 				} else
 				if (system.xmlObj.responseText) {
 					var r = eval ("(" + system.xmlObj.responseText + ")");
@@ -25456,12 +25487,12 @@ system.vo.menuItems.card = function (options) {
     		items: [{
 				card: {
 					id: "system.vo.menu.card",
-					title: "Пункт меню",
+					title: $o.getString ("Menu item"),
 					items: [{
 						objectId: id, attr: "view", xtype: "numberfield", hideLabel: true, style: "display: none"
 					}, {
 						xtype: "$conffield", 
-						fieldLabel: "Представление",
+						fieldLabel: $o.getString ("View"),
 						name: "view", 
 						value: o.get ("view"), 
 						anchor: "-20",
@@ -25489,7 +25520,7 @@ system.vo.menuItems.card = function (options) {
 						objectId: id, attr: "action", xtype: "numberfield", hideLabel: true, style: "display: none"
 					}, {
 						xtype: "$conffield", 
-						fieldLabel: "Действие",
+						fieldLabel: $o.getString ("Action"),
 						name: "action", 
 						value: o.get ("action"), 
 						anchor: "-20",
@@ -25527,12 +25558,12 @@ system.vo.menuItems.card = function (options) {
 			}, {
 				"olap": {
 					"id": "olapMenuItems",
-					"title": "Дочерние пункты меню",
+					"title": $o.getString ("Child menu items"),
 					"view": "system.vo.menuItems",
 					"actions": [
 						{
 							"fn": "common.tpl.show",
-							"text": "Открыть",
+							"text": $o.getString ("Open"),
 							"arguments": {
 								"asWindow": 1,
 								"card": "system.vo.menuItems.card"
@@ -25542,7 +25573,7 @@ system.vo.menuItems.card = function (options) {
 						},
 						{
 							"fn": "common.tpl.create",
-							"text": "Добавить",
+							"text": $o.getString ("Add"),
 							"arguments": {
 								"asWindow": 1,
 								"classCode": "system.vo.menuItems",
@@ -25554,7 +25585,7 @@ system.vo.menuItems.card = function (options) {
 						},
 						{
 							"fn": "common.tpl.remove",
-							"text": "Удалить",
+							"text": $o.getString ("Remove"),
 							"iconCls": "gi_circle_minus",
 							"active": "common.recordSelected"
 						}
@@ -25582,16 +25613,16 @@ system.vo.menu.cellRenderer = function (value, metaData, record, rowIndex, colIn
 	if (record.get ("a_position") && metaData.column.dataIndex == "a_position") {
 		switch (record.get ("a_position")) {
 		case "top":
-			value = "Вверху";
+			value = $o.getString ("Top");
 			break;
 		case "left":
-			value = "Слева";
+			value = $o.getString ("Left");
 			break;
 		case "bottom":
-			value = "Внизу";
+			value = $o.getString ("Bottom");
 			break;
 		case "right":
-			value = "Справа";
+			value = $o.getString ("Right");
 			break;
 		};
 	};
@@ -25685,7 +25716,7 @@ system.vo.chooseAdminMenu = function () {
 		border: false,
 		style: "background-color: #ffffff",
 		bodyStyle: "background-color: #ffffff",
-		title: "Меню администратора",
+		title: $o.getString ("Admin menu"),
 		iconCls: "gi_list",
 		bodyPadding: 5,
 		modal: 1,
@@ -25694,13 +25725,13 @@ system.vo.chooseAdminMenu = function () {
 			iconCls: "gi_ok",
 			handler: function () {
 				common.setConf ("adminMenu", {
-					name: "Меню администратора",
+					name: $o.getString ("Admin menu"),
 					value: win.down ("*[name=menu]").getValue ()
 				});
 				win.close ();
 			}
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			iconCls: "gi_remove",
 			handler: function () {
 				win.close ();
@@ -25709,7 +25740,7 @@ system.vo.chooseAdminMenu = function () {
 		items: {
 			xtype: "$objectfield",
 			name: "menu",
-			fieldLabel: "Меню",
+			fieldLabel: $o.getString ("Menu"),
 			value: common.getConf ("adminMenu").value,
 			choose: {type: "layout", attr: "olap.a_id", layout: {
 		        olap: {
@@ -25742,10 +25773,10 @@ system.vo.buildMenu = function () {
 			if (oRole && oRole.get ("menu")) {
 				menuId = oRole.get ("menu");
 			} else {
-				return common.message ("Пользователю не назначена роль.");
+				return common.message ($o.getString ("User has no role"));
 			}
 		} else {
-			return common.message ("Пользователю не назначена роль.");
+			return common.message ($o.getString ("User has no role"));
 		}
 	};
 	var m = common.execSQL ({
@@ -25885,7 +25916,7 @@ system.vo.buildMenu = function () {
 	};
 	*/
 	var o = {
-		text: "Выход",
+		text: $o.getString ("Exit"),
 		iconCls: "gi_exit",
 		handler: function () {
 			if ($o.userId) {
@@ -25917,7 +25948,7 @@ system.vo.buildMenu = function () {
 		};
 		menu.push ({
 			xtype: "displayfield",
-			value: "Системная дата:"
+			value: $o.getString ("System date") + ":"
 		}, {
 			xtype: "datefield",
 			minValue: date1,
@@ -25928,7 +25959,7 @@ system.vo.buildMenu = function () {
 				render: function () {
 					Ext.tip.QuickTipManager.register ({
 						target: this.id,
-						text: "Просмотр данных в прошедших датах.",
+						text: $o.getString ("View data in last dates"),
 						width: 200,
 						dismissDelay: 3000
 					});			
@@ -26019,7 +26050,7 @@ Ext.define ("ImportCSVObjects.Widget", {
 		});
 		me.tbar = [{
 			xtype: "combo",
-			fieldLabel: "Кодировка",
+			fieldLabel: $o.getString ("Encoding"),
 			labelWidth: 65,
 			width: 150,
 			name: "coding",
@@ -26037,7 +26068,7 @@ Ext.define ("ImportCSVObjects.Widget", {
 			value: "utf8",
 			editable: false
 		}, filePanel, {
-			text: "Загрузить",
+			text: $o.getString ("Load"),
 			iconCls: "gi_table",
 			name: "load",
 			disabled: true,
@@ -26123,7 +26154,7 @@ Ext.define ("ImportCSVObjects.Widget", {
 				reader.readAsText (file, me.down ("*[name=coding]").getValue () == "utf8" ? "utf-8" : "windows-1251");
 			}
 		}, {
-			text: "Импорт",
+			text: $o.getString ("Import"),
 			iconCls: "gi_file_import",
 			name: "import",
 			disabled: true,
@@ -26132,8 +26163,8 @@ Ext.define ("ImportCSVObjects.Widget", {
 					me.importer (me.data);
 				} else {
 					Ext.MessageBox.show ({
-					    title: "Пожалуйста подождите",
-					    msg: "Действие выполняется ...",
+					    title: $o.getString ("Please wait"),
+					    msg: $o.getString ("Action in progress") + " ...",
 					    progressText: "",
 					    width: 300,
 					    progress: 1,
@@ -26201,20 +26232,20 @@ Ext.define ("ImportCSVObjects.Widget", {
 		me.items = {
 			xtype: "tabpanel",
 			items: [{
-				title: "Сопоставление полей",
+				title: $o.getString ("Field mapping"),
 				layout: "vbox",
 				name: "map",
 				bodyPadding: 5,
 				tbar: [{
 					xtype: "textfield",
-					fieldLabel: "Класс",
+					fieldLabel: $o.getString ("Class"),
 					labelWidth: 50,
 					width: 400,
 					disabled: true,
 					value: me.oCls.toString ()
 				}, {
 					xtype: "combo",
-					fieldLabel: "Идентификатор",
+					fieldLabel: $o.getString ("Identifier"),
 					name: "idAttr",
 					triggerAction: "all",
 					lazyRender: true,
@@ -26242,7 +26273,7 @@ Ext.define ("ImportCSVObjects.Widget", {
 					xtype: "textfield",
 					disabled: true,
 					name: "recNum",
-					fieldLabel: "Количество"
+					fieldLabel: $o.getString ("Amount")
 				}],
 				store: {
 					xtype: "store",
@@ -26250,7 +26281,7 @@ Ext.define ("ImportCSVObjects.Widget", {
 					data: []
 				},
 				columns: [{
-					text: "Наименование",
+					text: $o.getString ("Name"),
 					dataIndex: "name",
 					width: 90
 				}],

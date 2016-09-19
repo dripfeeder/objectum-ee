@@ -10,7 +10,7 @@ Ext.define ("$o.LayoutTotal.Widget", {
 		var me = this;
 		me.value = me.value || {};
     	me.tbar = [{
-    		text: "Очистить",
+    		text: $o.getString ("Clear"),
     		name: "delete",
     		iconCls: "gi_circle_minus",
     		scope: me,
@@ -39,9 +39,9 @@ Ext.define ("$o.LayoutTotal.Widget", {
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Атрибут", dataIndex: "attr"
+				header: $o.getString ("Attribute"), dataIndex: "attr"
 			}, {
-				header: "Итог", width: 100, dataIndex: "total", editor: {
+				header: $o.getString ("Total"), width: 100, dataIndex: "total", editor: {
 					xtype: "combo",
 					mode: "local",
 					queryMode: "local",
@@ -49,10 +49,10 @@ Ext.define ("$o.LayoutTotal.Widget", {
 					store: new Ext.data.ArrayStore ({
 						fields: ["id", "text"],
 				        data: [
-				        	["sum", "Сумма"],
-				        	["avg", "Среднее"],
-				        	["max", "Максимальное"],
-				        	["min", "Минимальное"]
+				        	["sum", $o.getString ("Sum")],
+				        	["avg", $o.getString ("Average")],
+				        	["max", $o.getString ("Max")],
+				        	["min", $o.getString ("Min")]
 				        ]
 					}),
 					valueField: "id",
@@ -61,16 +61,16 @@ Ext.define ("$o.LayoutTotal.Widget", {
 					metaData.tdAttr += ' style=";border: 1px gray solid;"';
 					switch (value) {
 					case "sum":
-						value = "Сумма";
+						value = $o.getString ("Sum");
 						break;
 				    case "avg":
-				    	value = "Среднее";
+				    	value = $o.getString ("Average");
 				    	break;
 				    case "max":
-				    	value = "Максимальное";
+				    	value = $o.getString ("Max");
 				    	break;
 				    case "min":
-				    	value = "Минимальное";
+				    	value = $o.getString ("Min");
 				    };
 					return value;
 			    }

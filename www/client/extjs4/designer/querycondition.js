@@ -18,7 +18,7 @@
 			handler: me.save,
 			scope: me
 		}, {
-			text: "Отмена",
+			text: $o.getString ("Cancel"),
 			iconCls: "gi_remove",
 			name: "cancel",
 			handler: function () {
@@ -35,7 +35,7 @@
 		};
 		me.items = [{
 			xtype: "combo",
-			fieldLabel: "И/ИЛИ",
+			fieldLabel: $o.getString ("And/or"),
 			name: "and_or",
 			width: 250,
 			mode: "local",
@@ -44,8 +44,8 @@
 			store: new Ext.data.ArrayStore ({
 				fields: ["id", "text"],
 				data: [
-					["and", "И"],
-					["or", "ИЛИ"]
+					["and", $o.getString ("and")],
+					["or", $o.getString ("or")]
 				]
 			}),
 			valueField: "id",
@@ -60,7 +60,7 @@
 			*/
 		}, {
 			xtype: "combo",
-			fieldLabel: "Атрибут 1",
+			fieldLabel: $o.getString ("Attribute") + " 1",
 			name: "attr1",
 			width: "100%",
 			mode: "local",
@@ -75,7 +75,7 @@
 			validator: me.validator
 		}, {
 			xtype: "combo",
-			fieldLabel: "Оператор",
+			fieldLabel: $o.getString ("Operator"),
 			name: "oper",
 			width: 250,
 			mode: "local",
@@ -84,15 +84,15 @@
 			store: new Ext.data.ArrayStore ({
 				fields: ["id", "text"],
 				data: [
-					["=", "равно (=)"],
-					["<>", "не равно (<>)"],
-					["<", "меньше (<)"],
-					[">", "больше (>)"],
-					["<=", "меньше или равно (<=)"],
-					[">=", "больше или равно (>=)"],
-					["is null", "пусто (is null)"],
-					["is not null", "не пусто (is not null)"],
-					["in", "одно из перечня (in)"]
+					["=", $o.getString ("equal") + " (=)"],
+					["<>", $o.getString ("not equal") + " (<>)"],
+					["<", $o.getString ("less") + " (<)"],
+					[">", $o.getString ("more") + " (>)"],
+					["<=", $o.getString ("less or equal") + " (<=)"],
+					[">=", $o.getString ("more  or equal") + " (>=)"],
+					["is null", $o.getString ("null") + " (is null)"],
+					["is not null", $o.getString ("not null") + " (is not null)"],
+					["in", $o.getString ("one of list") + " (in)"]
 				]
 			}),
 			valueField: "id",
@@ -116,13 +116,13 @@
 			validator: me.validator
 		}, {
 			xtype: "textfield",
-			fieldLabel: "Значение",
+			fieldLabel: $o.getString ("Value"),
 			width: "100%",
 			name: "value",
 			validator: me.validator
 		}, {
 			xtype: "combo",
-			fieldLabel: "Атрибут 2",
+			fieldLabel: $o.getString ("Attribute") + " 2",
 			name: "attr2",
 			width: "100%",
 			mode: "local",

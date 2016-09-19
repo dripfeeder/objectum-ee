@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2011-2014 Samortsev Dmitry. All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry. All Rights Reserved.	
 	Configurator card (class, classAttr, view, viewAttr)
 */
 Ext.define ("$o.CardConf.Widget", {
@@ -152,10 +152,10 @@ Ext.define ("$o.CardConf.Widget", {
 			};
 		};
 		if (msg) {
-			common.message ("<font color=red>Форма содержит ошибки в заполнении:</font><br><br>" + msg);
+			common.message ("<font color=red>" + $o.getString ("Form contains errors") + ":</font><br><br>" + msg);
 		} else {
 			if (me.getEl ()) {
-				me.getEl ().mask ("Сохранение ...");
+				me.getEl ().mask ($o.getString ("Saving") + " ...");
 			};
 			setTimeout (saveFn, 100);
 		};

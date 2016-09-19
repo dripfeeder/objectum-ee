@@ -24,13 +24,13 @@ Ext.define ("$o.Classes.Widget", {
 					    actions: [{
 					        fn: function () {
 					        	var grid = this;
-								$zu.dialog.getNameAndCode ({title: "Добавление класса", success: function (name, code) {
+								$zu.dialog.getNameAndCode ({title: $o.getString ("Class", ":", "Adding"), success: function (name, code) {
 									var createSpr = false;
 									async.series ([
 										function (cb) {
 											var clsParent = $o.getClass (grid.getCurrentValue ("id"));
 											if (clsParent && clsParent.getFullCode ().split (".")[0] == "spr") {
-												common.confirm ({message: "Создать типовой справочник (карточка, представление)?", scope: this, fn: function (btn) {
+												common.confirm ({message: $o.getString ("Create standard dictionary (card, view)?"), scope: this, fn: function (btn) {
 													if (btn == "yes") {
 														createSpr = true;
 													}
@@ -97,7 +97,7 @@ Ext.define ("$o.Classes.Widget", {
 					            	return r;
 					            }
 					        },
-					        caption: "Объекты",
+					        caption: $o.getString ("Objects"),
 					        iconCls: "gi_file"
 					    }],
 					    listeners: {
@@ -111,16 +111,16 @@ Ext.define ("$o.Classes.Widget", {
 						pages: [{
 							cardConf: {
 								id: "commonCard",
-								title: "Общие",
+								title: $o.getString ("Commons"),
 								iconCls: "gi_edit",
 								items: [{
-									conf: "class", id: "olap", attr: "id.name", fieldLabel: "Наименование"
+									conf: "class", id: "olap", attr: "id.name", fieldLabel: $o.getString ("Name")
 								}, {
-									conf: "class", id: "olap", attr: "id.code", allowBlank: false, fieldLabel: "Код", readOnly: true, maskRe: /[A-Za-z0-9\_]/
+									conf: "class", id: "olap", attr: "id.code", allowBlank: false, fieldLabel: $o.getString ("Code"), readOnly: true, maskRe: /[A-Za-z0-9\_]/
 								}, {
-									conf: "class", id: "olap", attr: "id.description", fieldLabel: "Описание", xtype: "textarea", height: 150
+									conf: "class", id: "olap", attr: "id.description", fieldLabel: $o.getString ("Description"), xtype: "textarea", height: 150
 								}, {
-									conf: "class", id: "olap", attr: "id.format", fieldLabel: "Функция форматирования (по умолчанию: return this.get ('name');)", xtype: "textarea", height: 200
+									conf: "class", id: "olap", attr: "id.format", fieldLabel: $o.getString ("Format function (default: return this.get ('name');)"), xtype: "textarea", height: 200
 								}],
 								active: {
 									fn: function () {
@@ -130,7 +130,7 @@ Ext.define ("$o.Classes.Widget", {
 							}
 						}, {
 							split: {
-								title: "Атрибуты",
+								title: $o.getString ("Attributes"),
 								iconCls: "gi_file",
 								orientation: "vertical",
 								height: 400,
@@ -141,11 +141,11 @@ Ext.define ("$o.Classes.Widget", {
 										filter: ["class_id", "=", {id: "olap", attr: "id"}],
 									    actions: [{
 									        fn: function () {
-												$zu.dialog.getNameAndCodeAndType ({title: "Добавление атрибута класса", success: function (name, code, type) {
+												$zu.dialog.getNameAndCodeAndType ({title: $o.getString ("Class attribute", ":", "Adding"), success: function (name, code, type) {
 													var cls = $o.getClass (this.relatives ["olap"].getCurrentValue ("id"));
 													var cls2 = cls.hasAttrInHierarchy (code);
 													if (cls2) {
-														common.message ("Атрибут уже есть в классе: " + cls2.toString ());
+														common.message ($o.getString ("Attribute already exists in class") + ": " + cls2.toString ());
 														return;
 													};
 													var tr = $o.startTransaction ({description: 'Create class attr'});
@@ -218,23 +218,23 @@ Ext.define ("$o.Classes.Widget", {
 									cardConf: {
 										id: "attrCard",
 										items: [{
-											conf: "classAttr", id: "olapAttrs", attr: "id.name", fieldLabel: "Наименование"
+											conf: "classAttr", id: "olapAttrs", attr: "id.name", fieldLabel: $o.getString ("Name")
 										}, {
-											conf: "classAttr", id: "olapAttrs", attr: "id.code", fieldLabel: "Код", allowBlank: false, readOnly: true, maskRe: /[A-Za-z0-9\_]/
+											conf: "classAttr", id: "olapAttrs", attr: "id.code", fieldLabel: $o.getString ("Code"), allowBlank: false, readOnly: true, maskRe: /[A-Za-z0-9\_]/
 										}, {
-											conf: "classAttr", id: "olapAttrs", attr: "id.type", fieldLabel: "Тип", confRef: "class", readOnly: true
+											conf: "classAttr", id: "olapAttrs", attr: "id.type", fieldLabel: $o.getString ("Type"), confRef: "class", readOnly: true
 										}, {
 											"anchor": "100%",
 											"xtype": "fieldcontainer",
 											"layout": "hbox",
 											"items": [{
-												conf: "classAttr", id: "olapAttrs", attr: "id.secure", fieldLabel: "Пароль", xtype: "checkbox"
+												conf: "classAttr", id: "olapAttrs", attr: "id.secure", fieldLabel: $o.getString ("Password"), xtype: "checkbox"
 											}, {
-												conf: "classAttr", id: "olapAttrs", attr: "id.unique", fieldLabel: "Уникально", xtype: "checkbox", style: "margin-left: 10px"
+												conf: "classAttr", id: "olapAttrs", attr: "id.unique", fieldLabel: $o.getString ("Unique"), xtype: "checkbox", style: "margin-left: 10px"
 											}, {
-												conf: "classAttr", id: "olapAttrs", attr: "id.notNull", fieldLabel: "Обязательный", xtype: "checkbox", style: "margin-left: 10px"
+												conf: "classAttr", id: "olapAttrs", attr: "id.notNull", fieldLabel: $o.getString ("Not null"), xtype: "checkbox", style: "margin-left: 10px"
 											}, {
-												xtype: "compositefield", fieldLabel: "Правило удаления", style: "margin-left: 10px",
+												xtype: "compositefield", fieldLabel: $o.getString ("Remove rule"), style: "margin-left: 10px",
 												items: [{
 													xtype: "combo",
 													conf: "classAttr", 
@@ -249,8 +249,8 @@ Ext.define ("$o.Classes.Widget", {
 													store: new Ext.data.ArrayStore ({
 														fields: ["id", "text"],
 														data: [
-															["set null", "Очистить значение (set null)"],
-															["cascade", "Каскадное удаление (cascade)"]
+															["set null", "Set null)"],
+															["cascade", "Cascade"]
 														]
 													}),
 													valueField: "id",
@@ -258,11 +258,11 @@ Ext.define ("$o.Classes.Widget", {
 												}]
 											}]
 										}, {
-											conf: "classAttr", id: "olapAttrs", attr: "id.formatFunc", fieldLabel: "Параметры (JSON)", xtype: "textarea", height: 50
+											conf: "classAttr", id: "olapAttrs", attr: "id.formatFunc", fieldLabel: $o.getString ("Options") + " (JSON)", xtype: "textarea", height: 50
 										}, {
-											conf: "classAttr", id: "olapAttrs", attr: "id.validFunc", fieldLabel: "Функция валидации", xtype: "textarea", height: 30
+											conf: "classAttr", id: "olapAttrs", attr: "id.validFunc", fieldLabel: $o.getString ("Validation function"), xtype: "textarea", height: 30
 										}, {
-											conf: "classAttr", id: "olapAttrs", attr: "id.description", fieldLabel: "Описание", xtype: "textarea", height: 30
+											conf: "classAttr", id: "olapAttrs", attr: "id.description", fieldLabel: $o.getString ("Description"), xtype: "textarea", height: 30
 										}],
 										active: {
 											fn: function () {
@@ -287,7 +287,7 @@ Ext.define ("$o.Classes.Widget", {
 							}
 						}, {
 							split: {
-								title: "Действия",
+								title: $o.getString ("Actions"),
 								iconCls: "gi_wrench",
 								orientation: "vertical",
 								width: 400,
@@ -298,7 +298,7 @@ Ext.define ("$o.Classes.Widget", {
 										filter: ["class_id", "=", {id: "olap", attr: "id"}],
 									    actions: [{
 									        fn: function () {
-												$zu.dialog.getNameAndCode ({title: "Добавление действия", success: function (name, code) {
+												$zu.dialog.getNameAndCode ({title: $o.getString ("Action", ":", "Adding"), success: function (name, code) {
 													var tr = $o.startTransaction ({description: 'Create action'});
 										        	var o = $o.createAction ();
 										        	o.set ("class", this.relatives ["olap"].getCurrentValue ("id"));
@@ -353,7 +353,7 @@ Ext.define ("$o.Classes.Widget", {
 													frame: false, border: false, bodyPadding: 1,
 													modal: false,
 													maximizable: true,
-													title: "Исходный код действия: " + a.toString (),
+													title: $o.getString ("Action source code") + ": " + a.toString (),
 													iconCls: "gi_notes",
 													items: {
 														name: "body",
@@ -365,7 +365,7 @@ Ext.define ("$o.Classes.Widget", {
 														}
 													},
 													tbar: [{
-														text: "Сохранить",
+														text: $o.getString ("Save"),
 														iconCls: "gi_floppy_save",
 										            	disabled: this.relatives ["olap"].getCurrentValue ("schema_id"),
 														handler: function () {
@@ -375,7 +375,7 @@ Ext.define ("$o.Classes.Widget", {
 															win.close ();
 														}
 													}, {
-														text: "Отмена",
+														text: $o.getString ("Cancel"),
 														iconCls: "gi_remove",
 														handler: function () {
 															win.close ();
@@ -389,7 +389,7 @@ Ext.define ("$o.Classes.Widget", {
 									            	return this.getCurrentValue ("id");
 									            }
 									        },
-									        text: "Исходный код",
+									        text: $o.getString ("Source code"),
 									        iconCls: "gi_notes"
 									    }, {
 									    	fn: function () {
@@ -404,7 +404,7 @@ Ext.define ("$o.Classes.Widget", {
 													frame: false, border: false, bodyPadding: 1,
 													modal: false,
 													maximizable: true,
-													title: "Макет действия: " + a.toString (),
+													title: $o.getString ("Action layout") + ": " + a.toString (),
 													iconCls: "gi_table",
 													items: {
 														xtype: "$layoutdesigner",
@@ -417,7 +417,7 @@ Ext.define ("$o.Classes.Widget", {
 														}
 													},
 													tbar: [{
-														text: "Сохранить",
+														text: $o.getString ("Save"),
 														iconCls: "gi_floppy_save",
 										            	disabled: this.relatives ["olap"].getCurrentValue ("schema_id"),
 														handler: function () {
@@ -427,7 +427,7 @@ Ext.define ("$o.Classes.Widget", {
 																	try {
 																		l.layout = JSON.parse (layout);
 																	} catch (e) {
-																		common.message ("Парсинг макета завершился с ошибкой.");
+																		common.message ($o.getString ("Parsing layout ended with an error"));
 																		win.close ();
 																		return;
 																	};
@@ -445,7 +445,7 @@ Ext.define ("$o.Classes.Widget", {
 															win.close ();
 														}
 													}, {
-														text: "Отмена",
+														text: $o.getString ("Cancel"),
 														iconCls: "gi_remove",
 														handler: function () {
 															win.close ();
@@ -459,8 +459,9 @@ Ext.define ("$o.Classes.Widget", {
 									            	return this.getCurrentValue ("id");
 									            }
 									        },
-									        text: "Макет",
+									        text: $o.getString ("Layout"),
 									        iconCls: "gi_table"
+									        /*
 									    }, {
 									    	text: "Обновить действия по умолчанию",
 									    	iconCls: "gi_refresh",
@@ -469,6 +470,7 @@ Ext.define ("$o.Classes.Widget", {
 									    		var cls = $o.getClass (clsId);
 								    			cls.updateDefault ();
 									    	}
+									    	*/
 									    }],
 									    listeners: {
 									    	afterrender: function () {
@@ -501,13 +503,13 @@ Ext.define ("$o.Classes.Widget", {
 											}
 										},
 										items: [{
-											conf: "action", id: "olapActions", attr: "id.name", fieldLabel: "Наименование", labelWidth: 150
+											conf: "action", id: "olapActions", attr: "id.name", fieldLabel: $o.getString ("Name"), labelWidth: 150
 										}, {
-											conf: "action", id: "olapActions", attr: "id.code", fieldLabel: "Код", allowBlank: false, labelWidth: 150, maskRe: /[A-Za-z0-9\_]/
+											conf: "action", id: "olapActions", attr: "id.code", fieldLabel: $o.getString ("Code"), allowBlank: false, labelWidth: 150, maskRe: /[A-Za-z0-9\_]/
 										}, {
 											xtype: "combo",
 											name: "type",
-											fieldLabel: "Тип",
+											fieldLabel: $o.getString ("Type"),
 											triggerAction: "all",
 											lazyRender: true,
 											mode: "local",
@@ -518,9 +520,9 @@ Ext.define ("$o.Classes.Widget", {
 												fields: ["id", "text"],
 												data: [
 													[null, "-"],
-													["create", "Создание объекта"],
-													["remove", "Удаление объекта"],
-													["card", "Карточка объекта"]
+													["create", $o.getString ("Adding")],
+													["remove", $o.getString ("Removing")],
+													["card", $o.getString ("Card")]
 												]
 											}),
 											valueField: "id",
@@ -573,7 +575,7 @@ Ext.define ("$o.Classes.Widget", {
 											}
 										}, {
 											xtype: "compositefield",
-											fieldLabel: "Действие на сервере",
+											fieldLabel: $o.getString ("Server action"),
 											labelWidth: 150,
 											items: [{
 												xtype: "checkbox", name: "serverAction", listeners: {
@@ -593,7 +595,7 @@ Ext.define ("$o.Classes.Widget", {
 											}, {
 												xtype: "displayfield",
 												name: "displayNoAuth",
-												value: "Выполнять без аутентификации:",
+												value: $o.getString ("Execute no authentication") + ":",
 												style: "margin-left: 10px; margin-right: 5px"
 											}, {
 												xtype: "checkbox", name: "noAuth", labelWidth: 150, listeners: {
@@ -644,7 +646,7 @@ Ext.define ("$o.Classes.Widget", {
 						}, {
 							olap: {
 								id: "olapDependency",
-								title: "Зависимости",
+								title: $o.getString ("Dependencies"),
 								iconCls: "gi_link",
 								view: "system.typeClassAttrs",
 								filter: ["type_id", "=", {id: "olap", attr: "id"}],
@@ -668,11 +670,11 @@ Ext.define ("$o.Classes.Widget", {
 	showObjects: function (options) {
 		var cls = $o.getClass (options.classId);
 		if (!cls.attrsArray.length) {
-			common.message ("В классе отсутствуют атрибуты.");
+			common.message ($o.getString ("Class has no attributes"));
 			return;
 		};
 		var win = Ext.create ("Ext.Window", {
-			title: "Объекты класса: " + cls.toString (),
+			title: $o.getString ("Class objects") + ": " + cls.toString (),
 			iconCls: "gi_file",
 			width: 800,
 			height: 600,
@@ -704,7 +706,7 @@ Ext.define ("$o.Classes.Widget", {
 						actions: [{
 							fn: function () {
 								var me = this;
-								common.confirm ({message: "Вы уверены?", fn: function (btn) {
+								common.confirm ({message: $o.getString ("Are you sure?"), fn: function (btn) {
 									if (btn == "yes") {
 										$o.startTransaction ({description: "Remove by admin"});
 										_.each (me.getSelectionModel ().getSelection (), function (rec, i) {
@@ -715,7 +717,7 @@ Ext.define ("$o.Classes.Widget", {
 									};
 								}});
 							},
-							text: "Удалить",
+							text: $o.getString ("Remove"),
 							iconCls: "gi_circle_minus",
 							active: "common.recordSelected"
 						}, {
@@ -738,11 +740,11 @@ Ext.define ("$o.Classes.Widget", {
 								}
 								sql.asArray = true;
 								var recs = $o.execute (sql);
-								common.confirm ({message: "Будет удалено записей: " + recs.length + ". Вы уверены?", fn: function (btn) {
+								common.confirm ({message: $o.getString ("Entries will be deleted") + ": " + recs.length + ". " + $o.getString ("Are you sure?"), fn: function (btn) {
 									if (btn == "yes") {
 										Ext.MessageBox.show ({
-										    title: "Пожалуйста подождите",
-										    msg: "Действие выполняется ...",
+										    title: $o.getString ("Please wait"),
+										    msg: $o.getString ("Action in progress") + " ...",
 										    progressText: "",
 										    width: 300,
 										    progress: 1,
@@ -765,7 +767,7 @@ Ext.define ("$o.Classes.Widget", {
 									};
 								}});
 							},
-							text: "Удалить все",
+							text: $o.getString ("Remove all"),
 							iconCls: "gi_circle_minus"
 						}, {
 							fn: function () {
@@ -788,7 +790,7 @@ Ext.define ("$o.Classes.Widget", {
 								sql.asArray = true;
 								var recs = $o.execute (sql);
 								var win = Ext.create ("Ext.window.Window", {
-									title: "Изменение значения",
+									title: $o.getString ("Changing the value of"),
 									iconCls: "edit",
 									closable: true,
 									width: 600,
@@ -801,11 +803,11 @@ Ext.define ("$o.Classes.Widget", {
 									items: [{
 										xtype: "textfield",
 										disabled: true,
-										fieldLabel: "Будет изменено записей",
+										fieldLabel: $o.getString ("Entries will be changed"),
 										value: recs.length
 									}, {
 										xtype: "combo",
-										fieldLabel: "Атрибут",
+										fieldLabel: $o.getString ("Attribute"),
 										name: "attr",
 										triggerAction: "all",
 										lazyRender: true,
@@ -825,21 +827,21 @@ Ext.define ("$o.Classes.Widget", {
 									}, {
 										xtype: "textfield",
 										name: "value",
-										fieldLabel: "Значение",
+										fieldLabel: $o.getString ("Value"),
 										width: "100%"
 									}],
 									buttons: [{
-										text: "Изменить",
+										text: $o.getString ("Change"),
 										iconCls: "ok",
 										handler: function () {
 											var attr = win.down ("*[name=attr]").getValue ();
 											var value = win.down ("*[name=value]").getValue () || null;
 											if (!attr) {
-												return common.message ("Выберите атрибут");
+												return common.message ($o.getString ("Choose attribute"));
 											}
 											Ext.MessageBox.show ({
-											    title: "Пожалуйста подождите",
-											    msg: "Действие выполняется ...",
+											    title: $o.getString ("Please wait"),
+											    msg: $o.getString ("Action in progress") + " ...",
 											    progressText: "",
 											    width: 300,
 											    progress: 1,
@@ -867,15 +869,15 @@ Ext.define ("$o.Classes.Widget", {
 								});
 								win.show ();
 							},
-							text: "Изменить все",
+							text: $o.getString ("Change all"),
 							iconCls: "edit"
 						}, {
-							text: "Импорт из CSV",
+							text: $o.getString ("Import") + " CSV",
 							iconCls: "gi_disk_import",
 							fn: function () {
 								var olap = this;
 								var win = Ext.create ("Ext.window.Window", {
-									title: "Импорт из CSV",
+									title: $o.getString ("import") + " CSV",
 									iconCls: "gi_disk_import",
 									closable: true,
 									width: 800,
@@ -918,17 +920,17 @@ Ext.define ("$o.Classes.Widget", {
 					"id": "card",
 					"items": [{
 						"anchor": "100%",
-						"fieldLabel": "Наименование",
+						"fieldLabel": $o.getString ("Name"),
 						"attr": "name",
 						"objectId": "[#id]"
 					}, {
-						"fieldLabel": "№ пп",
+						"fieldLabel": $o.getString ("N"),
 						"attr": "npp",
 						"objectId": "[#id]",
 						"width": 200
 					}, {
 						"anchor": "100%",
-						"fieldLabel": "Код",
+						"fieldLabel": $o.getString ("Code"),
 						"attr": "code",
 						"objectId": "[#id]"
 					}],
@@ -965,10 +967,10 @@ Ext.define ("$o.Classes.Widget", {
 		try {
 			viewParent = $o.getView (codeParent);
 		} catch (e) {
-			return common.message ("Базовое представление отсутствует " + codeParent);
+			return common.message ($o.getString ("base view not exists") + " " + codeParent);
 		}
 		if (!viewParent) {
-			return common.message ("Базовое представление отсутствует " + codeParent);
+			return common.message ($o.getString ("base view not exists") + " " + codeParent);
 		}
 		var codeView = codeParent + "." + cls.get ("code");
 		var view = $o.createView ();
@@ -998,18 +1000,18 @@ Ext.define ("$o.Classes.Widget", {
 				actions: [
 					{
 						"fn": codeView + ".card",
-						"text": "Открыть",
+						"text": $o.getString ("Open"),
 						"iconCls": "gi_edit",
 						"active": "common.recordSelected"
 					},
 					{
 						"fn": codeView + ".create",
-						"text": "Добавить",
+						"text": $o.getString ("Add"),
 						"iconCls": "gi_circle_plus"
 					},
 					{
 						"fn": codeView + ".remove",
-						"text": "Удалить",
+						"text": $o.getString ("Remove"),
 						"iconCls": "gi_circle_minus",
 						"active": "common.recordSelected"
 					}
@@ -1022,11 +1024,11 @@ Ext.define ("$o.Classes.Widget", {
 		_.each ([{
 			code: "id", name: "id", width: 75, area: 0
 		}, {
-			code: "name", name: "Наименование", width: 500, area: 1
+			code: "name", name: $o.getString ("Name"), width: 500, area: 1
 		}, {
-			code: "code", name: "Код", width: 75, area: 0
+			code: "code", name: $o.getString ("Code"), width: 75, area: 0
 		}, {
-			code: "npp", name: "№ пп", width: 75, area: 0
+			code: "npp", name: $o.getString ("N"), width: 75, area: 0
 		}], function (o, i) {
 			var va = $o.createViewAttr ();
 			va.set ("view", view.get ("id"));

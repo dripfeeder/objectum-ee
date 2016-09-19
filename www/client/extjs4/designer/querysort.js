@@ -10,12 +10,12 @@
 		var me = this;
 		me.value = me.value || [];
 		me.tbar = [{
-			text: "Добавить",
+			text: $o.getString ("Add"),
 			handler: me.create,
 			iconCls: "gi_circle_plus",
 			scope: me
 		}, {
-			text: "Очистить",
+			text: $o.getString ("Clear"),
 			iconCls: "gi_circle_minus",
 			handler: me.clear,
 			scope: me
@@ -35,9 +35,9 @@
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Атрибут", width: 100, dataIndex: "attr", renderer: me.cellRenderer
+				header: $o.getString ("Attribute"), width: 100, dataIndex: "attr", renderer: me.cellRenderer
 			}, {
-				header: "Сортировка", width: 100, dataIndex: "dir", renderer: me.cellRenderer
+				header: $o.getString ("Sort"), width: 100, dataIndex: "dir", renderer: me.cellRenderer
 			}, {
 				header: "alias", width: 100, dataIndex: "attr_id", hidden: true
 			}, {
@@ -226,7 +226,7 @@
 			border: false,
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
-			title: "Выберите атрибут",
+			title: $o.getString ("Select", "attribute"),
 			iconCls: "gi_file",
 			bodyPadding: 5,
 			modal: 1,
@@ -254,7 +254,7 @@
 					me.fireEvent ("change", me.value);
 				}
 			}, {
-				text: "Отмена",
+				text: $o.getString ("Cancel"),
 				iconCls: "gi_remove",
 				handler: function () {
 					win.close ();
@@ -282,7 +282,7 @@
 				}
 				*/
 				xtype: "combo",
-				fieldLabel: "Атрибут",
+				fieldLabel: $o.getString ("Attribute"),
 				name: "attr",
 				width: "100%",
 				mode: "local",
@@ -305,7 +305,7 @@
 				}
 			}, {
 				xtype: "combo",
-				fieldLabel: "Сортировка",
+				fieldLabel: $o.getString ("Sort"),
 				name: "dir",
 				width: "100%",
 				mode: "local",
@@ -314,8 +314,8 @@
 				store: new Ext.data.ArrayStore ({
 					fields: ["id", "text"],
 					data: [
-						["ASC", "По возрастанию"],
-						["DESC", "По убыванию"]
+						["ASC", $o.getString ("Sort ascending")],
+						["DESC", $o.getString ("Sort descending")]
 					]
 				}),
 				valueField: "id",
@@ -338,10 +338,10 @@
 				};
 				var r = {};
 				if (me.value [i + 1] == "DESC") {
-					r.dir = "По убыванию";
+					r.dir = $o.getString ("Sort descending");
 					r.dir_id = "DESC";
 				} else {
-					r.dir = "По возрастанию";
+					r.dir = $o.getString ("Sort ascending");
 					r.dir_id = "ASC";
 				};
 				var alias; for (alias in me.value [i]) {break;};

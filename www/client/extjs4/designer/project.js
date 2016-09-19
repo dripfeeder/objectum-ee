@@ -18,13 +18,13 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 	    	name: "errors",
 	        store: store,
 	        columns: [{
-				text: "Сообщение", dataIndex: "msg", flex: 3, renderer: me.cellRenderer
+				text: $o.getString ("Message"), dataIndex: "msg", flex: 3, renderer: me.cellRenderer
 			}, {
-				text: "Действие", dataIndex: "action", width: 250, renderer: me.cellRenderer
+				text: $o.getString ("Action"), dataIndex: "action", width: 250, renderer: me.cellRenderer
 			}, {
-				text: "Строка", dataIndex: "line", width: 80
+				text: $o.getString ("String"), dataIndex: "line", width: 80
 			}, {
-				text: "Исходный код", dataIndex: "src", flex: 2, renderer: me.cellRenderer
+				text: $o.getString ("Source code"), dataIndex: "src", flex: 2, renderer: me.cellRenderer
 	        }],
 	        width: "100%",
 			forceFit: true,
@@ -38,7 +38,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				}
 			}),
 	        tbar: [{
-	        	text: "Исходный код действия",
+	        	text: $o.getString ("Action", ":", "Source code"),
 	        	iconCls: "gi_notes",
 	        	name: "showAction",
 	        	disabled: 1,
@@ -54,7 +54,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 							frame: false, border: false, bodyPadding: 1,
 							modal: false,
 							maximizable: true,
-							title: "Исходный код действия: " + a.toString (),
+							title: $o.getString ("Action", ":", "Source code") + ": " + a.toString (),
 							iconCls: "gi_notes",
 							items: {
 								name: "body",
@@ -66,7 +66,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 								}
 							},
 							tbar: [{
-								text: "Сохранить",
+								text: $o.getString ("Save"),
 								iconCls: "gi_floppy_save",
 								handler: function () {
 									a.set ("body", win.down ("*[name=body]").getValue ());
@@ -75,7 +75,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 									win.close ();
 								}
 							}, {
-								text: "Отмена",
+								text: $o.getString ("Cancel"),
 								iconCls: "gi_remove",
 								handler: function () {
 									win.close ();
@@ -118,12 +118,12 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 			}
 		};
 		me.items = [{
-			title: "Общие",
+			title: $o.getString ("Commons"),
 			iconCls: "gi_file",
 			layout: "vbox",
 			items: [{
 				xtype: "textfield",
-				fieldLabel: "Ревизия проекта",
+				fieldLabel: $o.getString ("Project revision"),
 				name: "revision",
 				labelWidth: 200,
 				width: 355,
@@ -131,13 +131,13 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				disabled: true
 			}, {
 				xtype: "textfield",
-				fieldLabel: "Наименование проекта",
+				fieldLabel: $o.getString ("Project name"),
 				labelWidth: 200,
 				name: "name",
 				width: "100%"
 			}, {
 				xtype: "compositefield",
-				fieldLabel: "Пароль администратора",
+				fieldLabel: $o.getString ("Admin password"),
 				labelWidth: 200,
 				items: [{
 					xtype: "textfield",
@@ -146,7 +146,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					width: 150
 				}, {
 					xtype: "displayfield",
-					value: "Введите пароль еще раз:",
+					value: $o.getString ("enter password again") + ":",
 					style: "margin-left: 5px; margin-right: 2px"
 				}, {
 					xtype: "textfield",
@@ -165,23 +165,23 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					items: [{
 						xtype: "textfield",
 						name: "smtpHost",
-						fieldLabel: "Хост"
+						fieldLabel: $o.getString ("Host")
 					}, {
 						xtype: "textfield",
 						name: "smtpUsername",
 						style: "margin-left: 10px",
-						fieldLabel: "Пользователь"
+						fieldLabel: $o.getString ("User")
 					}, {
 						xtype: "textfield",
 						name: "smtpPassword",
 						style: "margin-left: 10px",
-						fieldLabel: "Пароль",
+						fieldLabel: $o.getString ("Password"),
 						inputType: "password"
 					}, {
 						xtype: "textfield",
 						name: "smtpSender",
 						style: "margin-left: 10px",
-						fieldLabel: "Отправитель"
+						fieldLabel: $o.getString ("Sender")
 					}]
 				}
 			}, {
@@ -195,8 +195,9 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					items: [{
 						xtype: "checkbox",
 						name: "timeMachineCardButton",
-						fieldLabel: "Отобразить кнопку 'Изменения' в карточке",
+						fieldLabel: $o.getString ("Show button 'Changes' in card"),
 						labelWidth: 250
+						/*
 					}, {
 						xtype: "checkbox",
 						name: "timeMachineShowDates",
@@ -211,6 +212,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 						labelWidth: 150,
 						width: 230,
 						editable: false
+						*/
 					}]
 				}
 			}, {
@@ -220,11 +222,11 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				width: "100%",
 				items: [{
 					xtype: "button",
-					text: "Сборка проекта",
+					text: $o.getString ("Build project"),
 					iconCls: "gi_settings",
 					handler: function () {
-						me.down ("*[name=time]").setValue ("Сборка ...");
-						me.down ("*[name=errNum]").setValue ("Сборка ...");
+						me.down ("*[name=time]").setValue ($o.getString ("building") + " ...");
+						me.down ("*[name=errNum]").setValue ($o.getString ("building") + " ...");
 						me.down ("*[name=showAction]").disable ();
 						$o.app.name = $ptitle = me.down ("*[name=name]").getValue ();
 						var args = {
@@ -234,7 +236,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 						};
 						if (me.down ("*[name=password]").getValue ()) {
 							if (me.down ("*[name=password]").getValue () != me.down ("*[name=password2]").getValue ()) {
-								common.message ("Введенные пароли не совпадают.");
+								common.message ($o.getString ("Passwords not equal"));
 								return;
 							};
 							args.password = $o.util.sha1 (me.down ("*[name=password]").getValue ());
@@ -293,9 +295,9 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 			        columns: 2,
 			        style: "margin-left: 25px",
 			        items: [{
-			        	boxLabel: "Тестовая", name: "rgBuild", inputValue: "test", width: 90, checked: true
+			        	boxLabel: $o.getString ("Test"), name: "rgBuild", inputValue: "test", width: 90, checked: true
 			        }, {
-			        	boxLabel: "Продуктивная", name: "rgBuild", inputValue: "prod"
+			        	boxLabel: $o.getString ("Production"), name: "rgBuild", inputValue: "prod"
 			        }]
 			    }]
 			}, {
@@ -309,14 +311,14 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					disabled: 1,
 					name: "errNum",
 					width: 300,
-					fieldLabel: "Количество ошибок"
+					fieldLabel: $o.getString ("Errors num")
 				}, {
 					xtype: "textfield",
 					disabled: 1,
 					name: "time",
 					style: "margin-left: 10px",
 					width: 200,
-					fieldLabel: "Время сборки"
+					fieldLabel: $o.getString ("building duration")
 				}]
 				/*
 			}, {
@@ -338,34 +340,34 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				grid
 			]
 		}, {
-			title: "Дополнительно",
+			title: $o.getString ("Additional"),
 			iconCls: "gi_file",
 			layout: "vbox",
 			items: [{
 				xtype: "grid",
-				title: "Клиентские скрипты",
+				title: $o.getString ("Client scripts"),
 		    	name: "clientScripts",
 		        store: Ext.create ("Ext.data.Store", {
 			        fields: ["name"],
 			        data: []
 			    }),
 		        columns: [{
-					text: "Путь к скрипту на сервере", dataIndex: "name"
+					text: $o.getString ("Script location on server"), dataIndex: "name"
 		        }],
 		        width: "100%",
 				forceFit: true,
 				height: 150,
 		        tbar: [{
-		        	text: "Добавить",
+		        	text: $o.getString ("Add"),
 		        	iconCls: "gi_circle_plus",
 		        	handler: function () {
 		        		var grid = this.up ("grid");
-		        		dialog.getString ({fieldLabel: "Введите путь к скрипту на сервере", success: function (text) {
+		        		dialog.getString ({fieldLabel: $o.getString ("Enter script location on server"), success: function (text) {
 		        			grid.getStore ().add ({name: text});
 		        		}});
 		        	}
 		        }, {
-		        	text: "Удалить",
+		        	text: $o.getString ("Remove"),
 		        	iconCls: "gi_circle_minus",
 		        	handler: function () {
 		        		var grid = this.up ("grid");
@@ -377,7 +379,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 		        	}
 		        }]
 		    }, {
-				fieldLabel: "Действие инициализации клиента",
+				fieldLabel: $o.getString ("Action of client initialization"),
 				labelWidth: 200,
 				width: 600,
 				xtype: "$conffield", 
@@ -396,7 +398,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				}
 		    }, {
 				xtype: "fieldset",
-				title: "Логотип",
+				title: $o.getString ("Logo"),
 				width: "100%",
 				items: {
 					layout: "vbox",
@@ -405,26 +407,26 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					items: [{
 						xtype: "textfield",
 						name: "logoLeft",
-						fieldLabel: "Изображение слева",
+						fieldLabel: $o.getString ("Left image"),
 						width: "100%"
 				    }, {
 						xtype: "textfield",
 						name: "logoRight",
-						fieldLabel: "Изображение справа",
+						fieldLabel: $o.getString ("Right image"),
 						width: "100%"
 				    }, {
 						xtype: "numberfield",
 						name: "logoHeight",
-						fieldLabel: "Высота полосы"
+						fieldLabel: $o.getString ("Strip height")
 					}]
 				}
 			}]
 		}, {
-			title: "Серверные действия",
+			title: $o.getString ("Server actions"),
 			iconCls: "gi_notes",
 			layout: "fit",
 			tbar: [{
-				text: "Обновить",
+				text: $o.getString ("Refresh"),
 				iconCls: "gi_refresh",
 				handler: function () {
 					$o.execute ({fn: "vo.getActions", success: function (o) {

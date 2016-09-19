@@ -9,17 +9,17 @@ Ext.define ("$o.EventDesigner.Widget", {
 	initComponent: function () {
 		var me = this;
 		me.tbar = [{
-			text: "Открыть",
+			text: $o.getString ("Open"),
 			iconCls: "gi_edit",
 			handler: me.edit,
 			scope: me
 		}, {
-			text: "Добавить",
+			text: $o.getString ("Add"),
 			iconCls: "gi_circle_plus",
 			handler: me.create,
 			scope: me
 		}, {
-			text: "Удалить",
+			text: $o.getString ("Remove"),
 			iconCls: "gi_circle_minus",
 			handler: me.remove,
 			scope: me
@@ -37,9 +37,9 @@ Ext.define ("$o.EventDesigner.Widget", {
 		me.grid = Ext.create ("Ext.grid.Panel", {
 			store: me.store,
 			columns: [{
-				header: "Событие", flex: 1, dataIndex: "event", renderer: me.cellRenderer
+				header: $o.getString ("Event"), flex: 1, dataIndex: "event", renderer: me.cellRenderer
 			}, {
-				header: "Действие", flex: 2, dataIndex: "action", renderer: me.cellRenderer
+				header: $o.getString ("Action"), flex: 2, dataIndex: "action", renderer: me.cellRenderer
 			}, {
 				header: "fn", width: 100, dataIndex: "fn", hidden: true
 			}],
@@ -101,7 +101,7 @@ Ext.define ("$o.EventDesigner.Widget", {
 			border: false,
 			style: "background-color: #ffffff",
 			bodyStyle: "background-color: #ffffff",
-			title: "Событие",
+			title: $o.getString ("Event"),
 			bodyPadding: 5,
 			modal: 1,
 			items: {

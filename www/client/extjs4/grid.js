@@ -20,7 +20,7 @@ Ext.define ("$o.Base.Grid", {
 					try {
 						_fn = typeof (_fn) == "string" ? eval ("(" + _fn + ")") : _fn;
 					} catch (e) {
-						common.message ("Функция отсутствует: " + _fn);
+						common.message ($o.getString ("Function not exists") + ": " + _fn);
 						throw new Error ("action.fn exception: " + _fn + "\nexception: " + e);
 					};
 					if (!item.noTransaction) {
@@ -603,10 +603,10 @@ Ext.define ("$o.Grid.Widget", {
 			if (f.type == "bool") {
 				column.renderer = function (v, meta, rec, row, col, store) {
 					if (v) {
-						v = "Да";
+						v = $o.getString ("Yes");
 					} else {
 //					if (v == 0 || v == false) {
-						v = "Нет";
+						v = $o.getString ("No");
 					};
 					return me.cellRenderer (v, meta, rec, row, col, store);
 				};
@@ -662,19 +662,19 @@ Ext.define ("$o.Grid.Widget", {
 					tooltip: "Печать",
 					menu: {
 						items: [{
-							text: "*.xml (Таблица XML - Microsoft Excel)",
+							text: "*.xml (" + $o.getString ("Table") + " XML - Microsoft Excel)",
 							iconCls: "gi_print",
 							handler: function () {
 								me.printOlap.call (this, "xmlss");
 							}
 						}, {
-							text: "*.csv (CSV - кодировка win-1251)",
+							text: "*.csv (CSV - " + $o.getString ("encoding") + " win-1251)",
 							iconCls: "gi_print",
 							handler: function () {
 								me.printOlap.call (this, "csv", "win1251");
 							}
 						}, {
-							text: "*.csv (CSV - кодировка utf-8)",
+							text: "*.csv (CSV - " + $o.getString ("encoding") + " utf-8)",
 							iconCls: "gi_print",
 							handler: function () {
 								me.printOlap.call (this, "csv", "utf8");
@@ -705,7 +705,7 @@ Ext.define ("$o.Grid.Widget", {
 			if (!me.hideHeaders) {
 				items.push ({
 					iconCls: "gi_restart",
-					tooltip: "Сброс фильтров и итогов",
+					tooltip: $o.getString ("Reset filters and totals"),
 					handler: function () {
 						me.filters.clearFilters ();
 						me.total = {};
@@ -726,7 +726,7 @@ Ext.define ("$o.Grid.Widget", {
 				store: me.store,
 				dock: "bottom",
 				beforePageText: "",
-				afterPageText: "из {0}",
+				afterPageText: $o.getString ("of") + " {0}",
 				items: items
 			});
 		};
@@ -762,17 +762,17 @@ Ext.define ("$o.Grid.Widget", {
 		me.relatives = me.relatives || {};
 		me.relatives [me.zid] = me;
 		me.targets = {};
-		Ext.ux.grid.FiltersFeature.prototype.menuFilterText = "Фильтр";
-		Ext.ux.grid.filter.BooleanFilter.prototype.yesText = "Да";
-		Ext.ux.grid.filter.BooleanFilter.prototype.noText = "Нет";
-		Ext.ux.grid.filter.DateFilter.prototype.beforeEqText = "Меньше или равно";
-		Ext.ux.grid.filter.DateFilter.prototype.beforeText = "Меньше";
-		Ext.ux.grid.filter.DateFilter.prototype.afterEqText = "Больше или равно";
-		Ext.ux.grid.filter.DateFilter.prototype.afterText = "Больше";
-		Ext.ux.grid.filter.DateFilter.prototype.nonText = "Не равно";
-		Ext.ux.grid.filter.DateFilter.prototype.onText = "Равно";
+		Ext.ux.grid.FiltersFeature.prototype.menuFilterText = $o.getString ("Filter");
+		Ext.ux.grid.filter.BooleanFilter.prototype.yesText = $o.getString ("Yes");
+		Ext.ux.grid.filter.BooleanFilter.prototype.noText = $o.getString ("No");
+		Ext.ux.grid.filter.DateFilter.prototype.beforeEqText = $o.getString ("Less or equal");
+		Ext.ux.grid.filter.DateFilter.prototype.beforeText = $o.getString ("Less");
+		Ext.ux.grid.filter.DateFilter.prototype.afterEqText = $o.getString ("More or equal");
+		Ext.ux.grid.filter.DateFilter.prototype.afterText = $o.getString ("More");
+		Ext.ux.grid.filter.DateFilter.prototype.nonText = $o.getString ("Not equal");
+		Ext.ux.grid.filter.DateFilter.prototype.onText = $o.getString ("Equal");
 		Ext.ux.grid.filter.DateFilter.prototype.dateFormat = "d.m.Y";
-		Ext.ux.grid.menu.RangeMenu.prototype.menuItemCfgs.emptyText = "Введите число ...",
+		Ext.ux.grid.menu.RangeMenu.prototype.menuItemCfgs.emptyText = $o.getString ("Enter number") + " ...",
 		me.on ("columnshow", function () {
 			me.needReconfigureColumns = true;
 		});
@@ -811,7 +811,7 @@ Ext.define ("$o.Grid.Widget", {
 			};
 			if (numberColumn) {
 				this.add ([{
-					text: "Итоги",
+					text: $o.getString ("Totals"),
 					name: "totals",
 					iconCls: "gi_calculator",
 					menu: {
@@ -824,19 +824,19 @@ Ext.define ("$o.Grid.Widget", {
 							}
 						},
 						items: [{
-							text: "Сумма",
+							text: $o.getString ("Sum"),
 							iconCls: "gi_calculator",
 							name: "sum"
 						}, {
-							text: "Среднее",
+							text: $o.getString ("Average"),
 							iconCls: "gi_calculator",
 							name: "avg"
 						}, {
-							text: "Максимальное",
+							text: $o.getString ("Max"),
 							iconCls: "gi_calculator",
 							name: "max"
 						}, {
-							text: "Минимальное",
+							text: $o.getString ("Min"),
 							iconCls: "gi_calculator",
 							name: "min"
 						}]

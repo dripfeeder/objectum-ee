@@ -85,6 +85,7 @@ obj.create = function (options) {
     return id;
 };
 // options {id, objects, refresh}
+// deprecated
 obj.remove = function (options) {
     if (options.id == null ) {
     	common.message ($zr.getString ("object must be selected"));
@@ -1071,7 +1072,7 @@ dialog.selectObject = function (options) {
 		olap.selModel.on ('selectionchange', onSelectionChange, this);
 	}, this);
 	var win = new Ext.Window ({
-		code: "Выберите объект",
+		code: $o.getString ("Choose object"),
 		resizable: true,
 		closable: true,
 		width: options.width || 600,
@@ -1170,7 +1171,7 @@ dialog.getString = function (options) {
 	});
 	var fieldName = new Ext.form.TextField ({
 		selectOnFocus: true,
-		fieldLabel: options.fieldLabel || 'Введите строку',
+		fieldLabel: options.fieldLabel || $o.getString ("Enter string"),
 		allowBlank: false,
 		msgTarget: 'side',
 		anchor: '95%',
@@ -1249,7 +1250,7 @@ dialog.getNumber = function (options) {
 	});
 	var fieldName = new Ext.form.NumberField ({
 		selectOnFocus: true,
-		fieldLabel: options.fieldLabel || 'Введите число',
+		fieldLabel: options.fieldLabel || $o.getString ("Enter number"),
 		allowBlank: false,
 		msgTarget: 'side',
 		anchor: '95%',
@@ -1448,7 +1449,7 @@ $report.xmlss = function (options) {
 		options = options || {};
 		me.title = options.title;
 		var win = new Ext.Window ({
-			title: "Предварительный просмотр",
+			title: $o.getString ("Preview"),
 			resizable: true,
 			closable: true,
 			maximizable: true,
@@ -1751,7 +1752,7 @@ common.balloon = function (t, m) {
 };
 common.rowLinks = function (value, metaData, record, rowIndex, colIndex, store, args) {
 	if (metaData.id == (args.fieldName || "name") || (metaData.column && metaData.column.dataIndex == (args.fieldName || "name"))) {
-		value = value || args.nullText || 'Без названия';
+		value = value || args.nullText || $o.getString ("Untitled");
 		args.id = record.data [args.fieldId || "id"];
 		value = "<a href='#' onclick='" + args.fn + '.call (Ext.getCmp ("' + this.id + '"), ' + JSON.stringify (args) + ")'>" + value + "</a>";
 	};
@@ -1901,7 +1902,7 @@ common.updateRecord = function (options) {
 common.tpl.remove = function (options) {
 	options = options || {};
 	var me = this;
-	common.confirm ({message: "Вы уверены?", fn: function (btn) {
+	common.confirm ({message: $o.getString ("Are you sure?"), fn: function (btn) {
 		if (btn == "yes") {
 			var id = options.id || me.getValue ("a_id") || me.getValue ("id");
 			if (id) {
@@ -1939,7 +1940,7 @@ common.tpl.show = function (options) {
 	options.title = options.title || "";
 	if (options.id) {
 		var o = $s.getObject (options.id);
-		options.title = o.get ("name") || "ID: " + (options.id < 0 ? "Добавление" : options.id);
+		options.title = o.get ("name") || "ID: " + (options.id < 0 ? $o.getString ("Adding") : options.id);
 	};
 	var map = options.map || me.map || {};
 	var sql = eval ("(" + me.$view.get ("query") + ")");
@@ -2133,7 +2134,7 @@ common.tpl.updateTags = function (r, args) {
 dialog.getClass = function (options) {
 	var success = options.success;
 	var win = Ext.create ("Ext.Window", {
-		title: "Выберите класс",
+		title: $o.getString ("Choose", "class"),
 		width: 900,
 		height: 700,
 		layout: "fit",
@@ -2149,7 +2150,7 @@ dialog.getClass = function (options) {
 				var olap = win.down ("*[zid=olap]");
 				var id;
 				var btnChoose = Ext.create ("Ext.Button", {
-					text: "Выбрать",
+					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
 					handler: function () {
@@ -2183,7 +2184,7 @@ dialog.getClass = function (options) {
 dialog.getView = function (options) {
 	var success = options.success;
 	var win = Ext.create ("Ext.Window", {
-		title: "Выберите " + (options.hasQuery ? "запрос" : "представление"),
+		title: $o.getString ("Select") + " " + (options.hasQuery ? $o.getString ("query") : $o.getString ("view")),
 		width: 900,
 		height: 700,
 		layout: "fit",
@@ -2199,7 +2200,7 @@ dialog.getView = function (options) {
 				var olap = win.down ("*[zid=olap]");
 				var id;
 				var btnChoose = Ext.create ("Ext.Button", {
-					text: "Выбрать",
+					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
 					handler: function () {
@@ -2232,7 +2233,7 @@ dialog.getView = function (options) {
 dialog.getAction = function (options) {
 	var success = options.success;
 	var win = Ext.create ("Ext.Window", {
-		title: "Выберите действие",
+		title: $o.getString ("Select", "action"),
 		width: 900,
 		height: 700,
 		layout: "fit",
@@ -2249,7 +2250,7 @@ dialog.getAction = function (options) {
 				olap.up ("tabpanel").setActiveTab (2);
 				var id;
 				var btnChoose = Ext.create ("Ext.Button", {
-					text: "Выбрать",
+					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
 					handler: function () {
@@ -2284,7 +2285,7 @@ common.report.show = function (options) {
 	var success = options.success;
 	var value = o.get ("options") ? JSON.parse (o.get ("options")) : null;
 	var win = Ext.create ("Ext.Window", {
-		title: "Отчет",
+		title: $o.getString ("Report"),
 		iconCls: "gi_print",
 		width: 800,
 		height: 600,
@@ -2295,13 +2296,13 @@ common.report.show = function (options) {
 		modal: true,
 		maximizable: true,
 		tbar: [{
-			text: "Сохранить",
+			text: $o.getString ("Save"),
 			iconCls: "save",
 			handler: function () {
 				var rd = win.down ("*[name=reportdesigner]");
 				var v = rd.getValue ();
 				if (!v.code) {
-					common.message ("Введите код отчета.");
+					common.message ($o.getString ("Enter report code"));
 					return;
 				};
 				$o.startTransaction ();
@@ -2315,7 +2316,7 @@ common.report.show = function (options) {
 				};
 			}
 		}, {
-			text: "Предварительный просмотр",
+			text: $o.getString ("Preview"),
 			iconCls: "gi_search",
 			handler: function () {
 				var value = JSON.parse (o.get ("options"));
@@ -2347,7 +2348,7 @@ common.report.build = function (options) {
 		]
 	});
 	if (!r.length) {
-		common.message ("Отчет '" + code + "' отсутствует.");
+		common.message ($o.getString ("Report") + " '" + code + "' " + $o.getString ("not exists"));
 		return;
 	};
 	var o = $o.getObject (r.get (0, "id"));
@@ -2379,11 +2380,11 @@ common.makeReadOnlyLayout = function (layout) {
 	        if (typeof (l [key]) == "object") {
 		        if (key == "actions" && Ext.isArray (l [key])) {
 		            for (var i = l [key].length - 1; i >= 0; i --) {
-		                if (["Открыть"].indexOf (l [key][i].text) > -1 || ["open"].indexOf (l [key][i].caption) > -1) {
+		                if ([$o.getString ("Open")].indexOf (l [key][i].text) > -1 || ["open"].indexOf (l [key][i].caption) > -1) {
 		                    l [key][i].arguments = l [key][i].arguments || {};
 		                    l [key][i].arguments.readOnly = true;
 		                } else
-		                if (["Добавить", "Удалить"].indexOf (l [key][i].text) > -1 || ["create", "delete"].indexOf (l [key][i].caption) > -1) {
+		                if ([$o.getString ("Add"), $o.getString ("Remove")].indexOf (l [key][i].text) > -1 || ["create", "delete"].indexOf (l [key][i].caption) > -1) {
 		                    l [key][i].active = function () {return false;};
 		                } else {
 		                    l [key][i].arguments = l [key][i].arguments || {};
