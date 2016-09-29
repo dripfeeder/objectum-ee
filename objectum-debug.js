@@ -9405,6 +9405,84 @@ db.clear = function (options) {
 		success ();
 	});
 };
+/*
+	Init project folder
+*/
+db.init = function (options) {
+	var cfg = config.storages [options.code]
+	var rootDir = cfg.rootDir;
+	var dir = [
+	];
+	var files = [
+	];
+	async.series ([
+		function (cb) {
+			fs.mkdir (rootDir, cb);
+		},
+		function (cb) {
+			fs.mkdir (rootDir + "/files", cb);
+		},
+		function (cb) {
+			fs.mkdir (rootDir + "/plugins", cb);
+		},
+		function (cb) {
+			fs.mkdir (rootDir + "/resources", cb);
+		},
+		function (cb) {
+			fs.mkdir (rootDir + "/resources/css", cb);
+		},
+		function (cb) {
+			fs.mkdir (rootDir + "/resources/images", cb);
+		},
+		function (cb) {
+			fs.mkdir (rootDir + "/resources/scripts", cb);
+		},
+		function (cb) {
+			fs.mkdir (rootDir + "/schema", cb);
+		},
+		function (cb) {
+			fs.readFile (config.rootDir + "/server/project-app/schema/schema-app.js", function (err, data) {
+				if (err) {
+					return cb (err);
+				};
+				fs.writeFile (rootDir + "/schema/schema-app.js", data, cb);
+			});
+		},
+		function (cb) {
+			var html =
+				'<html>\n' +
+				'<head>\n' +
+				'\t<title>' + cfg.code + '</title>\n' +
+				'\t<!-- ExtJS -->\n' +
+				'\t<link rel="stylesheet" type="text/css" href="/third-party/extjs4/resources/css/ext-all-objectum.css">\n' +
+				'\t<script type="text/javascript" src="/third-party/extjs4/ext-all-debug.js"></script>\n' +
+				'\t<script type="text/javascript" src="/third-party/extjs4/locale/ext-lang-ru.js" charset="UTF-8"></script>\n' +
+				'\t<!-- Objectum Client -->\n' +
+				'\t<link rel="stylesheet" type="text/css" href="/client/extjs4/css/images.css">\n' +
+				'\t<script type="text/javascript" src="/client/extjs4/all-debug.js" charset="UTF-8"></script>\n' +
+				'\t<!-- Current configuration -->\n' +
+				'\t<script type="text/javascript" src="resources/scripts/all-debug.js" charset="UTF-8"></script>\n' +
+				'</head>\n' +
+				'<body>\n' +
+				'\t<div id="loading"></div>\n' +
+				'\t<script type="text/javascript" charset="UTF-8">\n' +
+				'\t\t$o.app.start ({"code": "' + cfg.code + '", "name": "' + cfg.code + '", "version": "1.0", "locale": "en", "useHash":true});\n' +
+				'\t</script>\n' +
+				'</body>\n' +
+				'</html>\n'
+			;
+			fs.writeFile (rootDir + "/index.html", html, cb);
+		},
+		function (cb) {
+		},
+		function (cb) {
+		},
+		function (cb) {
+		},
+	], function (err) {
+	});
+};
+
 
 //
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.

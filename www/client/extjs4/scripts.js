@@ -2375,7 +2375,12 @@ common.merge = function (json1, json2) {
     return out;
 };
 common.makeReadOnlyLayout = function (layout) {
+	var cache = {};
 	function go (l) {
+		if (cache [l]) {
+			return;
+		};
+		cache [l] = true;
 	    for (var key in l) {
 	        if (typeof (l [key]) == "object") {
 		        if (key == "actions" && Ext.isArray (l [key])) {

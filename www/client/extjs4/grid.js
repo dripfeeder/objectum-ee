@@ -540,6 +540,7 @@ Ext.define ("$o.Grid.Widget", {
 	rowLines: true,
 	total: {},
 	totalValues: {},
+	groupedColumns: true,
 	initComponent: function () {		
 		var me = this;
 		var view, viewId;

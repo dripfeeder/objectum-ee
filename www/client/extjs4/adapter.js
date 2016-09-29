@@ -195,25 +195,26 @@ Ext.define ("$o.locale", {
 	singleton: true,
 	strings: {},
 	load: function (url) {
-		/*
 		var r = Ext.Ajax.request ({
 			url: url,
 			async: false
-		}).responseXML;
-		var nodes = Ext.DomQuery.select ("string", r.documentElement);
-		for (var i = 0; i < nodes.length; i ++) {
-			var id = nodes [i].attributes [0].value;
-			var text = nodes [i].textContent || nodes [i].text;
-			$o.locale.strings [id] = text;
+		});
+		try {
+			_.each (JSON.parse (r.responseText), function (v, id) {
+				$o.locale.strings [id.toLowerCase ()] = v;
+			});
+		} catch (e) {
+			var r = Ext.Ajax.request ({
+				url: url,
+				async: false
+			}).responseXML;
+			var nodes = Ext.DomQuery.select ("string", r.documentElement);
+			for (var i = 0; i < nodes.length; i ++) {
+				var id = nodes [i].attributes [0].value;
+				var text = nodes [i].textContent || nodes [i].text;
+				$o.locale.strings [id] = text;
+			};
 		};
-		*/
-		var r = Ext.Ajax.request ({
-			url: url,
-			async: false
-		});
-		_.each (JSON.parse (r.responseText), function (v, id) {
-			$o.locale.strings [id.toLowerCase ()] = v;
-		});
 	},
 	getString: function () {
 		var r = _.map (_.toArray (arguments), function (s) {
