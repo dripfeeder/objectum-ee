@@ -232,6 +232,231 @@ var Import = function () {
 			success ();
 		});
 	}
+	this.updateEngineTables = function (opts, cb) {
+		var me = this;
+		log.info ({cls: "Import", fn: "updateEngineTables"});
+		var session = opts.session;
+		var fields = {
+			"_class": [
+				"fid",
+				"fparent_id",
+				"fname",
+				"fcode",
+				"fdescription",
+				"fformat",
+				"fview_id",
+				"fstart_id"
+			],
+			"_class_attr": [
+				"fid",
+				"fclass_id",
+				//"fclass_code",
+				"fname",
+				"fcode",
+				"fdescription",
+				"ftype_id",
+				"fnot_null",
+				"fsecure",
+				"funique",
+				"fremove_rule",
+				"fstart_id"
+			],
+			"_view": [
+				"fid",
+				"fparent_id",
+				"fname",
+				"fcode",
+				"fdescription",
+				"flayout",
+				"fquery",
+				"fstart_id"
+			],
+			"_object": [
+				"fid",
+				"fstart_id"
+			]
+		};
+		async.eachSeries (["class", "class_attr", "view", "object"], function (code, cb) {
+			async.series ([
+				function (cb) {
+					storage.query ({session: session, sql: 
+						"delete from _" + code
+					, success: function (options) {
+						cb ();
+					}});
+				},
+				function (cb) {
+					var sql =
+						"insert into _" + code + " (" + fields ["_" + code].join (",") + ") (\n" +
+						"\tselect " + fields ["_" + code].join (",") + " from t" + code + " where fend_id = " + storage.maxRevision + "\n" +
+						")\n"
+					;
+					if (code == "class_attr") {
+						sql =
+							"insert into _class_attr (" + fields ["_class_attr"].join (",") + ", fclass_code) (\n" +
+							"\tselect a." + fields ["_class_attr"].join (",a.") + ",b.fcode from tclass_attr a\n" +
+							"\tinner join tclass b on (a.fclass_id = b.fid)\n" +
+							"\twhere a.fend_id = " + storage.maxRevision + "\n" +
+							")\n"
+						;
+					};
+					if (code == "view") {
+						var sql =
+							"insert into _view (" + fields ["_view"].join (",") + ") (\n" +
+							"\tselect " + fields ["_view"].join (",") + " from tview where fsystem is null and fend_id = " + storage.maxRevision + "\n" +
+							")\n"
+						;
+					};
+					storage.query ({session: session, sql: sql, success: function (options) {
+						cb ();
+					}});
+				},
+				function (cb) {
+					if (code == "object") {
+						return cb ();
+					};
+					var objectsMap = {};
+					var _fields = me.data.fields ["t" + code];
+					_.each (me.data ["t" + code], function (rec) {
+						var o = {};
+						for (var i = 0; i < _fields.length; i ++) {
+							var field = _fields [i];
+							var value = rec.values [i];
+							o [field] = value;
+						};
+						if (o.fend_id != storage.maxRevision) {
+							return;
+						};
+						if (code == "view" && o.fsystem == 1) {
+							return;
+						};
+						objectsMap [o.fid] = objectsMap [o.fid] || o;
+						if (o.fstart_id > objectsMap [o.fid].fstart_id) {
+							objectsMap [o.fid] = o;
+						};
+					});
+					var objects = [];
+					_.each (objectsMap, function (o) {
+						objects.push (o);
+					});
+					async.eachSeries (objects, function (o, cb) {
+						var oo = {};
+						async.series ([
+							function (cb) {
+								storage.query ({session: session, sql:
+									"delete from _" + code + " where fid = " + o.fid
+								, success: function () {
+									cb ();
+								}});
+							},
+							function (cb) {
+								_.each (fields ["_" + code], function (f) {
+									oo [f] = o [f];
+								});
+								if (code == "class_attr") {
+									oo.fclass_code = "tmp";
+								};
+								oo.fid = me.newId ["t" + code][oo.fid];
+								if (oo.fparent_id) {
+									oo.fparent_id = me.newId ["t" + code][oo.fparent_id];
+								};
+								if (oo.fclass_id) {
+									oo.fclass_id = me.newId ["tclass"][oo.fclass_id];
+								};
+								if (oo.fview_id) {
+									oo.fview_id = me.newId ["tview"][oo.fview_id];
+								};
+								if (oo.ftype_id && oo.ftype_id >= 1000) {
+									oo.ftype_id = me.newId ["tclass"][oo.ftype_id];
+								};
+								oo.fstart_id = me.newId ["trevision"][oo.fstart_id];
+								cb ();
+							},
+							function (cb) {
+								if (code != "class") {
+									return cb ();
+								};
+								var table = oo.fcode + "_" + oo.fid;
+								storage.client.isTableExists ({session: session, table: table, success: function (result) {
+									if (result) {
+										return cb ();
+									};
+									storage.query ({session: session, sql: "create table " + table + " (fobject_id bigint)", success: function (options) {
+										cb ();
+									}});
+								}});
+							},
+							function (cb) {
+								if (code != "class_attr") {
+									return cb ();
+								};
+								storage.query ({session: session, sql: "select fcode from _class where fid = " + oo.fclass_id, success: function (opts) {
+									if (!opts.result.rows.length) {
+										return cb ();
+									};
+									var table = opts.result.rows [0].fcode + "_" + oo.fclass_id;
+									var field = oo.fcode + "_" + oo.fid;
+									storage.client.isFieldExists ({session: session, table: table, field: field, success: function (result) {
+										if (result) {
+											return cb ();
+										};
+										var columnType = "bigint";
+										if (oo.ftype_id == 3) {
+											columnType = "timestamp (6)";
+										};
+										if (oo.ftype_id == 2) {
+											columnType = "numeric";
+										};
+										if (oo.ftype_id == 1 || oo.ftype_id == 5) {
+											columnType = "text";
+										};
+										async.series ([
+											function (cb) {
+												storage.query ({session: session, sql: "alter table " + table + " add column " + field + " " + columnType, success: function (options) {
+													cb ();
+												}});
+											},
+											function (cb) {
+												if (o.funique && !storage.connection.dbEngine.uniqueValueIndex) {
+													storage.query ({session: session, sql: "create unique index " + table + "_" + field + "_unique on " + table + " (" + field + ")", success: function (options) {
+														cb ();
+													}});
+												} else {
+													if (oo.ftype_id == 12 || oo.ftype_id >= 1000 || (o.fformat_func && o.fformat_func.indexOf ('"index"') > 0)) {
+														storage.query ({session: session, sql: "create index " + table + "_" + field + " on " + table + " (" + field + ")", success: function (options) {
+															cb ();
+														}});
+													} else {
+														cb ();
+													};
+												};
+											}
+										], cb);
+									}});
+								}});
+							},
+							function (cb) {
+								var sql = me.generateInsert ({table: "_" + code, fields: oo});
+								storage.query ({session: session, sql: sql, success: function (options) {
+									cb ();
+								}});
+							}
+						], cb);
+					}, cb);
+				},
+				function (cb) {
+					storage.query ({session: session, sql:
+						"select " + fields._class.join (",") + " from _class order by fcode"
+					, success: function (opts) {
+						fs.writeFileSync ("c-schema.txt", JSON.stringify (me.data ["tclass"], null, "\t"));
+						fs.writeFile ("c-db.txt", JSON.stringify (opts.result.rows, null, "\t"), cb);
+					}});
+				}
+			], cb);
+		}, function (err) {
+			cb (err);
+		});
+	};
 	// Генерация insert запроса
 	this.generateInsert = function (options) {
 	    var fields = [];
@@ -1339,6 +1564,75 @@ var Import = function () {
 				me.count.tobject = 0;
 				me.count.tobject_attr = 0;
 				me.count.trevision = 0;
+				async.series ([
+					function (cb) {
+						me.getNewId ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importSchemas ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importRevisions ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.generateNewId ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						if (storage.connection.dbEngine && storage.connection.dbEngine.enabled) {
+							me.updateEngineTables ({session: session}, function () {
+								cb ();
+							});
+						} else {
+							cb ();
+						};
+					},
+					function (cb) {
+						me.importViews ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importViewAttrs ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importClasses ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importClassAttrs ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importActions ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						storage.query ({session: session, sql:
+							"select fobject_id from folder_1033"
+						, success: function (opts) {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importObjects ({success: function () {
+							cb ();
+						}});
+					}
+				], cb);
+				/*
 				me.getNewId ({success: function () {
 				me.importSchemas ({success: function () {
 				me.importRevisions ({success: function () {
@@ -1351,6 +1645,7 @@ var Import = function () {
 				me.importObjects ({success: function () {
 					cb ();
 				}}); }}); }}); }}); }}); }}); }}); }}); }}); }});
+				*/
 			},
 			function (cb) {
 				if (storage.client.database == "mssql") {
@@ -1389,14 +1684,48 @@ var Import = function () {
 				log.info ({cls: "Import"}, "records count:\n" + JSON.stringify (me.count, 0, "\t"));
 				// Перестроить токи
 				if (!options.keepToc && (me.count.tclass || me.count.tclass_attr || me.count.tobject || me.count.tobject_attr)) {
-					storage.initClasses ({success: function () {
-					storage.initClassAttrs ({success: function () {
-					storage.startTransaction ({session: session, remoteAddr: "127.0.0.1", description: "import_" + options.code, success: function () {
-					me.removeTOC ({success: function () {
-					me.createTOC ({success: function () {
-					storage.commitTransaction ({session: session, success: function () {
+					async.series ([
+						function (cb) {
+							storage.initClasses ({success: function () {
+								cb ();
+							}});
+						},
+						function (cb) {
+							storage.initClassAttrs ({success: function () {
+								cb ();
+							}});
+						},
+						function (cb) {
+							storage.startTransaction ({session: session, remoteAddr: "127.0.0.1", description: "import_" + options.code, success: function () {
+								cb ();
+							}});
+						},
+						function (cb) {
+							if (!storage.connection.dbEngine || (storage.connection.dbEngine && !storage.connection.dbEngine.enabled)) {
+								me.removeTOC ({success: function () {
+									cb ();
+								}});
+							} else {
+								cb ();
+							};
+						},
+						function (cb) {
+							if (!storage.connection.dbEngine || (storage.connection.dbEngine && !storage.connection.dbEngine.enabled)) {
+								me.createTOC ({success: function () {
+									cb ();
+								}});
+							} else {
+								cb ();
+							};
+						},
+						function (cb) {
+							storage.commitTransaction ({session: session, success: function () {
+								cb ();
+							}});
+						}
+					], function (err) {
 						cb ();
-					}}); }}); }}); }}); }}); }});
+					});
 				} else {
 					cb ();
 				};

@@ -1464,10 +1464,17 @@ $report.xmlss = function (options) {
 				autoScroll: true
 			},
 			buttons: [{
-				text: "Печать",
+				text: options.xlsx ? "Таблица XML - MS Excel" : "Печать",
 				iconCls: "gi_print",
 				handler: function () {
 					me.create ();
+				}
+			}, {
+				text: "XLSX - MS Excel",
+				iconCls: "gi_print",
+				hidden: options.xlsx ? false : true,
+				handler: function () {
+					me.createXLSX ();
 				}
 			}]
 		});

@@ -1448,7 +1448,11 @@ var Storage = function (options) {
 									cb (err);
 								});
 							};
-							async.series ([processObjectAttr, processTOC], function (err, results) {
+							var functions = [processObjectAttr, processTOC];
+				   			if (storage.connection.dbEngine && storage.connection.dbEngine.enabled) {
+								functions = [processObjectAttr];
+				   			};
+							async.series (functions, function (err, results) {
 								cb (err);
 							});
 						}

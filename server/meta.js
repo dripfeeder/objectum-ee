@@ -400,10 +400,14 @@ meta.fnClass = function (request, response, next) {
 	   		if (request.storageFn == "create") {
 	   			tableOptions.success = function (options) {
 	   				var values = options.values;
-	   				var toc = code + "_" + values [0];
-					storage.query ({sql: "create table " + toc + " ($tocObjectId$)", success: function () {
+	   				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
+		   				var toc = code + "_" + values [0];
+						storage.query ({sql: "create table " + toc + " ($tocObjectId$)", success: function () {
+							projects.send ({request: request, response: response, msg: "{header: {error: ''},data: [" + JSON.stringify (values) + "]}"});
+						}});
+					} else {
 						projects.send ({request: request, response: response, msg: "{header: {error: ''},data: [" + JSON.stringify (values) + "]}"});
-					}});
+					};
 	   			};
 		   		meta.tableCreate (tableOptions);
 			};
@@ -439,9 +443,13 @@ meta.fnClass = function (request, response, next) {
 		   				if (toc.toLowerCase () != tocNew.toLowerCase ()) {
 							storage.client.isTableExists ({table: toc, success: function (exists) {
 								if (exists) {
-									storage.query ({session: session, sql: "alter table " + toc + " rename to " + tocNew, success: function () {
+					   				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
+										storage.query ({session: session, sql: "alter table " + toc + " rename to " + tocNew, success: function () {
+											cb ();
+										}});
+									} else {
 										cb ();
-									}});
+									};
 								} else {
 									cb ();
 								};
@@ -614,9 +622,13 @@ meta.fnClassAttr = function (request, response, next) {
 		   				if (toc.toLowerCase () != tocNew.toLowerCase ()) {
 							storage.client.isFieldExists ({table: c.toc, field: toc, success: function (exists) {
 								if (exists) {
-									storage.query ({session: session, sql: "alter table " + c.toc + " rename column " + toc + " to " + tocNew, success: function () {
+					   				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
+										storage.query ({session: session, sql: "alter table " + c.toc + " rename column " + toc + " to " + tocNew, success: function () {
+											cb ();
+										}});
+									} else {
 										cb ();
-									}});
+									};
 								} else {
 									cb ();
 								};
@@ -690,11 +702,15 @@ meta.fnClassAttr = function (request, response, next) {
 					function (cb) {
 						storage.client.isFieldExists ({table: c.toc, field: ca.toc, success: function (exists) {
 							if (exists) {
-								storage.query ({session: session, sql: "alter table " + c.toc + " drop column " + ca.toc, success: function () {
+				   				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
+									storage.query ({session: session, sql: "alter table " + c.toc + " drop column " + ca.toc, success: function () {
+										cb ();
+									}, failure: function () {
+										cb ();
+									}});
+								} else {
 									cb ();
-								}, failure: function () {
-									cb ();
-								}});
+								};
 							} else {
 								cb ();
 							};

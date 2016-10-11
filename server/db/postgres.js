@@ -35,6 +35,7 @@ db.Postgres = function (options) {
 	var me = this;
 	me.storage = options;
 	me.database = "postgres";
+	me.dbEngine = options.connection.dbEngine;
 	me.host = options.connection.host;
 	me.port = options.connection.port;
 	me.db = options.connection.db;
@@ -363,6 +364,18 @@ db.Postgres.prototype.create = function (options) {
 			}, failure: function (err) {
 				cb ();
 			}});
+		},
+		function (cb) {
+			if (me.dbEngine && me.dbEngine.enabled) {
+				var sql = dbEngineSQL;
+				storage.query ({client: me, sql: sql, success: function (options) {
+					cb ();
+				}, failure: function (err) {
+					cb ();
+				}});
+			} else {
+				cb ();
+			};
 		},
 		function (cb) {
 			var sql = dbDataSQL;

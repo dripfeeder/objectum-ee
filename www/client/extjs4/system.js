@@ -1444,6 +1444,11 @@ system.vo.buildMenu = function () {
 		var items = [];
 		for (var i = 0; i < r.length; i ++) {
 			if (parentId == r.get (i, "parent")) {
+				try {
+					$o.getView (r.get (i, "view"));
+				} catch (e) {
+					console.log (r.get (i, "id"));
+				};
 				var o = {
 					text: r.get (i, "name"),
 					iconCls: r.get (i, "iconCls"),

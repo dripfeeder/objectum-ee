@@ -7,7 +7,8 @@ var prepareSQL = function () {
     var r =
         "\nvar dbTablesSQL = " + JSON.stringify (fs.readFileSync ("./server/db/tables.sql", "utf8")) + ";\n" +
         "\nvar dbIndexesSQL = " + JSON.stringify (fs.readFileSync ("./server/db/indexes.sql", "utf8")) + ";\n" +
-        "\nvar dbDataSQL = " + JSON.stringify (fs.readFileSync ("./server/db/data.sql", "utf8")) + ";\n"
+        "\nvar dbDataSQL = " + JSON.stringify (fs.readFileSync ("./server/db/data.sql", "utf8")) + ";\n" +
+        "\nvar dbEngineSQL = " + JSON.stringify (fs.readFileSync ("./server/db/engine.sql", "utf8")) + ";\n"
     ;
     fs.writeFileSync ("./server/db/sql.js", r);
 };

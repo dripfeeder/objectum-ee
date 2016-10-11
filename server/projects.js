@@ -167,6 +167,7 @@ projects.startProjectPlugins = function (options) {
 };
 projects.storagePool = {};
 projects.getStorage = function (options) {
+	log.info ({cls: "projects", fn: "getStorage", code: options.storageCode});
 	var request = options.request;
 	var response = options.response;
 	var success = options.success;

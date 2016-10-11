@@ -23345,10 +23345,17 @@ $report.xmlss = function (options) {
 				autoScroll: true
 			},
 			buttons: [{
-				text: "Печать",
+				text: options.xlsx ? "Таблица XML - MS Excel" : "Печать",
 				iconCls: "gi_print",
 				handler: function () {
 					me.create ();
+				}
+			}, {
+				text: "XLSX - MS Excel",
+				iconCls: "gi_print",
+				hidden: options.xlsx ? false : true,
+				handler: function () {
+					me.createXLSX ();
 				}
 			}]
 		});
@@ -25865,6 +25872,11 @@ system.vo.buildMenu = function () {
 		var items = [];
 		for (var i = 0; i < r.length; i ++) {
 			if (parentId == r.get (i, "parent")) {
+				try {
+					$o.getView (r.get (i, "view"));
+				} catch (e) {
+					console.log (r.get (i, "id"));
+				};
 				var o = {
 					text: r.get (i, "name"),
 					iconCls: r.get (i, "iconCls"),

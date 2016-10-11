@@ -1793,6 +1793,231 @@ var Import = function () {
 			success ();
 		});
 	}
+	this.updateEngineTables = function (opts, cb) {
+		var me = this;
+		log.info ({cls: "Import", fn: "updateEngineTables"});
+		var session = opts.session;
+		var fields = {
+			"_class": [
+				"fid",
+				"fparent_id",
+				"fname",
+				"fcode",
+				"fdescription",
+				"fformat",
+				"fview_id",
+				"fstart_id"
+			],
+			"_class_attr": [
+				"fid",
+				"fclass_id",
+				//"fclass_code",
+				"fname",
+				"fcode",
+				"fdescription",
+				"ftype_id",
+				"fnot_null",
+				"fsecure",
+				"funique",
+				"fremove_rule",
+				"fstart_id"
+			],
+			"_view": [
+				"fid",
+				"fparent_id",
+				"fname",
+				"fcode",
+				"fdescription",
+				"flayout",
+				"fquery",
+				"fstart_id"
+			],
+			"_object": [
+				"fid",
+				"fstart_id"
+			]
+		};
+		async.eachSeries (["class", "class_attr", "view", "object"], function (code, cb) {
+			async.series ([
+				function (cb) {
+					storage.query ({session: session, sql: 
+						"delete from _" + code
+					, success: function (options) {
+						cb ();
+					}});
+				},
+				function (cb) {
+					var sql =
+						"insert into _" + code + " (" + fields ["_" + code].join (",") + ") (\n" +
+						"\tselect " + fields ["_" + code].join (",") + " from t" + code + " where fend_id = " + storage.maxRevision + "\n" +
+						")\n"
+					;
+					if (code == "class_attr") {
+						sql =
+							"insert into _class_attr (" + fields ["_class_attr"].join (",") + ", fclass_code) (\n" +
+							"\tselect a." + fields ["_class_attr"].join (",a.") + ",b.fcode from tclass_attr a\n" +
+							"\tinner join tclass b on (a.fclass_id = b.fid)\n" +
+							"\twhere a.fend_id = " + storage.maxRevision + "\n" +
+							")\n"
+						;
+					};
+					if (code == "view") {
+						var sql =
+							"insert into _view (" + fields ["_view"].join (",") + ") (\n" +
+							"\tselect " + fields ["_view"].join (",") + " from tview where fsystem is null and fend_id = " + storage.maxRevision + "\n" +
+							")\n"
+						;
+					};
+					storage.query ({session: session, sql: sql, success: function (options) {
+						cb ();
+					}});
+				},
+				function (cb) {
+					if (code == "object") {
+						return cb ();
+					};
+					var objectsMap = {};
+					var _fields = me.data.fields ["t" + code];
+					_.each (me.data ["t" + code], function (rec) {
+						var o = {};
+						for (var i = 0; i < _fields.length; i ++) {
+							var field = _fields [i];
+							var value = rec.values [i];
+							o [field] = value;
+						};
+						if (o.fend_id != storage.maxRevision) {
+							return;
+						};
+						if (code == "view" && o.fsystem == 1) {
+							return;
+						};
+						objectsMap [o.fid] = objectsMap [o.fid] || o;
+						if (o.fstart_id > objectsMap [o.fid].fstart_id) {
+							objectsMap [o.fid] = o;
+						};
+					});
+					var objects = [];
+					_.each (objectsMap, function (o) {
+						objects.push (o);
+					});
+					async.eachSeries (objects, function (o, cb) {
+						var oo = {};
+						async.series ([
+							function (cb) {
+								storage.query ({session: session, sql:
+									"delete from _" + code + " where fid = " + o.fid
+								, success: function () {
+									cb ();
+								}});
+							},
+							function (cb) {
+								_.each (fields ["_" + code], function (f) {
+									oo [f] = o [f];
+								});
+								if (code == "class_attr") {
+									oo.fclass_code = "tmp";
+								};
+								oo.fid = me.newId ["t" + code][oo.fid];
+								if (oo.fparent_id) {
+									oo.fparent_id = me.newId ["t" + code][oo.fparent_id];
+								};
+								if (oo.fclass_id) {
+									oo.fclass_id = me.newId ["tclass"][oo.fclass_id];
+								};
+								if (oo.fview_id) {
+									oo.fview_id = me.newId ["tview"][oo.fview_id];
+								};
+								if (oo.ftype_id && oo.ftype_id >= 1000) {
+									oo.ftype_id = me.newId ["tclass"][oo.ftype_id];
+								};
+								oo.fstart_id = me.newId ["trevision"][oo.fstart_id];
+								cb ();
+							},
+							function (cb) {
+								if (code != "class") {
+									return cb ();
+								};
+								var table = oo.fcode + "_" + oo.fid;
+								storage.client.isTableExists ({session: session, table: table, success: function (result) {
+									if (result) {
+										return cb ();
+									};
+									storage.query ({session: session, sql: "create table " + table + " (fobject_id bigint)", success: function (options) {
+										cb ();
+									}});
+								}});
+							},
+							function (cb) {
+								if (code != "class_attr") {
+									return cb ();
+								};
+								storage.query ({session: session, sql: "select fcode from _class where fid = " + oo.fclass_id, success: function (opts) {
+									if (!opts.result.rows.length) {
+										return cb ();
+									};
+									var table = opts.result.rows [0].fcode + "_" + oo.fclass_id;
+									var field = oo.fcode + "_" + oo.fid;
+									storage.client.isFieldExists ({session: session, table: table, field: field, success: function (result) {
+										if (result) {
+											return cb ();
+										};
+										var columnType = "bigint";
+										if (oo.ftype_id == 3) {
+											columnType = "timestamp (6)";
+										};
+										if (oo.ftype_id == 2) {
+											columnType = "numeric";
+										};
+										if (oo.ftype_id == 1 || oo.ftype_id == 5) {
+											columnType = "text";
+										};
+										async.series ([
+											function (cb) {
+												storage.query ({session: session, sql: "alter table " + table + " add column " + field + " " + columnType, success: function (options) {
+													cb ();
+												}});
+											},
+											function (cb) {
+												if (o.funique && !storage.connection.dbEngine.uniqueValueIndex) {
+													storage.query ({session: session, sql: "create unique index " + table + "_" + field + "_unique on " + table + " (" + field + ")", success: function (options) {
+														cb ();
+													}});
+												} else {
+													if (oo.ftype_id == 12 || oo.ftype_id >= 1000 || (o.fformat_func && o.fformat_func.indexOf ('"index"') > 0)) {
+														storage.query ({session: session, sql: "create index " + table + "_" + field + " on " + table + " (" + field + ")", success: function (options) {
+															cb ();
+														}});
+													} else {
+														cb ();
+													};
+												};
+											}
+										], cb);
+									}});
+								}});
+							},
+							function (cb) {
+								var sql = me.generateInsert ({table: "_" + code, fields: oo});
+								storage.query ({session: session, sql: sql, success: function (options) {
+									cb ();
+								}});
+							}
+						], cb);
+					}, cb);
+				},
+				function (cb) {
+					storage.query ({session: session, sql:
+						"select " + fields._class.join (",") + " from _class order by fcode"
+					, success: function (opts) {
+						fs.writeFileSync ("c-schema.txt", JSON.stringify (me.data ["tclass"], null, "\t"));
+						fs.writeFile ("c-db.txt", JSON.stringify (opts.result.rows, null, "\t"), cb);
+					}});
+				}
+			], cb);
+		}, function (err) {
+			cb (err);
+		});
+	};
 	// Генерация insert запроса
 	this.generateInsert = function (options) {
 	    var fields = [];
@@ -2900,6 +3125,75 @@ var Import = function () {
 				me.count.tobject = 0;
 				me.count.tobject_attr = 0;
 				me.count.trevision = 0;
+				async.series ([
+					function (cb) {
+						me.getNewId ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importSchemas ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importRevisions ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.generateNewId ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						if (storage.connection.dbEngine && storage.connection.dbEngine.enabled) {
+							me.updateEngineTables ({session: session}, function () {
+								cb ();
+							});
+						} else {
+							cb ();
+						};
+					},
+					function (cb) {
+						me.importViews ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importViewAttrs ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importClasses ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importClassAttrs ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importActions ({success: function () {
+							cb ();
+						}});
+					},
+					function (cb) {
+						storage.query ({session: session, sql:
+							"select fobject_id from folder_1033"
+						, success: function (opts) {
+							cb ();
+						}});
+					},
+					function (cb) {
+						me.importObjects ({success: function () {
+							cb ();
+						}});
+					}
+				], cb);
+				/*
 				me.getNewId ({success: function () {
 				me.importSchemas ({success: function () {
 				me.importRevisions ({success: function () {
@@ -2912,6 +3206,7 @@ var Import = function () {
 				me.importObjects ({success: function () {
 					cb ();
 				}}); }}); }}); }}); }}); }}); }}); }}); }}); }});
+				*/
 			},
 			function (cb) {
 				if (storage.client.database == "mssql") {
@@ -2950,14 +3245,48 @@ var Import = function () {
 				log.info ({cls: "Import"}, "records count:\n" + JSON.stringify (me.count, 0, "\t"));
 				// Перестроить токи
 				if (!options.keepToc && (me.count.tclass || me.count.tclass_attr || me.count.tobject || me.count.tobject_attr)) {
-					storage.initClasses ({success: function () {
-					storage.initClassAttrs ({success: function () {
-					storage.startTransaction ({session: session, remoteAddr: "127.0.0.1", description: "import_" + options.code, success: function () {
-					me.removeTOC ({success: function () {
-					me.createTOC ({success: function () {
-					storage.commitTransaction ({session: session, success: function () {
+					async.series ([
+						function (cb) {
+							storage.initClasses ({success: function () {
+								cb ();
+							}});
+						},
+						function (cb) {
+							storage.initClassAttrs ({success: function () {
+								cb ();
+							}});
+						},
+						function (cb) {
+							storage.startTransaction ({session: session, remoteAddr: "127.0.0.1", description: "import_" + options.code, success: function () {
+								cb ();
+							}});
+						},
+						function (cb) {
+							if (!storage.connection.dbEngine || (storage.connection.dbEngine && !storage.connection.dbEngine.enabled)) {
+								me.removeTOC ({success: function () {
+									cb ();
+								}});
+							} else {
+								cb ();
+							};
+						},
+						function (cb) {
+							if (!storage.connection.dbEngine || (storage.connection.dbEngine && !storage.connection.dbEngine.enabled)) {
+								me.createTOC ({success: function () {
+									cb ();
+								}});
+							} else {
+								cb ();
+							};
+						},
+						function (cb) {
+							storage.commitTransaction ({session: session, success: function () {
+								cb ();
+							}});
+						}
+					], function (err) {
 						cb ();
-					}}); }}); }}); }}); }}); }});
+					});
 				} else {
 					cb ();
 				};
@@ -3542,10 +3871,14 @@ meta.fnClass = function (request, response, next) {
 	   		if (request.storageFn == "create") {
 	   			tableOptions.success = function (options) {
 	   				var values = options.values;
-	   				var toc = code + "_" + values [0];
-					storage.query ({sql: "create table " + toc + " ($tocObjectId$)", success: function () {
+	   				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
+		   				var toc = code + "_" + values [0];
+						storage.query ({sql: "create table " + toc + " ($tocObjectId$)", success: function () {
+							projects.send ({request: request, response: response, msg: "{header: {error: ''},data: [" + JSON.stringify (values) + "]}"});
+						}});
+					} else {
 						projects.send ({request: request, response: response, msg: "{header: {error: ''},data: [" + JSON.stringify (values) + "]}"});
-					}});
+					};
 	   			};
 		   		meta.tableCreate (tableOptions);
 			};
@@ -3581,9 +3914,13 @@ meta.fnClass = function (request, response, next) {
 		   				if (toc.toLowerCase () != tocNew.toLowerCase ()) {
 							storage.client.isTableExists ({table: toc, success: function (exists) {
 								if (exists) {
-									storage.query ({session: session, sql: "alter table " + toc + " rename to " + tocNew, success: function () {
+					   				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
+										storage.query ({session: session, sql: "alter table " + toc + " rename to " + tocNew, success: function () {
+											cb ();
+										}});
+									} else {
 										cb ();
-									}});
+									};
 								} else {
 									cb ();
 								};
@@ -3756,9 +4093,13 @@ meta.fnClassAttr = function (request, response, next) {
 		   				if (toc.toLowerCase () != tocNew.toLowerCase ()) {
 							storage.client.isFieldExists ({table: c.toc, field: toc, success: function (exists) {
 								if (exists) {
-									storage.query ({session: session, sql: "alter table " + c.toc + " rename column " + toc + " to " + tocNew, success: function () {
+					   				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
+										storage.query ({session: session, sql: "alter table " + c.toc + " rename column " + toc + " to " + tocNew, success: function () {
+											cb ();
+										}});
+									} else {
 										cb ();
-									}});
+									};
 								} else {
 									cb ();
 								};
@@ -3832,11 +4173,15 @@ meta.fnClassAttr = function (request, response, next) {
 					function (cb) {
 						storage.client.isFieldExists ({table: c.toc, field: ca.toc, success: function (exists) {
 							if (exists) {
-								storage.query ({session: session, sql: "alter table " + c.toc + " drop column " + ca.toc, success: function () {
+				   				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
+									storage.query ({session: session, sql: "alter table " + c.toc + " drop column " + ca.toc, success: function () {
+										cb ();
+									}, failure: function () {
+										cb ();
+									}});
+								} else {
 									cb ();
-								}, failure: function () {
-									cb ();
-								}});
+								};
 							} else {
 								cb ();
 							};
@@ -4240,6 +4585,7 @@ projects.startProjectPlugins = function (options) {
 };
 projects.storagePool = {};
 projects.getStorage = function (options) {
+	log.info ({cls: "projects", fn: "getStorage", code: options.storageCode});
 	var request = options.request;
 	var response = options.response;
 	var success = options.success;
@@ -8292,7 +8638,11 @@ var Storage = function (options) {
 									cb (err);
 								});
 							};
-							async.series ([processObjectAttr, processTOC], function (err, results) {
+							var functions = [processObjectAttr, processTOC];
+				   			if (storage.connection.dbEngine && storage.connection.dbEngine.enabled) {
+								functions = [processObjectAttr];
+				   			};
+							async.series (functions, function (err, results) {
 								cb (err);
 							});
 						}
@@ -9521,6 +9871,7 @@ db.Postgres = function (options) {
 	var me = this;
 	me.storage = options;
 	me.database = "postgres";
+	me.dbEngine = options.connection.dbEngine;
 	me.host = options.connection.host;
 	me.port = options.connection.port;
 	me.db = options.connection.db;
@@ -9849,6 +10200,18 @@ db.Postgres.prototype.create = function (options) {
 			}, failure: function (err) {
 				cb ();
 			}});
+		},
+		function (cb) {
+			if (me.dbEngine && me.dbEngine.enabled) {
+				var sql = dbEngineSQL;
+				storage.query ({client: me, sql: sql, success: function (options) {
+					cb ();
+				}, failure: function (err) {
+					cb ();
+				}});
+			} else {
+				cb ();
+			};
 		},
 		function (cb) {
 			var sql = dbDataSQL;
@@ -10450,6 +10813,8 @@ var dbTablesSQL = "create table $schema_prefix$tschema (\r\n\tfid $tid$ not null
 var dbIndexesSQL = "create unique index tschema_fid on $schema_prefix$tschema (fid) $tablespace$;\r\n\r\ncreate index trevision_fdate on $schema_prefix$trevision (fdate) $tablespace$;\r\ncreate unique index trevision_fid on $schema_prefix$trevision (fid) $tablespace$;\r\ncreate index trevision_fschema_id on $schema_prefix$trevision (fschema_id) $tablespace$;\r\ncreate index trevision_frecord_id on $schema_prefix$trevision (frecord_id) $tablespace$;\r\ncreate index trevision_ftoc on $schema_prefix$trevision (ftoc) $tablespace$;\r\n\r\ncreate index tview_ftype on $schema_prefix$tview (ftype) $tablespace$;\r\ncreate index tview_fid on $schema_prefix$tview (fid) $tablespace$;\r\ncreate index tview_fcode on $schema_prefix$tview (fcode);\r\ncreate index tview_fend_id on $schema_prefix$tview (fend_id) $tablespace$;\r\ncreate unique index tview_ufid on $schema_prefix$tview (fid,fstart_id,fend_id) $tablespace$;\r\ncreate index tview_fname on $schema_prefix$tview (fname);\r\ncreate index tview_fparent_id on $schema_prefix$tview (fparent_id) $tablespace$;\r\ncreate index tview_fsystem on $schema_prefix$tview (fsystem) $tablespace$;\r\ncreate index tview_fstart_id on $schema_prefix$tview (fstart_id) $tablespace$;\r\ncreate index tview_fclass_id on $schema_prefix$tview (fclass_id) $tablespace$;\r\ncreate index tview_fschema_id on $schema_prefix$tview (fschema_id) $tablespace$;\r\ncreate index tview_frecord_id on $schema_prefix$tview (frecord_id) $tablespace$;\r\n\r\ncreate index tview_attr_fid on $schema_prefix$tview_attr (fid) $tablespace$;\r\ncreate index tview_attr_fclass_id on $schema_prefix$tview_attr (fclass_id) $tablespace$;\r\ncreate index tview_attr_fclass_attr_id on $schema_prefix$tview_attr (fclass_attr_id) $tablespace$;\r\ncreate index tview_attr_fcode on $schema_prefix$tview_attr (fcode) $tablespace$;\r\ncreate unique index tview_attr_ufid on $schema_prefix$tview_attr (fid,fstart_id,fend_id) $tablespace$;\r\ncreate index tview_attr_fname on $schema_prefix$tview_attr (fname) $tablespace$;\r\ncreate index tview_attr_fview_id on $schema_prefix$tview_attr (fview_id) $tablespace$;\r\ncreate index tview_attr_fsubject_id on $schema_prefix$tview_attr (fsubject_id) $tablespace$;\r\ncreate index tview_attr_fstart_id on $schema_prefix$tview_attr (fstart_id) $tablespace$;\r\ncreate index tview_attr_fend_id on $schema_prefix$tview_attr (fend_id) $tablespace$;\r\ncreate index tview_attr_farea on $schema_prefix$tview_attr (farea) $tablespace$;\r\ncreate index tview_attr_fschema_id on $schema_prefix$tview_attr (fschema_id) $tablespace$;\r\ncreate index tview_attr_frecord_id on $schema_prefix$tview_attr (frecord_id) $tablespace$;\r\n\r\ncreate index taction_fid on $schema_prefix$taction (fid) $tablespace$;\r\ncreate index taction_fclass_id on $schema_prefix$taction (fclass_id) $tablespace$;\r\ncreate index taction_fcode on $schema_prefix$taction (fcode);\r\ncreate index taction_fend_id on $schema_prefix$taction (fend_id) $tablespace$;\r\ncreate unique index taction_ufid on $schema_prefix$taction (fid,fstart_id,fend_id) $tablespace$;\r\ncreate index taction_fname on $schema_prefix$taction (fname);\r\ncreate index taction_fstart_id on $schema_prefix$taction (fstart_id) $tablespace$;\r\ncreate index taction_fschema_id on $schema_prefix$taction (fschema_id) $tablespace$;\r\ncreate index taction_frecord_id on $schema_prefix$taction (frecord_id) $tablespace$;\r\n\r\ncreate index taction_attr_fid on $schema_prefix$taction_attr (fid) $tablespace$;\r\ncreate index taction_attr_faction_id on $schema_prefix$taction_attr (faction_id) $tablespace$;\r\ncreate index taction_attr_fcode on $schema_prefix$taction_attr (fcode);\r\ncreate index taction_attr_fend_id on $schema_prefix$taction_attr (fend_id) $tablespace$;\r\ncreate unique index taction_attr_ufid on $schema_prefix$taction_attr (fid,fstart_id,fend_id) $tablespace$;\r\ncreate index taction_attr_fname on $schema_prefix$taction_attr (fname);\r\ncreate index taction_attr_fstart_id on $schema_prefix$taction_attr (fstart_id) $tablespace$;\r\ncreate index taction_attr_fschema_id on $schema_prefix$taction_attr (fschema_id) $tablespace$;\r\ncreate index taction_attr_frecord_id on $schema_prefix$taction_attr (frecord_id) $tablespace$;\r\n\r\ncreate index tclass_fid on $schema_prefix$tclass (fid) $tablespace$;\r\ncreate index tclass_fcode on $schema_prefix$tclass (fcode);\r\ncreate index tclass_fend_id on $schema_prefix$tclass (fend_id) $tablespace$;\r\ncreate index tclass_fname on $schema_prefix$tclass (fname);\r\ncreate index tclass_fparent_id on $schema_prefix$tclass (fparent_id) $tablespace$;\r\ncreate index tclass_fsystem on $schema_prefix$tclass (fsystem) $tablespace$;\r\ncreate index tclass_ftype on $schema_prefix$tclass (ftype) $tablespace$;\r\ncreate index tclass_fkind on $schema_prefix$tclass (fkind) $tablespace$;\r\ncreate index tclass_fstart_id on $schema_prefix$tclass (fstart_id) $tablespace$;\r\ncreate index tclass_fview_id on $schema_prefix$tclass (fview_id) $tablespace$;\r\ncreate index tclass_fschema_id on $schema_prefix$tclass (fschema_id) $tablespace$;\r\ncreate index tclass_frecord_id on $schema_prefix$tclass (frecord_id) $tablespace$;\r\n\r\ncreate index tclass_attr_fid on $schema_prefix$tclass_attr (fid) $tablespace$;\r\ncreate index tclass_attr_fclass_id on $schema_prefix$tclass_attr (fclass_id) $tablespace$;\r\ncreate index tclass_attr_fcode on $schema_prefix$tclass_attr (fcode);\r\ncreate index tclass_attr_fend_id on $schema_prefix$tclass_attr (fend_id) $tablespace$;\r\ncreate index tclass_attr_fname on $schema_prefix$tclass_attr (fname);\r\ncreate index tclass_attr_fstart_id on $schema_prefix$tclass_attr (fstart_id) $tablespace$;\r\ncreate index tclass_attr_ftype_id on $schema_prefix$tclass_attr (ftype_id) $tablespace$;\r\ncreate index tclass_attr_fschema_id on $schema_prefix$tclass_attr (fschema_id) $tablespace$;\r\ncreate index tclass_attr_frecord_id on $schema_prefix$tclass_attr (frecord_id) $tablespace$;\r\n\r\ncreate index tobject_fid on $schema_prefix$tobject (fid) $tablespace$;\r\ncreate index tobject_fclass_id on $schema_prefix$tobject (fclass_id) $tablespace$;\r\ncreate index tobject_fend_id on $schema_prefix$tobject (fend_id) $tablespace$;\r\ncreate unique index tobject_ufid on $schema_prefix$tobject (fid,fstart_id,fend_id) $tablespace$;\r\ncreate index tobject_fstart_id on $schema_prefix$tobject (fstart_id) $tablespace$;\r\ncreate index tobject_fschema_id on $schema_prefix$tobject (fschema_id) $tablespace$;\r\ncreate index tobject_frecord_id on $schema_prefix$tobject (frecord_id) $tablespace$;\r\n\r\ncreate index tobject_attr_fid on $schema_prefix$tobject_attr (fid) $tablespace$;\r\ncreate index tobject_attr_fclass_attr_id on $schema_prefix$tobject_attr (fclass_attr_id) $tablespace$;\r\ncreate index tobject_attr_fend_id on $schema_prefix$tobject_attr (fend_id) $tablespace$;\r\ncreate index tobject_attr_fnumber on $schema_prefix$tobject_attr (fnumber) $tablespace$;\r\ncreate index tobject_attr_fobject_id on $schema_prefix$tobject_attr (fobject_id) $tablespace$;\r\ncreate index tobject_attr_ftime on $schema_prefix$tobject_attr (ftime) $tablespace$;\r\ncreate index tobject_attr_fstart_id on $schema_prefix$tobject_attr (fstart_id) $tablespace$;\r\ncreate index tobject_attr_fstring on $schema_prefix$tobject_attr ($tobject_attr_fstring$);\r\ncreate index tobject_attr_fschema_id on $schema_prefix$tobject_attr (fschema_id) $tablespace$;\r\ncreate index tobject_attr_frecord_id on $schema_prefix$tobject_attr (frecord_id) $tablespace$;\r\n\r\ncreate unique index tmail_fid on $schema_prefix$tmail (fid) $tablespace$;\r\n";
 
 var dbDataSQL = "insert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (1, null, 'Строка', 'String', '', 1, 2147483647, '', null, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (2, null, 'Число', 'Number', '', 1, 2147483647, '', null, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (3, null, 'Дата', 'Date', '', 1, 2147483647, '', null, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (4, null, 'Логический', 'Boolean', '', 1, 2147483647, '', null, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (5, null, 'Файл', 'File', '', 1, 2147483647, '', null, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (6, null, 'Класс', 'Class', '', 1, 2147483647, '', null, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (7, null, 'Атрибут класса', 'ClassAttr', '', 1, 2147483647, '', 1867, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (8, null, 'Представление', 'View', '', 1, 2147483647, '', null, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (9, null, 'Атрибут представления', 'ViewAttr', '', 1, 2147483647, '', null, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (10, null, 'Действие', 'Action', '', 1, 2147483647, '', null, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (11, null, 'Атрибут действия', 'ActionAttr', '', 1, 2147483647, '', null, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (12, null, 'Объект', 'Object', '', 1, 2147483647, '', null, 1, 0, null);\r\ninsert into $schema_prefix$tclass (fid, fparent_id, fname, fcode, fdescription, fstart_id, fend_id, fformat, fview_id, fsystem, ftype, fkind)\r\nvalues (13, null, 'Атрибут объекта', 'ObjectAttr', '', 1, 2147483647, '', null, 1, 0, null);\r\n";
+
+var dbEngineSQL = "create table $schema_prefix$_class (\n\tfid $tid$ not null,\n\tfparent_id $tnumber$,\n\tfname $tstring$,\n\tfcode $tstring$ not null,\n\tfdescription $ttext$,\n\tfformat $ttext$,\n\tfview_id $tnumber$,\n\tfstart_id $tnumber$\n) $tablespace$;\n\ncreate table $schema_prefix$_class_attr (\n\tfid $tid$ not null,\n\tfclass_id $tnumber$ not null,\n\tfclass_code $tstring$ not null,\n\tfname $tstring$,\n\tfcode $tstring$ not null,\n\tfdescription $ttext$,\n\tftype_id $tnumber$ not null,\n\tfnot_null $tnumber$,\n\tfsecure $tnumber$,\n\tfunique $tnumber$,\n\tfremove_rule $tstring$,\n\tfstart_id $tnumber$\n) $tablespace$;\n\ncreate table $schema_prefix$_view (\n\tfid $tid$ not null,\n\tfparent_id $tnumber$,\n\tfname $tstring$,\n\tfcode $tstring$ not null,\n\tfdescription $ttext$,\n\tflayout $ttext$,\n\tfquery $ttext$,\n\tfstart_id $tnumber$\n) $tablespace$;\n\ncreate table $schema_prefix$_object (\n\tfid $tid$ not null,\n\tfstart_id $tnumber$\n) $tablespace$;\n\nalter table $schema_prefix$_class add primary key (fid);\nalter table $schema_prefix$_class_attr add primary key (fid);\nalter table $schema_prefix$_view add primary key (fid);\nalter table $schema_prefix$_object add primary key (fid);\n\ncreate unique index _class_fcode on $schema_prefix$_class (fparent_id, fcode) $tablespace$;\ncreate unique index _class_fcode_null on $schema_prefix$_class (fcode) $tablespace$ where fparent_id is null;\ncreate unique index _class_attr_fcode on $schema_prefix$_class_attr (fclass_id, fcode) $tablespace$;\ncreate unique index _view_fcode on $schema_prefix$_view (fparent_id, fcode) $tablespace$;\ncreate unique index _view_fcode_null on $schema_prefix$_view (fcode) $tablespace$ where fparent_id is null;\n\n-- tclass after insert\ncreate function trigger_tclass_after_insert () returns trigger as\n$$\ndeclare\n\ttableName varchar (256);\n\tclassCode varchar (256);\n\tparentId int;\nbegin\n\tif (NEW.fend_id = 2147483647) then\n\t\ttableName = NEW.fcode || '_' || NEW.fid;\n\t\tselect fcode, fparent_id into classCode, parentId from _class where fid = NEW.fid;\n\t\tif (classCode is null) then\n\t\t\tif (NEW.fid >= 1000) then\n\t\t\t\tbegin\n\t\t\t\t\texecute 'create table ' || tableName || '(fobject_id bigint)';\n\t\t\t\texception when others then\n\t\t\t\tend;\n\t\t\tend if;\n\t\t\tinsert into _class (\n\t\t\t\tfid, fparent_id, fname, fcode, fdescription, fformat, fview_id, fstart_id\n\t\t\t) values (\n\t\t\t\tNEW.fid, NEW.fparent_id, NEW.fname, NEW.fcode, NEW.fdescription, NEW.fformat, NEW.fview_id, NEW.fstart_id\n\t\t\t);\n\t\telse\n\t\t\tif (classCode <> NEW.fcode) then\n\t\t\t\traise exception 'You can''t change: code';\n\t\t\tend if;\n\t\t\tif (parentId <> NEW.fparent_id) then\n\t\t\t\traise exception 'You can''t change: parent_id';\n\t\t\tend if;\n\t\t\tupdate _class set\n\t\t\t\tfparent_id = NEW.fparent_id,\n\t\t\t\tfname = NEW.fname,\n\t\t\t\tfcode = NEW.fcode,\n\t\t\t\tfdescription = NEW.fdescription,\n\t\t\t\tfformat = NEW.fformat,\n\t\t\t\tfview_id = NEW.fview_id,\n\t\t\t\tfstart_id = NEW.fstart_id\n\t\t\twhere\n\t\t\t\tfid = NEW.fid;\n\t\tend if;\n\tend if;\n\treturn NEW;\nend; \n$$ language plpgsql;\n\ncreate trigger tclass_after_insert\nafter insert on tclass for each row \nexecute procedure trigger_tclass_after_insert ();\n\n-- tclass after update\ncreate function trigger_tclass_after_update () returns trigger as\n$$\ndeclare\n\tstartId int;\nbegin\n\tselect fstart_id into startId from _class where fid = NEW.fid;\n\tif (NEW.fstart_id = startId) then\n\t\texecute 'delete from _class where fid = ' || NEW.fid;\n\t\tif (NEW.fid >= 1000) then\n\t\t\texecute 'drop table ' || NEW.fcode || '_' || NEW.fid;\n\t\tend if;\n\tend if;\n\treturn NEW;\nend; \n$$ language plpgsql;\n\ncreate trigger tclass_after_update\nafter update on tclass for each row \nexecute procedure trigger_tclass_after_update ();\n\n-- tclass_attr after insert\ncreate function trigger_tclass_attr_after_insert () returns trigger as\n$$\ndeclare\n\tclassCode varchar (256);\n\ttableName varchar (256);\n\tcolumnName varchar (256);\n\tcolumnType varchar (64);\n\tcaCode varchar (256);\n\tcaClassId int;\n\tcaTypeId int;\n\tcaUnique int;\nbegin\n\tselect fcode into classCode from _class where fid = NEW.fclass_id;\n\tif (classCode is not null and NEW.fend_id = 2147483647) then\n\t\tselect fcode, fclass_id, ftype_id, funique into caCode, caClassId, caTypeId, caUnique from _class_attr where fid = NEW.fid;\n\t\tcolumnName = NEW.fcode || '_' || NEW.fid;\n\t\ttableName = classCode || '_' || NEW.fclass_id;\n\t\tif (caCode is null) then\n\t\t\t-- Column type\n\t\t\tcolumnType = 'bigint';\n\t\t\tif (NEW.ftype_id = 3) then\n\t\t\t\tcolumnType = 'timestamp (6)';\n\t\t\tend if;\n\t\t\tif (NEW.ftype_id = 2) then\n\t\t\t\tcolumnType = 'numeric';\n\t\t\tend if;\n\t\t\tif (NEW.ftype_id = 1 or NEW.ftype_id = 5) then\n\t\t\t\tcolumnType = 'text';\n\t\t\tend if;\n\t\t\texecute 'alter table ' || tableName || ' add column ' || columnName || ' ' || columnType;\n\t\t\tinsert into _class_attr (\n\t\t\t\tfid, fclass_id, fclass_code, fname, fcode, fdescription, ftype_id, fnot_null, fsecure, funique, fremove_rule, fstart_id\n\t\t\t) values (\n\t\t\t\tNEW.fid, NEW.fclass_id, classCode, NEW.fname, NEW.fcode, NEW.fdescription, NEW.ftype_id, NEW.fnot_null, NEW.fsecure, NEW.funique, NEW.fremove_rule, NEW.fstart_id\n\t\t\t);\n\t\t\t-- Unique\n\t\t\t--if (NEW.funique is not null and NEW.funique = 1) then\n\t\t\t--\texecute 'create unique index ' || tableName || '_' || columnName || '_unique on ' || tableName || ' (' || columnName || ')';\n\t\t\t--end if;\n\t\t\t-- Index\n\t\t\tif (NEW.ftype_id = 12 or NEW.ftype_id >= 1000 or position ('\"index\"' in NEW.fformat_func) > 0) then\n\t\t\t\t-- if (NEW.ftype_id = 1) then\n\t\t\t\t-- \texecute 'create index ' || tableName || '_' || columnName || ' on ' || tableName || ' (' || columnName || ') (substr (' || columnName || ', 1, 1024))';\n\t\t\t\t-- else\n\t\t\t\t\texecute 'create index ' || tableName || '_' || columnName || ' on ' || tableName || ' (' || columnName || ')';\n\t\t\t\t-- end if;\n\t\t\tend if;\n\t\telse\n\t\t\tif (caCode <> NEW.fcode) then\n\t\t\t\traise exception 'You can''t change: code' using message = 'You can''t change: code - ' || caCode || ',' || NEW.fcode;\n\t\t\tend if;\n\t\t\tif (caClassId <> NEW.fclass_id) then\n\t\t\t\traise exception 'You can''t change: class_id' using message = 'You can''t change: class_id - ' || caClassId || ',' || NEW.fclass_id;\n\t\t\tend if;\n\t\t\tif (caTypeId <> NEW.ftype_id) then\n\t\t\t\traise exception 'You can''t change: type_id' using message = 'You can''t change: type_id - ' || caTypeId || ',' || NEW.ftype_id;\n\t\t\tend if;\n\t\t\tif (caUnique <> NEW.funique) then\n\t\t\t\traise exception 'You can''t change: unique' using message = 'You can''t change: unique';\n\t\t\tend if;\n\t\t\tupdate _class_attr set\n\t\t\t\tfname = NEW.fname,\n\t\t\t\tfcode = NEW.fcode,\n\t\t\t\tfclass_id = NEW.fclass_id,\n\t\t\t\tfclass_code = classCode,\n\t\t\t\tftype_id = NEW.ftype_id,\n\t\t\t\tfdescription = NEW.fdescription,\n\t\t\t\tfnot_null = NEW.fnot_null,\n\t\t\t\tfsecure = NEW.fsecure,\n\t\t\t\tfremove_rule = NEW.fremove_rule,\n\t\t\t\tfstart_id = NEW.fstart_id\n\t\t\twhere\n\t\t\t\tfid = NEW.fid;\n\t\tend if;\n\tend if;\n\treturn NEW;\nend; \n$$ language plpgsql;\n\ncreate trigger tclass_attr_after_insert\nafter insert on tclass_attr for each row \nexecute procedure trigger_tclass_attr_after_insert ();\n\n-- tclass_attr after update\ncreate function trigger_tclass_attr_after_update () returns trigger as\n$$\ndeclare\n\tstartId int;\n\tclassCode varchar (256);\nbegin\n\tselect fstart_id, fclass_code into startId, classCode from _class_attr where fid = NEW.fid;\n\tif (NEW.fstart_id = startId) then\n\t\texecute 'delete from _class_attr where fid = ' || NEW.fid;\n\t\texecute 'alter table ' || classCode || '_' || NEW.fclass_id || ' drop column ' || NEW.fcode || '_' || NEW.fid || ' cascade';\n\tend if;\n\treturn NEW;\nend; \n$$ language plpgsql;\n\ncreate trigger tclass_attr_after_update\nafter update on tclass_attr for each row \nexecute procedure trigger_tclass_attr_after_update ();\n\n-- tview after insert\ncreate function trigger_tview_after_insert () returns trigger as\n$$\ndeclare\n\tviewCode varchar (256);\nbegin\n\tselect fcode into viewCode from _view where fid = NEW.fid;\n\tif (NEW.fsystem is null and NEW.fend_id = 2147483647) then\n\t\tif (viewCode is null) then\n\t\t\tinsert into _view (\n\t\t\t\tfid, fparent_id, fname, fcode, fdescription, flayout, fquery, fstart_id\n\t\t\t) values (\n\t\t\t\tNEW.fid, NEW.fparent_id, NEW.fname, NEW.fcode, NEW.fdescription, NEW.flayout, NEW.fquery, NEW.fstart_id\n\t\t\t);\n\t\telse\n\t\t\tupdate _view set\n\t\t\t\tfparent_id = NEW.fparent_id,\n\t\t\t\tfname = NEW.fname,\n\t\t\t\tfcode = NEW.fcode,\n\t\t\t\tfdescription = NEW.fdescription,\n\t\t\t\tflayout = NEW.flayout,\n\t\t\t\tfquery = NEW.fquery,\n\t\t\t\tfstart_id = NEW.fstart_id\n\t\t\twhere\n\t\t\t\tfid = NEW.fid;\n\t\tend if;\n\tend if;\n\treturn NEW;\nend; \n$$ language plpgsql;\n\ncreate trigger tview_after_insert\nafter insert on tview for each row \nexecute procedure trigger_tview_after_insert ();\n\n-- tview after update\ncreate function trigger_tview_after_update () returns trigger as\n$$\ndeclare\n\tstartId int;\nbegin\n\tselect fstart_id into startId from _view where fid = NEW.fid;\n\tif (NEW.fsystem is null and startId is not null and NEW.fstart_id = startId) then\n\t\texecute 'delete from _view where fid = ' || NEW.fid;\n\tend if;\n\treturn NEW;\nend; \n$$ language plpgsql;\n\ncreate trigger tview_after_update\nafter update on tview for each row \nexecute procedure trigger_tview_after_update ();\n\n-- tobject after insert\ncreate function trigger_tobject_after_insert () returns trigger as\n$$\ndeclare\n\tclassCode varchar (256);\n\tid int;\n\tstartId int;\n\tclassId int;\n\tparentId int;\nbegin\n\tif (NEW.fend_id = 2147483647) then\n\t\tid = NEW.fid;\n\t\tclassId = NEW.fclass_id;\n\t\tstartId = NEW.fstart_id;\n\t\tselect fcode, fparent_id into classCode, parentId from _class where fid = classId;\n\t\tif (classCode is not null) then\n\t\t\tinsert into _object (\n\t\t\t\tfid, fstart_id\n\t\t\t) values (\n\t\t\t\tid, startId\n\t\t\t);\n\t\tend if;\n\t\tloop\n\t\t\tif (classCode is not null) then\n\t\t\t\texecute 'insert into ' || classCode || '_' || classId || ' (fobject_id) values (' || id || ')';\n\t\t\tend if;\n\t\t    if (parentId is null) then\n\t\t        exit;\n\t\t    else\n\t\t    \tclassId = parentId;\n\t\t\t\tselect fcode, fparent_id into classCode, parentId from _class where fid = classId;\n\t\t    end if;\n\t\tend loop;\n\tend if;\n\treturn NEW;\nend; \n$$ language plpgsql;\n\ncreate trigger tobject_after_insert\nafter insert on tobject for each row \nexecute procedure trigger_tobject_after_insert ();\n\n-- tobject after update\ncreate function trigger_tobject_after_update () returns trigger as\n$$\ndeclare\n\tstartId int;\n\tclassCode varchar (256);\nbegin\n\tselect fstart_id into startId from _object where fid = NEW.fid;\n\tif (NEW.fstart_id = startId) then\n\t\t-- todo delete from parent classes\n\t\texecute 'delete from _object where fid = ' || NEW.fid;\n\t\tselect fcode into classCode from _class where fid = NEW.fclass_id;\n\t\texecute 'delete from ' || classCode || '_' || NEW.fclass_id || ' where fobject_id = ' || NEW.fid;\n\tend if;\n\treturn NEW;\nend; \n$$ language plpgsql;\n\ncreate trigger tobject_after_update\nafter update on tobject for each row \nexecute procedure trigger_tobject_after_update ();\n\n-- tobject_attr after insert\ncreate function trigger_tobject_attr_after_insert () returns trigger as\n$$\ndeclare\n\tclassCode varchar (256);\n\tclassId int;\n\tcaCode varchar (256);\n\tvalue text;\nbegin\n\tselect fclass_code, fclass_id, fcode into classCode, classId, caCode from _class_attr where fid = NEW.fclass_attr_id;\n\tif (classCode is not null) then\n\t\tvalue = 'null';\n\t\tif (NEW.fstring is not null) then\n\t\t\tvalue = '''' || replace (NEW.fstring, '''', '''''') || '''';\n\t\tend if;\n\t\tif (NEW.ftime is not null) then\n\t\t\tvalue = '''' || to_char (NEW.ftime, 'DD.MM.YYYY HH24:MI:SS.MS') || '''';\n\t\tend if;\n\t\tif (NEW.fnumber is not null) then\n\t\t\tvalue = '''' || NEW.fnumber::text || '''';\n\t\tend if;\n\t\tbegin\n\t\t\texecute 'update ' || classCode || '_' || classId || ' set ' || caCode || '_' || NEW.fclass_attr_id || ' = ' || value || ' where fobject_id = ' || NEW.fobject_id;\n\t\texception when others then\n\t\tend;\n\tend if;\n\treturn NEW;\nend; \n$$ language plpgsql;\n\ncreate trigger tobject_attr_after_insert\nafter insert on tobject_attr for each row \nexecute procedure trigger_tobject_attr_after_insert ();\n\n";
 
 //
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
