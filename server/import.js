@@ -1620,13 +1620,6 @@ var Import = function () {
 						}});
 					},
 					function (cb) {
-						storage.query ({session: session, sql:
-							"select fobject_id from folder_1033"
-						, success: function (opts) {
-							cb ();
-						}});
-					},
-					function (cb) {
 						me.importObjects ({success: function () {
 							cb ();
 						}});
