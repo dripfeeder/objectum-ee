@@ -66,6 +66,7 @@ begin
 			if (NEW.fid >= 1000) then
 				begin
 					execute 'create table ' || tableName || '(fobject_id bigint)';
+					execute 'alter table ' || tableName || ' add primary key (fobject_id)';
 				exception when others then
 				end;
 			end if;
@@ -344,36 +345,36 @@ after update on tobject for each row
 execute procedure trigger_tobject_after_update ();
 
 -- tobject_attr after insert
-create function trigger_tobject_attr_after_insert () returns trigger as
-$$
-declare
-	classCode varchar (256);
-	classId int;
-	caCode varchar (256);
-	value text;
-begin
-	select fclass_code, fclass_id, fcode into classCode, classId, caCode from _class_attr where fid = NEW.fclass_attr_id;
-	if (classCode is not null) then
-		value = 'null';
-		if (NEW.fstring is not null) then
-			value = '''' || replace (NEW.fstring, '''', '''''') || '''';
-		end if;
-		if (NEW.ftime is not null) then
-			value = '''' || to_char (NEW.ftime, 'DD.MM.YYYY HH24:MI:SS.MS') || '''';
-		end if;
-		if (NEW.fnumber is not null) then
-			value = '''' || NEW.fnumber::text || '''';
-		end if;
-		begin
-			execute 'update ' || classCode || '_' || classId || ' set ' || caCode || '_' || NEW.fclass_attr_id || ' = ' || value || ' where fobject_id = ' || NEW.fobject_id;
-		exception when others then
-		end;
-	end if;
-	return NEW;
-end; 
-$$ language plpgsql;
-
-create trigger tobject_attr_after_insert
-after insert on tobject_attr for each row 
-execute procedure trigger_tobject_attr_after_insert ();
+--create function trigger_tobject_attr_after_insert () returns trigger as
+--$$
+--declare
+--	classCode varchar (256);
+--	classId int;
+--	caCode varchar (256);
+--	value text;
+--begin
+--	select fclass_code, fclass_id, fcode into classCode, classId, caCode from _class_attr where fid = NEW.fclass_attr_id;
+--	if (classCode is not null) then
+--		value = 'null';
+--		if (NEW.fstring is not null) then
+--			value = '''' || replace (NEW.fstring, '''', '''''') || '''';
+--		end if;
+--		if (NEW.ftime is not null) then
+--			value = '''' || to_char (NEW.ftime, 'DD.MM.YYYY HH24:MI:SS.MS') || '''';
+--		end if;
+--		if (NEW.fnumber is not null) then
+--			value = '''' || NEW.fnumber::text || '''';
+--		end if;
+--		begin
+--			execute 'update ' || classCode || '_' || classId || ' set ' || caCode || '_' || NEW.fclass_attr_id || ' = ' || value || ' where fobject_id = ' || NEW.fobject_id;
+--		exception when others then
+--		end;
+--	end if;
+--	return NEW;
+--end; 
+--$$ language plpgsql;
+--
+--create trigger tobject_attr_after_insert
+--after insert on tobject_attr for each row 
+--execute procedure trigger_tobject_attr_after_insert ();
 

@@ -941,7 +941,9 @@ var Storage = function (options) {
 						insertTOC ({classId: classObject.get ("fparent_id")});
 					}
 				};
-				insertTOC ({classId: classId});
+				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
+					insertTOC ({classId: classId});
+				};
 				async.eachSeries (sql, function (sql, cb) {
 					storage.query ({session: session, sql: sql, success: function (result) {
 						cb ();
@@ -1090,7 +1092,9 @@ var Storage = function (options) {
 					deleteTOC ({classId: classObject.get ("fparent_id")});
 				}
 			};
-			deleteTOC ({classId: object.data.fclass_id});
+			if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
+				deleteTOC ({classId: object.data.fclass_id});
+			};
 			async.map (sql, function (s, cb) {
 				storage.query ({session: session, sql: s, success: function () {
 					cb ();
@@ -1449,9 +1453,9 @@ var Storage = function (options) {
 								});
 							};
 							var functions = [processObjectAttr, processTOC];
-				   			if (storage.connection.dbEngine && storage.connection.dbEngine.enabled) {
-								functions = [processObjectAttr];
-				   			};
+				   			//if (storage.connection.dbEngine && storage.connection.dbEngine.enabled) {
+							//	functions = [processObjectAttr];
+				   			//};
 							async.series (functions, function (err, results) {
 								cb (err);
 							});
