@@ -3211,9 +3211,35 @@ var Import = function () {
 				};
 			},
 			function (cb) {
+				if (storage.connection.dbEngine && storage.connection.dbEngine.enabled) {
+					storage.query ({session: session, sql:
+						"create trigger tobject_attr_after_insert\n" +
+						"after insert on tobject_attr for each row \n" +
+						"execute procedure trigger_tobject_attr_after_insert ();\n"
+					, success: function (options) {
+						cb ();
+					}});
+
+				} else {
+					cb ();
+				};
+			},
+			function (cb) {
 				me.importObjectAttrs ({success: function () {
 					cb ();
 				}});
+			},
+			function (cb) {
+				if (storage.connection.dbEngine && storage.connection.dbEngine.enabled) {
+					storage.query ({session: session, sql:
+						"drop trigger tobject_attr_after_insert on tobject_attr"
+					, success: function (options) {
+						cb ();
+					}});
+
+				} else {
+					cb ();
+				};
 			},
 			function (cb) {
 				if (storage.client.database == "mssql") {
