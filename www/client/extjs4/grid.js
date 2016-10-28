@@ -922,8 +922,12 @@ Ext.define ("$o.Grid.Widget", {
 	printOlap: function (format, coding) {
 		var me = this;
 		// reportUri
+		var viewId = me.up ("grid").viewId;
+		if (!viewId && me.up ("grid").classView) {
+			viewId = $o.getClass (me.up ("grid").classView).get ("view");
+		};
 		var reportUri = "report?";			
-		reportUri += "format=" + format + "&view=" + me.up ("grid").viewId + "&storage=" + $o.code;
+		reportUri += "format=" + format + "&view=" + viewId + "&storage=" + $o.code;
 		if (coding) {
 			reportUri += "&coding=" + coding;
 		}

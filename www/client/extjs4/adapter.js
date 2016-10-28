@@ -223,7 +223,7 @@ Ext.define ("$o.locale", {
 			};
 			var n = $o.locale.strings [s.toLowerCase ()] || s;
 			if (s && n) {
-				if (s [0].toUpperCase () == s [0]) {
+				if (s [0].toUpperCase () == s [0] || ["create", "remove", "delete"].indexOf (s) > -1) {
 					n = n [0].toUpperCase () + n.substr (1);
 				} else {
 					n = n [0].toLowerCase () + n.substr (1);

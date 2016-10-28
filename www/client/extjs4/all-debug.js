@@ -8132,8 +8132,12 @@ Ext.define ("$o.Grid.Widget", {
 	printOlap: function (format, coding) {
 		var me = this;
 		// reportUri
+		var viewId = me.up ("grid").viewId;
+		if (!viewId && me.up ("grid").classView) {
+			viewId = $o.getClass (me.up ("grid").classView).get ("view");
+		};
 		var reportUri = "report?";			
-		reportUri += "format=" + format + "&view=" + me.up ("grid").viewId + "&storage=" + $o.code;
+		reportUri += "format=" + format + "&view=" + viewId + "&storage=" + $o.code;
 		if (coding) {
 			reportUri += "&coding=" + coding;
 		}
@@ -21651,7 +21655,7 @@ Ext.define ("$o.locale", {
 			};
 			var n = $o.locale.strings [s.toLowerCase ()] || s;
 			if (s && n) {
-				if (s [0].toUpperCase () == s [0]) {
+				if (s [0].toUpperCase () == s [0] || ["create", "remove", "delete"].indexOf (s) > -1) {
 					n = n [0].toUpperCase () + n.substr (1);
 				} else {
 					n = n [0].toLowerCase () + n.substr (1);

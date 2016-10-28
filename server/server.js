@@ -495,6 +495,11 @@ server.init = function (options) {
 	server.app.all ("/objectum/stat", server.requestStart, function (req, res) {
 		server.stat ({request: req, response: res});
 	});
+	server.app.all ("/exception", function (req, res) {
+		setTimeout (function () {
+			throw Error ("boo");
+		}, 1000);
+	});
 	server.startPlugins ({success: function () {
 		server.app.get ("*", server.requestStart, function (req, res, next) {
 			server.www ({request: req, response: res, next: next});
@@ -695,18 +700,18 @@ server.start = function (options, cb) {
 			};
 		}
 	], function (err, results) {
+		if (err) {
+			console.log ("Objectum server start error: " + err + ", port: " + port);
+		} else {
+			console.log ("Objectum server has started at port: " + port);
+		};
 		redisClient.hset ("server-started", process.pid, common.currentUTCTimestamp ());
 		server.http.listen (port, config.host, config.backlog);
 		server.http.on ("error", function (err) {
 			log.error ({cls: "server", fn: "start", error: "http error: " + err});
 		});
-		if (err) {
-			console.log ("Objectum server start error: " + err + ", port: " + port);
-		} else {
-			console.log ("Objectum server has started at port: " + port);
-		}
 		if (cb) {
 			cb (err);
-		}
+		};
 	});
 };
