@@ -61,12 +61,14 @@ var currentTimestamp = function () {
 	return currentDate () + " " + currentTime ();
 };
 var start = function (config) {
+	config = config.config || config;
 	var $o = new (require (__dirname + "/objectum-debug").Objectum)(config);
 	$o.server.init ({objectum: $o, success: function () {
 		$o.server.start ({port: $o.config.startPort});
 	}});
 };
 var startMaster = function (config) {
+	config = config.config || config;
 	var env = {config: JSON.stringify (config)};
 	cluster.setupMaster ({
 	    exec: __dirname + "/index.js"
@@ -86,6 +88,7 @@ var startMaster = function (config) {
 	});
 };
 var startCluster = function (config) {
+	config = config.config || config;
 	var $o = new (require (__dirname + "/objectum-debug").Objectum)(config);
 	cluster.setupMaster ({
 	    exec: __dirname + "/ocluster.js"
