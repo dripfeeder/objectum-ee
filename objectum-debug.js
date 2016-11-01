@@ -11374,6 +11374,8 @@ function XMLSS (options) {
 	me.colWidth = {};
 };
 XMLSS.prototype.setDefaultStyles = function () {
+	this.xmlStyles = "";
+	/*
 	this.xmlStyles =
 		"<Style ss:ID='Default' ss:Name='Normal'>\n" +
 		"<Alignment ss:Horizontal='Left' ss:Vertical='Center'/>\n" +
@@ -11384,6 +11386,7 @@ XMLSS.prototype.setDefaultStyles = function () {
 		"<Protection/>\n" +
 		"</Style>\n"
 	;
+	*/
 };
 XMLSS.prototype.clearColWidth = function () {
 	this.colWidth = [];
