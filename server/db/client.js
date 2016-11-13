@@ -44,6 +44,41 @@ db.execute = function (options) {
 				}});
 			    return;
 			};
+			if (cfg.fn == "import") {
+				console.log ("Importing storage ...");
+				var i = new Import ();
+			    i.importFromFile ({
+			    	code: cfg.code,
+			    	file: cfg.file,
+			    	success: function () {
+						console.log ("Storage imported.");
+						cb ();
+					}
+			    });
+			    return;
+			};
+			if (cfg.fn == "export") {
+				console.log ("Exporting storage ...");
+				var e = new Export ();
+			    e.exportToFile ({
+			    	schema: _.has (cfg, "schema") ? cfg.schema : true,
+			    	code: cfg.code,
+			    	file: cfg.file,
+			    	classes: cfg.classes || "all",
+			    	views: cfg.views || "all",
+			    	except: {
+			    		tobject: [{
+			    			fclass_id: cfg.filterClasses || []
+			    		}]
+			    	},
+			    	space: _.has (cfg, "space") ? cfg.space : "\t",
+			    	success: function () {
+						console.log ("Storage exported.");
+						cb ();
+					}
+			    });
+			    return;
+			};
 			storage = new Storage ({systemDB: true, code: cfg.code, connection: connection, success: function () {
 				if (cfg.fn == "create") {
 					console.log ("Creating storage ...");
@@ -74,7 +109,9 @@ db.execute = function (options) {
 		if (err) {
 			common.log ({file: config.rootDir + "/error.log", text: err});
 		} else {
-			storage.freeResources ();
+			if (storage) {
+				storage.freeResources ();
+			};
 			if (cfg.success) {
 				cfg.success ();
 			};

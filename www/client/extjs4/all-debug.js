@@ -7467,6 +7467,14 @@ Ext.define ("$o.Base.Grid", {
 				r.push ("and");
 			};
 			var f = fd [i];
+			if (typeof (f.data.value) == "object" && f.data.value.isNotNull) {
+				r.push (f.field);
+				r.push ("is not null");
+			} else
+			if (typeof (f.data.value) == "object" && f.data.value.isNull) {
+				r.push (f.field);
+				r.push ("is null");
+			} else
 			if (f.data.type && f.data.type == "boolean") {
 				if (f.data.value) {
 					r.push ([f.field, "=", 1]);
@@ -20814,6 +20822,22 @@ Ext.define ("$o.app", {
 				var va = $o.viewsMap [id].attrs;
 				for (var i = 0; i < fs.length; i ++) {
 					var f = fs [i];
+					if (typeof (f.value) == "object" && f.value.isNotNull) {
+						if (filter.length) {
+							filter.push ("and");
+						};
+						filter.push (f.field);
+						filter.push ("is not null");
+						continue;
+					} else
+					if (typeof (f.value) == "object" && f.value.isNull) {
+						if (filter.length) {
+							filter.push ("and");
+						};
+						filter.push (f.field);
+						filter.push ("is null");
+						continue;
+					};
 					var dataType;
 					if (!va [f.field].get ("classAttr")) {
 						dataType = "number";
@@ -28361,6 +28385,43 @@ Ext.define('Ext.ux.grid.filter.DateFilter', {
             //me.add(item);
             me.menu.add(item);
         }
+        me.menu.add ("-");
+        me.menu.add ({
+            xtype: "checkbox",
+            name: "isNull",
+            boxLabel: "Пусто",
+            style: "color: white; margin-left: 4px",
+            listeners: {
+                change: function () {
+                    me.setActive (me.isActivatable ());
+                    me.fireEvent ("update", me);
+                    if (me.menu.down ("*[name=isNull]").getValue ()) {
+                        me.menu.down ("*[name=isNotNull]").disable ();
+                    } else {
+                        me.menu.down ("*[name=isNotNull]").enable ();
+                    };
+                },
+                scope: me
+            }
+        });
+        me.menu.add ({
+            xtype: "checkbox",
+            name: "isNotNull",
+            boxLabel: "Непусто",
+            style: "color: white; margin-left: 4px",
+            listeners: {
+                change: function () {
+                    me.setActive (me.isActivatable ());
+                    me.fireEvent ("update", me);
+                    if (me.menu.down ("*[name=isNotNull]").getValue ()) {
+                        me.menu.down ("*[name=isNull]").disable ();
+                    } else {
+                        me.menu.down ("*[name=isNull]").enable ();
+                    };
+                },
+                scope: me
+            }
+        });
         me.values = {};
     },
 
@@ -28426,6 +28487,12 @@ Ext.define('Ext.ux.grid.filter.DateFilter', {
      */
     getValue : function () {
         var key, result = {};
+        if (me.menu.down ("*[name=isNull]").getValue ()) {
+            return {isNull: true};
+        };
+        if (me.menu.down ("*[name=isNotNull]").getValue ()) {
+            return {isNotNull: true};
+        };
         for (key in this.fields) {
             if (this.fields[key].checked) {
                 result[key] = this.getFieldValue(key);
@@ -28461,9 +28528,15 @@ Ext.define('Ext.ux.grid.filter.DateFilter', {
      * @return {Boolean}
      */
     isActivatable : function () {
-        var key;
-        for (key in this.fields) {
-            if (this.fields[key].checked) {
+        var me = this;
+        if (me.menu.down ("*[name=isNull]").getValue ()) {
+            return true;
+        };
+        if (me.menu.down ("*[name=isNotNull]").getValue ()) {
+            return true;
+        };
+        for (var key in me.fields) {
+            if (me.fields [key].checked) {
                 return true;
             }
         }
@@ -28478,6 +28551,13 @@ Ext.define('Ext.ux.grid.filter.DateFilter', {
      * key value pairs representing the current configuration of the filter.
      */
     getSerialArgs : function () {
+        var me = this;
+        if (me.menu.down ("*[name=isNull]").getValue ()) {
+            return {type: "string", value: {isNull: true}};
+        };
+        if (me.menu.down ("*[name=isNotNull]").getValue ()) {
+            return {type: "string", value: {isNotNull: true}};
+        };
         var args = [];
         for (var key in this.fields) {
             if(this.fields[key].checked){
@@ -29467,6 +29547,45 @@ Ext.define('Ext.ux.grid.filter.StringFilter', {
                 scope: this
             }
         });
+        var me = this;
+        this.menu.add({
+            xtype: "checkbox",
+            name: "isNull",
+            boxLabel: "Пусто",
+            style: "color: white",
+            listeners: {
+                change: function () {
+                    this.updateTask.delay(1);
+                    if (me.menu.down ("*[name=isNull]").getValue ()) {
+                        me.menu.down ("*[name=isNotNull]").disable ();
+                        me.menu.down ("*[name=notLike]").disable ();
+                    } else {
+                        me.menu.down ("*[name=isNotNull]").enable ();
+                        me.menu.down ("*[name=notLike]").enable ();
+                    };
+                },
+                scope: this
+            }
+        });
+        this.menu.add({
+            xtype: "checkbox",
+            name: "isNotNull",
+            boxLabel: "Непусто",
+            style: "color: white",
+            listeners: {
+                change: function () {
+                    this.updateTask.delay(1);
+                    if (me.menu.down ("*[name=isNotNull]").getValue ()) {
+                        me.menu.down ("*[name=isNull]").disable ();
+                        me.menu.down ("*[name=notLike]").disable ();
+                    } else {
+                        me.menu.down ("*[name=isNull]").enable ();
+                        me.menu.down ("*[name=notLike]").enable ();
+                    };
+                },
+                scope: this
+            }
+        });
         this.menu.showSeparator = false;
         this.updateTask = Ext.create('Ext.util.DelayedTask', this.fireUpdate, this);
     },
@@ -29478,7 +29597,12 @@ Ext.define('Ext.ux.grid.filter.StringFilter', {
      */
     getValue : function () {
         var me = this;
-        return {value: me.inputItem.getValue(), notLike: me.menu.down ("*[name=notLike]").getValue ()};
+        return {
+            value: me.inputItem.getValue(),
+            notLike: me.menu.down ("*[name=notLike]").getValue (),
+            isNull: me.menu.down ("*[name=isNull]").getValue (),
+            isNotNull: me.menu.down ("*[name=isNotNull]").getValue ()
+        };
     },
 
     /**
@@ -29497,7 +29621,8 @@ Ext.define('Ext.ux.grid.filter.StringFilter', {
      * @return {Boolean}
      */
     isActivatable : function () {
-        return this.inputItem.getValue().length > 0;
+        var me = this;
+        return this.inputItem.getValue().length > 0 || me.menu.down ("*[name=isNull]").getValue () || me.menu.down ("*[name=isNotNull]").getValue ();
     },
 
     /**
@@ -29928,6 +30053,43 @@ menuItemCfgs : {
             }
             me.add(item);
         }
+        /*
+        me.add ("-");
+        me.add ({
+            xtype: "checkbox",
+            name: "isNull",
+            boxLabel: "Пусто",
+            style: "color: white",
+            listeners: {
+                change: function () {
+                    this.updateTask.delay (1);
+                    if (me.menu.down ("*[name=isNull]").getValue ()) {
+                        me.menu.down ("*[name=isNotNull]").disable ();
+                    } else {
+                        me.menu.down ("*[name=isNotNull]").enable ();
+                    };
+                },
+                scope: me
+            }
+        });
+        me.add ({
+            xtype: "checkbox",
+            name: "isNotNull",
+            boxLabel: "Непусто",
+            style: "color: white",
+            listeners: {
+                change: function () {
+                    this.updateTask.delay (1);
+                    if (me.menu.down ("*[name=isNotNull]").getValue ()) {
+                        me.menu.down ("*[name=isNull]").disable ();
+                    } else {
+                        me.menu.down ("*[name=isNull]").enable ();
+                    };
+                },
+                scope: me
+            }
+        });
+        */
     },
     
     stopFn: function(e) {
@@ -29947,6 +30109,7 @@ menuItemCfgs : {
      * @return {String} The value of this filter
      */
     getValue : function () {
+        var me = this;
         var result = {},
             fields = this.fields, 
             key, field;

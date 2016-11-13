@@ -257,6 +257,14 @@ Ext.define ("$o.Base.Grid", {
 				r.push ("and");
 			};
 			var f = fd [i];
+			if (typeof (f.data.value) == "object" && f.data.value.isNotNull) {
+				r.push (f.field);
+				r.push ("is not null");
+			} else
+			if (typeof (f.data.value) == "object" && f.data.value.isNull) {
+				r.push (f.field);
+				r.push ("is null");
+			} else
 			if (f.data.type && f.data.type == "boolean") {
 				if (f.data.value) {
 					r.push ([f.field, "=", 1]);

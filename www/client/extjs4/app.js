@@ -579,6 +579,22 @@ Ext.define ("$o.app", {
 				var va = $o.viewsMap [id].attrs;
 				for (var i = 0; i < fs.length; i ++) {
 					var f = fs [i];
+					if (typeof (f.value) == "object" && f.value.isNotNull) {
+						if (filter.length) {
+							filter.push ("and");
+						};
+						filter.push (f.field);
+						filter.push ("is not null");
+						continue;
+					} else
+					if (typeof (f.value) == "object" && f.value.isNull) {
+						if (filter.length) {
+							filter.push ("and");
+						};
+						filter.push (f.field);
+						filter.push ("is null");
+						continue;
+					};
 					var dataType;
 					if (!va [f.field].get ("classAttr")) {
 						dataType = "number";
