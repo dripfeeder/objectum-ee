@@ -281,6 +281,7 @@ projects.tryLogin = function (options) {
 	var success = options.success;
 	var storage = options.storage;
 	var session = options.session;
+	var authOld = options.authOld;
 	var sessionId = session.id;
 	var cookies = options.cookies;
 	projects.sessions [sessionId] = session;
@@ -291,7 +292,17 @@ projects.tryLogin = function (options) {
 		roleId = storage.subjectRoles [session.userId].role;
 		menuId = storage.subjectRoles [session.userId].menu;
 	};
-	success ({result: sessionId + " " + session.userId + " 3 " + roleId + " " + menuId, access: "granted"});
+	if (authOld) {
+		success ({result: sessionId + " " + session.userId + " 3 " + roleId + " " + menuId, access: "granted"});
+	} else {
+		success ({result: JSON.stringify ({
+			sessionId: sessionId,
+			userId: session.userId,
+			roleId: roleId,
+			menuId: menuId,
+			access: "granted"
+		})});
+	};
 };
 projects.authActiveDirectory = function (opts, cb) {
 	var storage = opts.storage;
@@ -322,6 +333,7 @@ projects.checkAuth = function (request, response, next) {
 		var storage = options.storage;
 		var login = options.login;
 		var password = options.password;
+		var authOld = options.authOld;
 		if (login == "admin" && password == config.storages [storage.code].adminPassword) {
 			var sessionId = sha.hex_sha1 (common.getRemoteAddress (request) + new Date ().getTime () + Math.random ());
 			projects.sessions [sessionId] = {
@@ -342,7 +354,16 @@ projects.checkAuth = function (request, response, next) {
 				ip: common.getRemoteAddress (request)
 			};
 			projects.saveSession (projects.sessions [sessionId]);
-			projects.send ({request: request, response: response, msg: sessionId + " null 3 admin admin"});
+			if (authOld) {
+				projects.send ({request: request, response: response, msg: sessionId + " null 3 admin admin"});
+			} else {
+				projects.send ({request: request, response: response, msg: JSON.stringify ({
+					sessionId: sessionId,
+					userId: null,
+					roleId: "admin",
+					menuId: "admin"
+				})});
+			};
 			return true;
 		} else {
 			return false;
@@ -352,6 +373,7 @@ projects.checkAuth = function (request, response, next) {
 		var storage = options.storage;
 		var login = options.login;
 		var password = options.password;
+		var authOld = options.authOld;
 		if (login == "autologin" && config.storages [storage.code].autologin) {
 			var sessionId = sha.hex_sha1 (common.getRemoteAddress (request) + new Date ().getTime () + Math.random ());
 			projects.sessions [sessionId] = {
@@ -372,7 +394,16 @@ projects.checkAuth = function (request, response, next) {
 				ip: common.getRemoteAddress (request)
 			};
 			projects.saveSession (projects.sessions [sessionId]);
-			projects.send ({request: request, response: response, msg: sessionId + " null 3 autologin autologin"});
+			if (authOld) {
+				projects.send ({request: request, response: response, msg: sessionId + " null 3 autologin autologin"});
+			} else {
+				projects.send ({request: request, response: response, msg: JSON.stringify ({
+					sessionId: sessionId,
+					userId: null,
+					roleId: "autologin",
+					menuId: "autologin"
+				})});
+			};
 			return true;
 		} else {
 			return false;
@@ -384,9 +415,16 @@ projects.checkAuth = function (request, response, next) {
 		var login = options.login;
 		var password = options.password;
 		var passwordPlain = options.passwordPlain;
+		var authOld = options.authOld;
 		var rows, userId, sessionId, session;
 		if (storage.authRecords [login] && storage.authRecords [login].tryNum >= 3 && config.clock - storage.authRecords [login].lastTry < 600) {
-			return projects.send ({request: request, response: response, msg: "wait " + (600 - (config.clock - storage.authRecords [login].lastTry))});
+			if (authOld) {
+				return projects.send ({request: request, response: response, msg: "wait " + (600 - (config.clock - storage.authRecords [login].lastTry))});
+			} else {
+				return projects.send ({request: request, response: response, msg: JSON.stringify ({
+					wait: (600 - (config.clock - storage.authRecords [login].lastTry))
+				})});
+			};
 		}
 		async.series ([
 			function (cb) {
@@ -422,13 +460,18 @@ projects.checkAuth = function (request, response, next) {
 			}
 		], function (err, results) {
 			if (err == "complete") {
-				projects.tryLogin ({storage: storage, session: session, cookies: common.getCookies (request.headers.cookie), success: function (options) {
+				projects.tryLogin ({storage: storage, session: session, cookies: common.getCookies (request.headers.cookie), authOld: authOld, success: function (options) {
 					projects.logLastTry (storage, login, true);
 					projects.send ({request: request, response: response, msg: options.result});
 				}});
 			} else {
 				projects.logLastTry (storage, login, false);
-				projects.send ({request: request, response: response, msg: ""});
+				if (authOld) {
+					projects.send ({request: request, response: response, msg: ""});
+				} else {
+					response.writeHead (401, {"Content-Type": "text/html; charset=utf-8"});
+					response.end ('{"error": "401 Unauthenticated"}');
+				};
 			};
 		});
 	};
@@ -440,29 +483,47 @@ projects.checkAuth = function (request, response, next) {
 		next ();
 	};
    	if (request.query.authorize == 1) {
+   		/*
    		var tokens = request.body.split ("\n");
    		var login = tokens [0];
    		var password = tokens [1];
    		var passwordPlain = tokens.length > 2 ? tokens [2] : null;
-		tokens = request.url.split ("/");
+   		*/
+   		var login, password, passwordPlain, opts, authOld = false;
+   		try {
+   			opts = JSON.parse (request.body);
+   			login = opts.username;
+   			password = opts.password;
+   			passwordPlain = opts.passwordPlain;
+   		} catch (e) {
+   			authOld = true;
+	   		var tokens = request.body.split ("\n");
+	   		login = tokens [0];
+	   		password = tokens [1];
+	   		passwordPlain = tokens.length > 2 ? tokens [2] : null;
+   		};
+		var tokens = request.url.split ("/");
 		var storageCode = tokens [2];
 		projects.getStorage ({request: request, response: response, storageCode: storageCode, success: function (options) {
 			var storage = options.storage;
-			if (!authorizeAdmin ({storage: storage, login: login, password: password})) {
-				if (!authorizeAutologin ({storage: storage, login: login, password: password})) {
-					authorizeUser ({storage: storage, login: login, password: password, passwordPlain: passwordPlain});
+			if (!authorizeAdmin ({storage: storage, login: login, password: password, authOld: authOld})) {
+				if (!authorizeAutologin ({storage: storage, login: login, password: password, authOld: authOld})) {
+					authorizeUser ({storage: storage, login: login, password: password, passwordPlain: passwordPlain, authOld: authOld});
 				}
 			}
 		}});
 	} else {
 		if (!projects.sessions [request.session.id]) {
 			response.writeHead (401, {"Content-Type": "text/html; charset=utf-8"});
+			/*
 			response.end (
 				"<html>" +
 				"<head><title>Unauthenticated</title></head>" +
 				"<body><h1>401 Unauthenticated</h1></body>" +
 				"</html>"
 			);
+			*/
+			response.end ('{"error": "401 Unauthenticated"}');
 		} else {
 			authorized ();
 		}

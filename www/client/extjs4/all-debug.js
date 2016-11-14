@@ -4671,8 +4671,10 @@ Ext.define ("$o", {
 		var mainOptions = options;
 		Ext.Ajax.request ({
 			url: "?authorize=1",
-			params: options.login + "\n" + options.password + "\n" + options.passwordPlain,
+//			params: options.login + "\n" + options.password + "\n" + options.passwordPlain,
+			params: JSON.stringify ({username: options.login, password: options.password}),
 			success: function (response, options) {
+				/*
 				if (!response.responseText) {
 					if (mainOptions.failure) {
 						mainOptions.failure.call (mainOptions.scope || this, "Authentication error");
@@ -4726,6 +4728,30 @@ Ext.define ("$o", {
 					$o.roleId = tokens [3] == "null" ? null : tokens [3];
 					$o.menuId = tokens [4] == "null" ? null : tokens [4];
 				};
+				*/
+				var opts = JSON.parse (response.responseText);
+				if (!opts || opts.error) {
+					if (mainOptions.failure) {
+						mainOptions.failure.call (mainOptions.scope || this, opts.error);
+					};
+					return;
+				};
+				if (opts.wait) {
+					if (mainOptions.failure) {
+						mainOptions.failure.call (mainOptions.scope || this, $o.getString ("Wait") + " " + (opts.wait / 60 | 0) + $o.getString (" ", "min", "and", "try again"));
+					};
+					return;
+				};
+				$o.serverVersion = 3;
+				this.sessionId = $sessionId = opts.sessionId;
+				this.userId = $userId = opts.userId;
+				this.authorized = true;
+				this.currentUser = mainOptions.login;
+				if (this.currentUser != "autologin") {
+					$o.util.setCookie ("sessionId", $sessionId);
+				};
+				$o.roleId = opts.roleId;
+				$o.menuId = opts.menuId;
 				$o.idleTimer = 0;
 				var userAction = function () {
 					$o.idleTimer = 0;
@@ -4748,8 +4774,8 @@ Ext.define ("$o", {
 				document.addEventListener ("click", userAction, false);
 				document.addEventListener ("scroll", userAction, false);				
 				mainOptions.success.call (mainOptions.scope || this, Ext.apply (mainOptions, {
-					sessionId: sessionId,
-					userId: userId
+					sessionId: $sessionId,
+					userId: $userId
 				}));
 			},
 			failure: function () {
@@ -18984,7 +19010,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					me.down ("*[name=smtpPassword]").setValue (o.smtp.password);
 					me.down ("*[name=smtpSender]").setValue (o.smtp.sender);
 					me.down ("*[name=timeMachineCardButton]").setValue ($o.visualObjectum.timeMachine.cardButton);
-					me.down ("*[name=timeMachineShowDates]").setValue ($o.visualObjectum.timeMachine.showDates);
+//					me.down ("*[name=timeMachineShowDates]").setValue ($o.visualObjectum.timeMachine.showDates);
 					me.down ("*[name=timeMachineBuildTime]").setValue ($o.visualObjectum.timeMachine.buildTime);
 					me.down ("*[name=logoLeft]").setValue ($o.visualObjectum.logo.left);
 					me.down ("*[name=logoRight]").setValue ($o.visualObjectum.logo.right);
@@ -19133,7 +19159,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 							password: me.down ("*[name=smtpPassword]").getValue (),
 							sender: me.down ("*[name=smtpSender]").getValue ()
 						};
-						var buildTime = me.down ("*[name=timeMachineBuildTime]").getValue ();
+						var buildTime = null;//me.down ("*[name=timeMachineBuildTime]").getValue ();
 						args.timeMachine = {
 							cardButton: me.down ("*[name=timeMachineCardButton]").getValue () ? 1 : 0,
 							showDates: me.down ("*[name=timeMachineShowDates]").getValue () ? 1 : 0
