@@ -99,7 +99,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					me.down ("*[name=smtpSender]").setValue (o.smtp.sender);
 					me.down ("*[name=timeMachineCardButton]").setValue ($o.visualObjectum.timeMachine.cardButton);
 //					me.down ("*[name=timeMachineShowDates]").setValue ($o.visualObjectum.timeMachine.showDates);
-					me.down ("*[name=timeMachineBuildTime]").setValue ($o.visualObjectum.timeMachine.buildTime);
+//					me.down ("*[name=timeMachineBuildTime]").setValue ($o.visualObjectum.timeMachine.buildTime);
 					me.down ("*[name=logoLeft]").setValue ($o.visualObjectum.logo.left);
 					me.down ("*[name=logoRight]").setValue ($o.visualObjectum.logo.right);
 					me.down ("*[name=logoHeight]").setValue ($o.visualObjectum.logo.height);
@@ -250,7 +250,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 						var buildTime = null;//me.down ("*[name=timeMachineBuildTime]").getValue ();
 						args.timeMachine = {
 							cardButton: me.down ("*[name=timeMachineCardButton]").getValue () ? 1 : 0,
-							showDates: me.down ("*[name=timeMachineShowDates]").getValue () ? 1 : 0
+							showDates: 0//me.down ("*[name=timeMachineShowDates]").getValue () ? 1 : 0
 						};
 						args.logo = {
 							left: me.down ("*[name=logoLeft]").getValue (),
