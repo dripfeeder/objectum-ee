@@ -207,9 +207,15 @@ Ext.define ("$o", {
 					userId: $userId
 				}));
 			},
-			failure: function () {
+			failure: function (response, options) {
 				if (mainOptions.failure) {
-					mainOptions.failure.call (mainOptions.scope || this, "Authentication error");
+					var opts, err;
+					try {
+						opts = JSON.parse (response.responseText);
+						err = opts.error;
+					} catch (e) {
+					};
+					mainOptions.failure.call (mainOptions.scope || this, err || "Authentication error");
 				};
 			},
 			scope: this

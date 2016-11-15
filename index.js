@@ -130,6 +130,11 @@ var startCluster = function (config) {
 	};
 	cluster.on ("exit", function (worker, code, signal) {
 		log ("worker pid: " + worker.process.pid + " (port: " + worker.port + ") died.");
+		for (var id in cluster.workers) {
+			if (worker.port != cluster.workers [id]) {
+				cluster.workers [id].send (JSON.stringify ({restartPort: worker.port}));
+			};
+		};
 		startWorker (worker.port);
 	});
 	if (!config.redis.enabled) {
