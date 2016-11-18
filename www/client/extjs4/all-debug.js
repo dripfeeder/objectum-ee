@@ -25890,6 +25890,27 @@ system.vo.buildMenu = function () {
 			{"a": "npp"}, ",", {"a": "name"}
 		]
 	});
+	// preload actions
+	var actions = [];
+	for (var i = 0; i < r.length; i ++) {
+		if (r.get (i, "action")) {
+			actions.push (r.get (i, "action"));
+		};
+	};
+	var actionRecs = $o.execute ({
+		asArray: true,
+		select: [
+			{"a": "___fid"}, "id",
+			{"a": "___fclass_id"}, "classId",
+			{"a": "___fcode"}, "code"
+		],
+		from: [
+			{"a": "system.action"}
+		],
+		where: [
+			{"a": "___fid"}, "in", actions.join (".,.").split (".")
+		]
+	});
 	var menu = [];
 	for (var i = 0; i < r.length; i ++) {
 		if (r.get (i, "menu") == menuId && !r.get (i, "parent")) {
@@ -25903,7 +25924,8 @@ system.vo.buildMenu = function () {
 				iconCls: iconCls,
 				viewRecord: $o.getView (r.get (i, "view")),
 				viewReadOnly: r.get (i, "readOnly"),
-				actionRecord: $o.getAction (r.get (i, "action")),
+//				actionRecord: $o.getAction (r.get (i, "action")),
+				actionId: r.get (i, "action"),
 				handler: function () {
 					if (this.viewRecord) {
 						$o.app.show.call ($o.app, {
@@ -25911,8 +25933,16 @@ system.vo.buildMenu = function () {
 							readOnly: this.viewReadOnly
 						});
 					} else
-					if (this.actionRecord) {
-						this.actionRecord.execute ({readOnly: this.viewReadOnly});
+					if (this.actionId) {
+						var actionRec = _.findWhere (actionRecs, {id: this.actionId});
+						if (actionRec) {
+							var cls = $o.getClass (actionRec.classId);
+							var _fn = (cls ? (cls.getFullCode () + ".") : "") + actionRec.code;
+							_fn = eval (_fn);
+							if (typeof (_fn) == "function") {
+								_fn ({readOnly: this.viewReadOnly});
+							};
+						};
 					};
 				}
 			};
@@ -25942,7 +25972,8 @@ system.vo.buildMenu = function () {
 					iconCls: r.get (i, "iconCls"),
 					viewRecord: $o.getView (r.get (i, "view")),
 					viewReadOnly: r.get (i, "readOnly"),
-					actionRecord: $o.getAction (r.get (i, "action")),
+//					actionRecord: $o.getAction (r.get (i, "action")),
+					actionId: r.get (i, "action"),
 					handler: function () {
 						if (this.viewRecord) {
 							$o.app.show.call ($o.app, {
@@ -25950,8 +25981,21 @@ system.vo.buildMenu = function () {
 								readOnly: this.viewReadOnly
 							});
 						} else
+						/*
 						if (this.actionRecord) {
 							this.actionRecord.execute ({readOnly: this.viewReadOnly});
+						};
+						*/
+						if (this.actionId) {
+							var actionRec = _.findWhere (actionRecs, {id: this.actionId});
+							if (actionRec) {
+								var cls = $o.getClass (actionRec.classId);
+								var _fn = (cls ? (cls.getFullCode () + ".") : "") + actionRec.code;
+								_fn = eval (_fn);
+								if (typeof (_fn) == "function") {
+									_fn ({readOnly: this.viewReadOnly});
+								};
+							};
 						};
 					}
 				};
@@ -25966,34 +26010,6 @@ system.vo.buildMenu = function () {
 	for (var j = 0; j < menu.length; j ++) {
 		getMenuElements (menu [j], menu [j].id);
 	};
-	/*
-	for (var i = 0; i < r.length; i ++) {
-		for (var j = 0; j < menu.length; j ++) {
-			if (menu [j].id == r.get (i, "parent")) {
-				menu [j].menu = menu [j].menu || {};
-				menu [j].menu.items = menu [j].menu.items || [];
-				menu [j].menu.items.push ({
-					text: r.get (i, "name"),
-					iconCls: r.get (i, "iconCls"),
-					viewRecord: $o.getView (r.get (i, "view")),
-					viewReadOnly: r.get (i, "readOnly"),
-					actionRecord: $o.getAction (r.get (i, "action")),
-					handler: function () {
-						if (this.viewRecord) {
-							$o.app.show.call ($o.app, {
-								record: this.viewRecord,
-								readOnly: this.viewReadOnly
-							});
-						} else
-						if (this.actionRecord) {
-							this.actionRecord.execute ({readOnly: this.viewReadOnly});
-						};
-					}
-				});
-			};
-		};
-	};
-	*/
 	var o = {
 		text: $o.getString ("Exit"),
 		iconCls: "gi_exit",
