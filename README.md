@@ -1,5 +1,6 @@
 # Objectum Enterprise Edition
-Objectum framework makes it easy to write realtime single page applications that run in both Node.js and browsers.
+Objectum platform makes it easy to create realtime single page applications that run in both Node.js and browsers.  
+Objectum includes a powerful user interface constructor called Visual Objectum that creates grids, tree grids, forms, etc. Automatically generates source code for CRUD (create, read, update, delete) functions.
 
 ## Learn by Example project "To-do list"
 
