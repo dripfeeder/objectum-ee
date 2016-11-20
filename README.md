@@ -127,7 +127,7 @@ cd /opt/objectum/node
 node index.js:
 ```
 
-Open URL: http://localhost:8100/projects/tm/
+Open URL: http://localhost:8100/projects/tm/  
 Login: admin  
 Password: admin  
 
