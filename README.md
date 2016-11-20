@@ -17,7 +17,7 @@ cd /opt/objectum/node
 npm install objectum-ee
 ```
 
-You must have installed PostgreSQL 9.x (datestyle = dmy)
+You must have installed [PostgreSQL 9.x](https://www.postgresql.org/download/) (datestyle = dmy)
 
 Add project configuration (postgres password: 12345):
 ```bash
@@ -128,8 +128,8 @@ node index.js:
 ```
 
 Open URL: http://localhost:8100/projects/tm/
-Login: admin
-Password: admin
+Login: admin  
+Password: admin  
 
 ## Author
 
