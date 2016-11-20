@@ -31,6 +31,18 @@ db.execute = function (options) {
 		},
 		function (cb) {
 			var connection = config.storages [cfg.code];
+			if (cfg.fn == "init") {
+				console.log ("Initializing folder ...");
+				connection.code = cfg.code;
+				db.init (connection, function (err) {
+					if (err) {
+						console.error ("Error:", err);
+					} else {
+						console.log ("Folder initialized");
+					};
+				});
+			    return;
+			};
 			if (cfg.fn == "rebuild") {
 				storage = new Storage ({code: cfg.code, connection: connection, success: function () {
 					console.log ("Rebuilding storage ...");
@@ -186,37 +198,48 @@ db.clear = function (options) {
 /*
 	Init project folder
 */
-db.init = function (options) {
-	var cfg = config.storages [options.code]
+db.init = function (cfg, cb) {
 	var rootDir = cfg.rootDir;
-	var dir = [
-	];
-	var files = [
-	];
 	async.series ([
 		function (cb) {
-			fs.mkdir (rootDir, cb);
+			fs.mkdir (rootDir, function (err) {
+				cb ();
+			});
 		},
 		function (cb) {
-			fs.mkdir (rootDir + "/files", cb);
+			fs.mkdir (rootDir + "/files", function (err) {
+				cb ();
+			});
 		},
 		function (cb) {
-			fs.mkdir (rootDir + "/plugins", cb);
+			fs.mkdir (rootDir + "/plugins", function (err) {
+				cb ();
+			});
 		},
 		function (cb) {
-			fs.mkdir (rootDir + "/resources", cb);
+			fs.mkdir (rootDir + "/resources", function (err) {
+				cb ();
+			});
 		},
 		function (cb) {
-			fs.mkdir (rootDir + "/resources/css", cb);
+			fs.mkdir (rootDir + "/resources/css", function (err) {
+				cb ();
+			});
 		},
 		function (cb) {
-			fs.mkdir (rootDir + "/resources/images", cb);
+			fs.mkdir (rootDir + "/resources/images", function (err) {
+				cb ();
+			});
 		},
 		function (cb) {
-			fs.mkdir (rootDir + "/resources/scripts", cb);
+			fs.mkdir (rootDir + "/resources/scripts", function (err) {
+				cb ();
+			});
 		},
 		function (cb) {
-			fs.mkdir (rootDir + "/schema", cb);
+			fs.mkdir (rootDir + "/schema", function (err) {
+				cb ();
+			});
 		},
 		function (cb) {
 			fs.readFile (config.rootDir + "/server/project-app/schema/schema-app.js", function (err, data) {
@@ -225,6 +248,28 @@ db.init = function (options) {
 				};
 				fs.writeFile (rootDir + "/schema/schema-app.js", data, cb);
 			});
+		},
+		function (cb) {
+			fs.readFile (config.rootDir + "/server/project-app/plugins/vo.js", function (err, data) {
+				if (err) {
+					return cb (err);
+				};
+				fs.writeFile (rootDir + "/plugins/vo.js", data, cb);
+			});
+		},
+		function (cb) {
+			fs.readFile (config.rootDir + "/server/project-app/plugins/plugins.js", function (err, data) {
+				if (err) {
+					return cb (err);
+				};
+				fs.writeFile (rootDir + "/plugins/plugins.js", data, cb);
+			});
+		},
+		function (cb) {
+			fs.writeFile (rootDir + "/resources/scripts/vo-debug.js", "", cb);
+		},
+		function (cb) {
+			fs.writeFile (rootDir + "/plugins/actions.js", "", cb);
 		},
 		function (cb) {
 			var html =
@@ -238,8 +283,8 @@ db.init = function (options) {
 				'\t<!-- Objectum Client -->\n' +
 				'\t<link rel="stylesheet" type="text/css" href="/client/extjs4/css/images.css">\n' +
 				'\t<script type="text/javascript" src="/client/extjs4/all-debug.js" charset="UTF-8"></script>\n' +
-				'\t<!-- Current configuration -->\n' +
-				'\t<script type="text/javascript" src="resources/scripts/all-debug.js" charset="UTF-8"></script>\n' +
+				'\t<!-- App -->\n' +
+				'\t<script type="text/javascript" src="resources/scripts/vo-debug.js" charset="UTF-8"></script>\n' +
 				'</head>\n' +
 				'<body>\n' +
 				'\t<div id="loading"></div>\n' +
@@ -250,14 +295,9 @@ db.init = function (options) {
 				'</html>\n'
 			;
 			fs.writeFile (rootDir + "/index.html", html, cb);
-		},
-		function (cb) {
-		},
-		function (cb) {
-		},
-		function (cb) {
-		},
+		}
 	], function (err) {
+		cb (err);
 	});
 };
 

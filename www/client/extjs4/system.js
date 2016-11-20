@@ -1045,10 +1045,10 @@ system.vo.menu.card = function (options) {
 				store: new Ext.data.ArrayStore ({
 					fields: ["id", "text"],
 					data: [
-						["top", "Вверху"],
-						["left", "Слева"],
-						["bottom", "Внизу"],
-						["right", "Справа"]
+						["top", $o.getString ("Top")],
+						["left", $o.getString ("Left")],
+						["bottom", $o.getString ("Bottom")],
+						["right", $o.getString ("Right")]
 					]
 				}),
 				valueField: "id",
@@ -1409,20 +1409,23 @@ system.vo.buildMenu = function () {
 			actions.push (r.get (i, "action"));
 		};
 	};
-	var actionRecs = $o.execute ({
-		asArray: true,
-		select: [
-			{"a": "___fid"}, "id",
-			{"a": "___fclass_id"}, "classId",
-			{"a": "___fcode"}, "code"
-		],
-		from: [
-			{"a": "system.action"}
-		],
-		where: [
-			{"a": "___fid"}, "in", actions.join (".,.").split (".")
-		]
-	});
+	var actionRecs = [];
+	if (actions.length) {
+		actionRecs = $o.execute ({
+			asArray: true,
+			select: [
+				{"a": "___fid"}, "id",
+				{"a": "___fclass_id"}, "classId",
+				{"a": "___fcode"}, "code"
+			],
+			from: [
+				{"a": "system.action"}
+			],
+			where: [
+				{"a": "___fid"}, "in", actions.join (".,.").split (".")
+			]
+		});
+	};
 	var menu = [];
 	for (var i = 0; i < r.length; i ++) {
 		if (r.get (i, "menu") == menuId && !r.get (i, "parent")) {
@@ -1631,4 +1634,63 @@ Ext.override (Ext.menu.Menu, {
 	    me.fireEvent ("mouseleave", me, e);
     }
 });
+Ext.namespace ("subject.human.vo_adm");
+subject.human.vo_adm.create = function (options) {
+	common.tpl.create.call (this, {
+		asWindow: 1,
+		classCode: "subject.human.vo_adm",
+		fn: function (o, options) {
+			options.layout = subject.human.vo_adm.card.layout (o.get ("id"))
+		}
+	});
+};
+subject.human.vo_adm.card = function (options) {
+	var me = this;
+	var id = me.getValue ("id") || me.getValue ("a_id");
+	common.tpl.show.call (this, {
+		id: id,
+		asWindow: 1,
+		layout: subject.human.vo_adm.card.layout (id)
+	});
+};
+subject.human.vo_adm.card.layout = function (id) {
+	var l = {
+		"card": {
+			"id": "card",
+			"items": [
+				{
+					"anchor": "100%",
+					"fieldLabel": $o.getString ("Login"),
+					"attr": "login",
+					"objectId": id
+				},
+				{
+					"anchor": "100%",
+					"fieldLabel": $o.getString ("Password"),
+					"attr": "password",
+					"objectId": id
+				},
+				{
+					"anchor": "100%",
+					"fieldLabel": $o.getString ("Surname"),
+					"attr": "surname",
+					"objectId": id
+				},
+				{
+					"anchor": "100%",
+					"fieldLabel": $o.getString ("Forename"),
+					"attr": "forename",
+					"objectId": id
+				},
+				{
+					"anchor": "100%",
+					"fieldLabel": $o.getString ("Patronymic"),
+					"attr": "patronymic",
+					"objectId": id
+				}
+			]
+		}
+	};
+	return l;
+};
 

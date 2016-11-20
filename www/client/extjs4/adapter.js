@@ -221,7 +221,7 @@ Ext.define ("$o.locale", {
 			if (!s) {
 				return s;
 			};
-			var n = $o.locale.strings [s.toLowerCase ()] || s;
+			var n = _.has ($o.locale.strings, s.toLowerCase ()) ? $o.locale.strings [s.toLowerCase ()] : s;
 			if (s && n) {
 				if (s [0].toUpperCase () == s [0] || ["create", "remove", "delete", "open", "choose", "cancel"].indexOf (s) > -1) {
 					n = n [0].toUpperCase () + n.substr (1);
@@ -402,7 +402,7 @@ $zu.dialog.getNameAndCodeAndType = function (options) {
 		choose: {
 			type: "view", id: "system.classes", attr: "olap.id", width: 500, height: 400
 		},
-		fieldLabel: "Тип",
+		fieldLabel: $o.getString ("Type"),
 		value: 1,
 		allowBlank: false,
 		msgTarget: 'side',

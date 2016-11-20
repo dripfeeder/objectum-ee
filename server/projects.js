@@ -86,10 +86,12 @@ projects.loadConfig = function (options) {
 			} else {
 				try {
 					config.storages [storageCode] = JSON.parse (data);
-					success ();
 				} catch (e) {
+					console.error (e);
 					failure ("Unknown storage: " + storageCode);
+					return;
 				};
+				success ();
 			};
 		});
 	} else {

@@ -215,6 +215,9 @@ Ext.define ("$o", {
 						err = opts.error;
 					} catch (e) {
 					};
+					if (!response.responseText) {
+						err = "Server error";
+					};
 					mainOptions.failure.call (mainOptions.scope || this, err || "Authentication error");
 				};
 			},
@@ -378,7 +381,7 @@ Ext.define ("$o", {
 		    	var r;
 		    	if (me.tableName == "Action") {
 		    		r = me.get ("name") + " (" + code + ":" + me.get ("id") + ")" + (
-		    			me.get ("class") ? (", Класс: " + $o.getClass (me.get ("class")).toString ()) : ""
+		    			me.get ("class") ? (", " + $o.getString ("Class") + ": " + $o.getClass (me.get ("class")).toString ()) : ""
 		    		);
 		    	} else {
 		    		r = me.get ("name") + " (" + code + ":" + me.get ("id") + ")";

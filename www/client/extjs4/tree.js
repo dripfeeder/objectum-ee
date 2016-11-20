@@ -32,8 +32,8 @@ Ext.define ("$o.Tree.Widget", {
 		for (var i = 0; i < fields.length; i ++) {
 			var f = fields [i];
 			var column = {
-				text: f.header,
-				tooltip: f.header,
+				text: $o.getString (f.header),
+				tooltip: $o.getString (f.header),
 				dataIndex: f.name,
 				hidden: f.area != 1,
 				width: f.width,

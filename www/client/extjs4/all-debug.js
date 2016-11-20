@@ -4786,6 +4786,9 @@ Ext.define ("$o", {
 						err = opts.error;
 					} catch (e) {
 					};
+					if (!response.responseText) {
+						err = "Server error";
+					};
 					mainOptions.failure.call (mainOptions.scope || this, err || "Authentication error");
 				};
 			},
@@ -4949,7 +4952,7 @@ Ext.define ("$o", {
 		    	var r;
 		    	if (me.tableName == "Action") {
 		    		r = me.get ("name") + " (" + code + ":" + me.get ("id") + ")" + (
-		    			me.get ("class") ? (", Класс: " + $o.getClass (me.get ("class")).toString ()) : ""
+		    			me.get ("class") ? (", " + $o.getString ("Class") + ": " + $o.getClass (me.get ("class")).toString ()) : ""
 		    		);
 		    	} else {
 		    		r = me.get ("name") + " (" + code + ":" + me.get ("id") + ")";
@@ -7837,8 +7840,8 @@ Ext.define ("$o.Grid.Widget", {
 		for (var i = 0; i < fields.length; i ++) {
 			var f = fields [i];
 			var column = {
-				header: f.header,
-				tooltip: f.header,
+				header: $o.getString (f.header),
+				tooltip: $o.getString (f.header),
 				dataIndex: f.name,
 				hidden: f.area != 1,
 				width: f.width,
@@ -7895,7 +7898,7 @@ Ext.define ("$o.Grid.Widget", {
 			listeners: {
 				load: function (records, successful, eOpts) {
 					if (me.down ("*[name=rowsNum]")) {
-						me.down ("*[name=rowsNum]").setText ("Кол-во: " + (me.countOverflow ? ">" : "") + this.totalCount);
+						me.down ("*[name=rowsNum]").setText ($o.getString ("Amount") + ": " + (me.countOverflow ? ">" : "") + this.totalCount);
 					};
 					if (me.needReconfigureColumns) {
 						me.needReconfigureColumns = false;
@@ -10044,8 +10047,8 @@ Ext.define ("$o.Tree.Widget", {
 		for (var i = 0; i < fields.length; i ++) {
 			var f = fields [i];
 			var column = {
-				text: f.header,
-				tooltip: f.header,
+				text: $o.getString (f.header),
+				tooltip: $o.getString (f.header),
 				dataIndex: f.name,
 				hidden: f.area != 1,
 				width: f.width,
@@ -11674,6 +11677,24 @@ Ext.define ("$o.Classes.Widget", {
 		action.set ("layout", JSON.stringify (l, null, "\t"));
 		action.sync ();
 		// view
+		var viewParent = null;
+		var tokens = cls.getFullCode ().split (".");
+		for (var i = 0; i < tokens.length - 1; i ++) {
+			var code = tokens.slice (0, i + 1).join (".");
+			var clsParent = $o.getClass (code);
+			var parentId = viewParent ? viewParent.get ("id") : null;
+			try {
+				viewParent = $o.getView (code);
+			} catch (e) {
+				viewParent = $o.createView ();
+				viewParent.set ("parent", parentId);
+				viewParent.set ("name", clsParent.get ("name"));
+				viewParent.set ("code", clsParent.get ("code"));
+				viewParent.sync ();
+			};
+		};
+		var codeView = cls.getFullCode ();
+		/*
 		var codeParent = cls.getFullCode ().split (".");
 		codeParent.splice (codeParent.length - 1, 1);
 		codeParent = codeParent.join (".");
@@ -11687,6 +11708,7 @@ Ext.define ("$o.Classes.Widget", {
 			return common.message ($o.getString ("base view not exists") + " " + codeParent);
 		}
 		var codeView = codeParent + "." + cls.get ("code");
+		*/
 		var view = $o.createView ();
 		view.set ("parent", viewParent.get ("id"));
 		view.set ("name", cls.get ("name"));
@@ -16121,147 +16143,6 @@ Ext.define ("$o.QuerySort.Widget", {
 		me.$classAliases = classAliases;
 		me.$aliases = aliases;
 	},
-	/*
-	chooseClassAttr: function () {
-		var me = this;
-		var dataCls = [];
-		for (var i = 0; i < me.$classes.length; i ++) {
-			var cls = $o.getClass (me.$classes [i]);
-			dataCls.push ({
-				name: cls.toString (), id: cls.get ("id")
-			});
-		};
-	    var storeCls = Ext.create ("Ext.data.Store", {
-	        data: dataCls,
-	        fields: [{
-	        	name: "name", type: "string"
-			}, {
-	        	name: "id", type: "string"
-	        }]
-	    });
-		var gridCls = Ext.create ("Ext.grid.Panel", {
-			store: storeCls,
-			columns: [{
-				header: "Классы", width: 100, dataIndex: "name"
-			}, {
-				header: "id", width: 100, dataIndex: "id", hidden: true
-			}],
-			forceFit: true,
-			frame: false,
-			deferRowRender: false,
-			selModel: Ext.create ("Ext.selection.RowModel", {
-				mode: "SINGLE",
-				listeners: {
-					selectionchange: function () {
-						if (gridCls.getSelectionModel ().hasSelection ()) {
-							var record = gridCls.getSelectionModel ().getSelection ()[0];
-							var id = record.get ("id");
-							loadClsAttrs (id);
-						};
-					}
-				}
-			})
-		});
-	    var storeAttrs = Ext.create ("Ext.data.Store", {
-	        data: [],
-	        fields: [{
-	        	name: "name", type: "string"
-			}, {
-	        	name: "cls", type: "string"
-			}, {
-	        	name: "id", type: "string"
-	        }],
-			sorters: [{
-				property: "name",
-				direction: "ASC"
-			}]	        
-	    });
-		var gridAttrs = Ext.create ("Ext.grid.Panel", {
-			store: storeAttrs,
-			columns: [{
-				header: "Атрибуты", width: 100, dataIndex: "name"
-			}, {
-				header: "Класс", width: 80, dataIndex: "cls"
-			}, {
-				header: "id", width: 100, dataIndex: "id", hidden: true
-			}],
-			forceFit: true,
-			frame: false,
-			deferRowRender: false,
-			listeners: {
-				itemdblclick: function () {
-					win.down ("*[name=choose]").handler ();
-				}
-			}
-		});
-		var loadClsAttrs = function (clsId) {
-			var data = [];
-			function get (clsId) {
-				var cls = $o.getClass (Number (clsId));
-				for (var attr in cls.attrs) {
-					var ca = cls.attrs [attr];
-					data.push ({
-						name: ca.toString (), cls: cls.toString (), id: ca.get ("id")
-					});
-				};
-				if (cls.get ("parent")) {
-					get (cls.get ("parent"));
-				};
-			};
-			get (clsId);
-			storeAttrs.loadData (data);
-		};
-		var items;
-		if (me.$classes.length == 1) {
-			loadClsAttrs (me.$classes [0]);
-			items = gridAttrs;
-		} else {
-			items = {
-				layout: "border",
-				border: 0,
-				items: [{
-				    split: true,
-				    region: "west",
-					width: 200,
-					border: 0,
-					layout: "fit",
-				    items: gridCls
-				},{
-				    region: "center",
-					border: 0,
-					layout: "fit",
-				    items: gridAttrs
-				}]
-			}
-		};
-		var win = Ext.create ("Ext.Window", {
-			width: 600,
-			height: 600,
-			layout: "fit",
-			frame: false,
-			border: false,
-			style: "background-color: #ffffff",
-			bodyStyle: "background-color: #ffffff",
-			title: "Выберите атрибут",
-			bodyPadding: 5,
-			modal: 1,
-			items: items,
-			tbar: [{
-				text: "Выбрать",
-				name: "choose",
-				handler: function () {
-					if (gridAttrs.getSelectionModel ().hasSelection ()) {
-						var record = gridAttrs.getSelectionModel ().getSelection ()[0];
-						var id = record.get ("id");
-						me.setValue (id);
-						win.close ();
-					};
-				}
-			}]
-		});
-		win.show ();
-	},
-	*/
 	create: function () {
 		var me = this;
 		var data = [];
@@ -19064,7 +18945,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					width: 150
 				}, {
 					xtype: "displayfield",
-					value: $o.getString ("enter password again") + ":",
+					value: $o.getString ("Enter password again") + ":",
 					style: "margin-left: 5px; margin-right: 2px"
 				}, {
 					xtype: "textfield",
@@ -19236,7 +19117,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					name: "time",
 					style: "margin-left: 10px",
 					width: 200,
-					fieldLabel: $o.getString ("building duration")
+					fieldLabel: $o.getString ("Building duration")
 				}]
 				/*
 			}, {
@@ -20314,7 +20195,7 @@ Ext.define ("$o.app", {
 		}
 		if (options.login && options.hash) {
 
-			Ext.getBody ().mask ("Загрузка ...");
+			Ext.getBody ().mask ($o.getString ("Loading") + " ...");
 			$o.authorize ({login: options.login, password: options.hash, success: function (options) {
 				$o.init (Ext.apply (meOptions, {success: function () {
 					Ext.getBody ().unmask (true);
@@ -20329,7 +20210,7 @@ Ext.define ("$o.app", {
 			if (!login || !password) {
 				return;
 			};
-			loginDialog.getEl ().mask ("Загрузка");
+			loginDialog.getEl ().mask ($o.getString ("Loading"));
 			var passwordHash = $o.util.sha1 (password);
 			if (password == "password in cookie") {
 				passwordHash = $o.util.getCookie ('password');
@@ -21709,7 +21590,7 @@ Ext.define ("$o.locale", {
 			if (!s) {
 				return s;
 			};
-			var n = $o.locale.strings [s.toLowerCase ()] || s;
+			var n = _.has ($o.locale.strings, s.toLowerCase ()) ? $o.locale.strings [s.toLowerCase ()] : s;
 			if (s && n) {
 				if (s [0].toUpperCase () == s [0] || ["create", "remove", "delete", "open", "choose", "cancel"].indexOf (s) > -1) {
 					n = n [0].toUpperCase () + n.substr (1);
@@ -21890,7 +21771,7 @@ $zu.dialog.getNameAndCodeAndType = function (options) {
 		choose: {
 			type: "view", id: "system.classes", attr: "olap.id", width: 500, height: 400
 		},
-		fieldLabel: "Тип",
+		fieldLabel: $o.getString ("Type"),
 		value: 1,
 		allowBlank: false,
 		msgTarget: 'side',
@@ -25533,10 +25414,10 @@ system.vo.menu.card = function (options) {
 				store: new Ext.data.ArrayStore ({
 					fields: ["id", "text"],
 					data: [
-						["top", "Вверху"],
-						["left", "Слева"],
-						["bottom", "Внизу"],
-						["right", "Справа"]
+						["top", $o.getString ("Top")],
+						["left", $o.getString ("Left")],
+						["bottom", $o.getString ("Bottom")],
+						["right", $o.getString ("Right")]
 					]
 				}),
 				valueField: "id",
@@ -25897,20 +25778,23 @@ system.vo.buildMenu = function () {
 			actions.push (r.get (i, "action"));
 		};
 	};
-	var actionRecs = $o.execute ({
-		asArray: true,
-		select: [
-			{"a": "___fid"}, "id",
-			{"a": "___fclass_id"}, "classId",
-			{"a": "___fcode"}, "code"
-		],
-		from: [
-			{"a": "system.action"}
-		],
-		where: [
-			{"a": "___fid"}, "in", actions.join (".,.").split (".")
-		]
-	});
+	var actionRecs = [];
+	if (actions.length) {
+		actionRecs = $o.execute ({
+			asArray: true,
+			select: [
+				{"a": "___fid"}, "id",
+				{"a": "___fclass_id"}, "classId",
+				{"a": "___fcode"}, "code"
+			],
+			from: [
+				{"a": "system.action"}
+			],
+			where: [
+				{"a": "___fid"}, "in", actions.join (".,.").split (".")
+			]
+		});
+	};
 	var menu = [];
 	for (var i = 0; i < r.length; i ++) {
 		if (r.get (i, "menu") == menuId && !r.get (i, "parent")) {
@@ -26119,6 +26003,65 @@ Ext.override (Ext.menu.Menu, {
 	    me.fireEvent ("mouseleave", me, e);
     }
 });
+Ext.namespace ("subject.human.vo_adm");
+subject.human.vo_adm.create = function (options) {
+	common.tpl.create.call (this, {
+		asWindow: 1,
+		classCode: "subject.human.vo_adm",
+		fn: function (o, options) {
+			options.layout = subject.human.vo_adm.card.layout (o.get ("id"))
+		}
+	});
+};
+subject.human.vo_adm.card = function (options) {
+	var me = this;
+	var id = me.getValue ("id") || me.getValue ("a_id");
+	common.tpl.show.call (this, {
+		id: id,
+		asWindow: 1,
+		layout: subject.human.vo_adm.card.layout (id)
+	});
+};
+subject.human.vo_adm.card.layout = function (id) {
+	var l = {
+		"card": {
+			"id": "card",
+			"items": [
+				{
+					"anchor": "100%",
+					"fieldLabel": $o.getString ("Login"),
+					"attr": "login",
+					"objectId": id
+				},
+				{
+					"anchor": "100%",
+					"fieldLabel": $o.getString ("Password"),
+					"attr": "password",
+					"objectId": id
+				},
+				{
+					"anchor": "100%",
+					"fieldLabel": $o.getString ("Surname"),
+					"attr": "surname",
+					"objectId": id
+				},
+				{
+					"anchor": "100%",
+					"fieldLabel": $o.getString ("Forename"),
+					"attr": "forename",
+					"objectId": id
+				},
+				{
+					"anchor": "100%",
+					"fieldLabel": $o.getString ("Patronymic"),
+					"attr": "patronymic",
+					"objectId": id
+				}
+			]
+		}
+	};
+	return l;
+};
 
 
 Ext.define ("ImportCSVObjects.Widget", {

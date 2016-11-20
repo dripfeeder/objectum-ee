@@ -146,7 +146,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					width: 150
 				}, {
 					xtype: "displayfield",
-					value: $o.getString ("enter password again") + ":",
+					value: $o.getString ("Enter password again") + ":",
 					style: "margin-left: 5px; margin-right: 2px"
 				}, {
 					xtype: "textfield",
@@ -318,7 +318,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 					name: "time",
 					style: "margin-left: 10px",
 					width: 200,
-					fieldLabel: $o.getString ("building duration")
+					fieldLabel: $o.getString ("Building duration")
 				}]
 				/*
 			}, {

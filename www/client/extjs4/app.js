@@ -39,7 +39,7 @@ Ext.define ("$o.app", {
 		}
 		if (options.login && options.hash) {
 
-			Ext.getBody ().mask ("Загрузка ...");
+			Ext.getBody ().mask ($o.getString ("Loading") + " ...");
 			$o.authorize ({login: options.login, password: options.hash, success: function (options) {
 				$o.init (Ext.apply (meOptions, {success: function () {
 					Ext.getBody ().unmask (true);
@@ -54,7 +54,7 @@ Ext.define ("$o.app", {
 			if (!login || !password) {
 				return;
 			};
-			loginDialog.getEl ().mask ("Загрузка");
+			loginDialog.getEl ().mask ($o.getString ("Loading"));
 			var passwordHash = $o.util.sha1 (password);
 			if (password == "password in cookie") {
 				passwordHash = $o.util.getCookie ('password');

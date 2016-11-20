@@ -960,6 +960,24 @@ Ext.define ("$o.Classes.Widget", {
 		action.set ("layout", JSON.stringify (l, null, "\t"));
 		action.sync ();
 		// view
+		var viewParent = null;
+		var tokens = cls.getFullCode ().split (".");
+		for (var i = 0; i < tokens.length - 1; i ++) {
+			var code = tokens.slice (0, i + 1).join (".");
+			var clsParent = $o.getClass (code);
+			var parentId = viewParent ? viewParent.get ("id") : null;
+			try {
+				viewParent = $o.getView (code);
+			} catch (e) {
+				viewParent = $o.createView ();
+				viewParent.set ("parent", parentId);
+				viewParent.set ("name", clsParent.get ("name"));
+				viewParent.set ("code", clsParent.get ("code"));
+				viewParent.sync ();
+			};
+		};
+		var codeView = cls.getFullCode ();
+		/*
 		var codeParent = cls.getFullCode ().split (".");
 		codeParent.splice (codeParent.length - 1, 1);
 		codeParent = codeParent.join (".");
@@ -973,6 +991,7 @@ Ext.define ("$o.Classes.Widget", {
 			return common.message ($o.getString ("base view not exists") + " " + codeParent);
 		}
 		var codeView = codeParent + "." + cls.get ("code");
+		*/
 		var view = $o.createView ();
 		view.set ("parent", viewParent.get ("id"));
 		view.set ("name", cls.get ("name"));

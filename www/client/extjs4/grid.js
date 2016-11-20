@@ -595,8 +595,8 @@ Ext.define ("$o.Grid.Widget", {
 		for (var i = 0; i < fields.length; i ++) {
 			var f = fields [i];
 			var column = {
-				header: f.header,
-				tooltip: f.header,
+				header: $o.getString (f.header),
+				tooltip: $o.getString (f.header),
 				dataIndex: f.name,
 				hidden: f.area != 1,
 				width: f.width,
@@ -653,7 +653,7 @@ Ext.define ("$o.Grid.Widget", {
 			listeners: {
 				load: function (records, successful, eOpts) {
 					if (me.down ("*[name=rowsNum]")) {
-						me.down ("*[name=rowsNum]").setText ("Кол-во: " + (me.countOverflow ? ">" : "") + this.totalCount);
+						me.down ("*[name=rowsNum]").setText ($o.getString ("Amount") + ": " + (me.countOverflow ? ">" : "") + this.totalCount);
 					};
 					if (me.needReconfigureColumns) {
 						me.needReconfigureColumns = false;
