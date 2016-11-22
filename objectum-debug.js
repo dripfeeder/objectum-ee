@@ -2007,7 +2007,7 @@ var Import = function () {
 							}
 						], cb);
 					}, cb);
-				},
+				}/*,
 				function (cb) {
 					storage.query ({session: session, sql:
 						"select " + fields._class.join (",") + " from _class order by fcode"
@@ -2015,7 +2015,7 @@ var Import = function () {
 						fs.writeFileSync ("c-schema.txt", JSON.stringify (me.data ["tclass"], null, "\t"));
 						fs.writeFile ("c-db.txt", JSON.stringify (opts.result.rows, null, "\t"), cb);
 					}});
-				}
+				}*/
 			], cb);
 		}, function (err) {
 			cb (err);
@@ -9737,6 +9737,8 @@ db.execute = function (options) {
 			if (cfg.fn == "init") {
 				console.log ("Initializing folder ...");
 				connection.code = cfg.code;
+				connection.locale = cfg.locale;
+				connection.name = cfg.name;
 				db.init (connection, function (err) {
 					if (err) {
 						console.error ("Error:", err);
@@ -9969,6 +9971,16 @@ db.init = function (cfg, cb) {
 			});
 		},
 		function (cb) {
+			fs.readFile (config.rootDir + "/server/project-app/plugins/compiler.jar", function (err, data) {
+				if (err) {
+					return cb (err);
+				};
+				fs.writeFile (rootDir + "/plugins/compiler.jar", data, function (err) {
+					cb ();
+				});
+			});
+		},
+		function (cb) {
 			fs.writeFile (rootDir + "/resources/scripts/vo-debug.js", "", cb);
 		},
 		function (cb) {
@@ -9978,11 +9990,11 @@ db.init = function (cfg, cb) {
 			var html =
 				'<html>\n' +
 				'<head>\n' +
-				'\t<title>' + cfg.code + '</title>\n' +
+				'\t<title>' + cfg.name + '</title>\n' +
 				'\t<!-- ExtJS -->\n' +
 				'\t<link rel="stylesheet" type="text/css" href="/third-party/extjs4/resources/css/ext-all-objectum.css">\n' +
 				'\t<script type="text/javascript" src="/third-party/extjs4/ext-all-debug.js"></script>\n' +
-				'\t<script type="text/javascript" src="/third-party/extjs4/locale/ext-lang-ru.js" charset="UTF-8"></script>\n' +
+				'\t<script type="text/javascript" src="/third-party/extjs4/locale/ext-lang-' + cfg.locale + '.js" charset="UTF-8"></script>\n' +
 				'\t<!-- Objectum Client -->\n' +
 				'\t<link rel="stylesheet" type="text/css" href="/client/extjs4/css/images.css">\n' +
 				'\t<script type="text/javascript" src="/client/extjs4/all-debug.js" charset="UTF-8"></script>\n' +
@@ -9992,7 +10004,7 @@ db.init = function (cfg, cb) {
 				'<body>\n' +
 				'\t<div id="loading"></div>\n' +
 				'\t<script type="text/javascript" charset="UTF-8">\n' +
-				'\t\t$o.app.start ({"code": "' + cfg.code + '", "name": "' + cfg.code + '", "version": "1.0", "locale": "en", "useHash":true});\n' +
+				'\t\t$o.app.start ({"code": "' + cfg.code + '", "name": "' + cfg.name + '", "version": "1.0", "locale": "' + cfg.locale + '", "useHash":true});\n' +
 				'\t</script>\n' +
 				'</body>\n' +
 				'</html>\n'

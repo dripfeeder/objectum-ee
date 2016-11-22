@@ -443,7 +443,7 @@ var Import = function () {
 							}
 						], cb);
 					}, cb);
-				},
+				}/*,
 				function (cb) {
 					storage.query ({session: session, sql:
 						"select " + fields._class.join (",") + " from _class order by fcode"
@@ -451,7 +451,7 @@ var Import = function () {
 						fs.writeFileSync ("c-schema.txt", JSON.stringify (me.data ["tclass"], null, "\t"));
 						fs.writeFile ("c-db.txt", JSON.stringify (opts.result.rows, null, "\t"), cb);
 					}});
-				}
+				}*/
 			], cb);
 		}, function (err) {
 			cb (err);

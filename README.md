@@ -1,4 +1,4 @@
-# Objectum Enterprise Edition
+# Objectum Enterprise Edition - javascript app platform
 Objectum platform makes it easy to create realtime single page applications that run in both Node.js and browsers.  
 Objectum includes a powerful user interface constructor called Visual Objectum that creates grids, tree grids, forms, etc. Automatically generates source code for CRUD (create, read, update, delete) functions.
 
@@ -68,18 +68,20 @@ module.exports = new objectum.Objectum (config);
 
 Add script:
 ```bash
-cat > /opt/objectum/projects/tm/bin/tm-init.js
+cat > /opt/objectum/projects/tm/bin/init.js
 var $o = require ("/opt/objectum/node/objectum");
 $o.db.execute ({
 	code: "tm",
-	fn: "init"
+	fn: "init",
+	name: "To-do list",
+	locale: "en" // en, ru
 });
 ```
 
 Init project folder:
 ```bash
 cd /opt/objectum/projects/tm/bin
-node tm-init.js
+node init.js
 ```
 
 Prepare tablespace folder:
@@ -90,7 +92,7 @@ chown postgres:postgres /opt/objectum/projects/tm/db
 
 Add script:
 ```bash
-cat > /opt/objectum/projects/tm/bin/tm-create.js
+cat > /opt/objectum/projects/tm/bin/create.js
 var $o = require ("/opt/objectum/node/objectum");
 $o.db.execute ({
 	code: "tm",
@@ -102,12 +104,12 @@ $o.db.execute ({
 Create storage:
 ```bash
 cd /opt/objectum/projects/tm/bin
-node tm-create.js
+node create.js
 ```
 
 Add script:
 ```bash
-cat > /opt/objectum/projects/tm/bin/tm-import.js
+cat > /opt/objectum/projects/tm/bin/import.js
 var $o = require ("/opt/objectum/node/objectum");
 $o.db.execute ({
 	code: "tm",
@@ -119,7 +121,7 @@ $o.db.execute ({
 Import storage structure:
 ```bash
 cd /opt/objectum/projects/tm/bin
-node tm-import.js
+node import.js
 ```
 
 Start platform:
@@ -128,9 +130,35 @@ cd /opt/objectum/node
 node index.js:
 ```
 
+Start platform with forever:
+```bash
+forever start -a -l /opt/objectum/node/objectum.log -o /dev/null -e /opt/objectum/node/objectum-error.log --sourceDir /opt/objectum/node -c "--nouse-idle-notification --expose-gc" index.js
+```
+
+Stop platform with forever:
+```bash
+forever stop index.js
+```
+
 Open URL: http://localhost:8100/projects/tm/  
 Login: admin  
 Password: admin  
+
+Add script:
+```bash
+cat > /opt/objectum/projects/tm/bin/remove.js
+var $o = require ("/opt/objectum/node/objectum");
+$o.db.execute ({
+	code: "tm",
+	fn: "remove"
+});
+```
+
+Remove storage (drop tablespace, role, user from PostgreSQL):
+```bash
+cd /opt/objectum/projects/tm/bin
+node remove.js
+```
 
 ## Author
 

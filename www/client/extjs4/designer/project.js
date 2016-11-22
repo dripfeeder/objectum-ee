@@ -295,9 +295,9 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 			        columns: 2,
 			        style: "margin-left: 25px",
 			        items: [{
-			        	boxLabel: $o.getString ("Test"), name: "rgBuild", inputValue: "test", width: 90, checked: true
+			        	boxLabel: $o.getString ("Test"), name: "rgBuild", inputValue: "test", width: 90, checked: true, hidden: true
 			        }, {
-			        	boxLabel: $o.getString ("Production"), name: "rgBuild", inputValue: "prod"
+			        	boxLabel: $o.getString ("Production"), name: "rgBuild", inputValue: "prod", hidden: true
 			        }]
 			    }]
 			}, {
