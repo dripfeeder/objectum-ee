@@ -1040,3 +1040,6 @@
     /* you could use Ext.util.TextMetrics if you needed to dynamically determine the text size */
     height: 200px;
 }
+.x-form-cb-label-after {
+    display: inline !important;
+}

@@ -160,6 +160,14 @@ cd /opt/objectum/projects/tm/bin
 node remove.js
 ```
 
+## Visual Objectum - user interface constructor
+
+Create class. Name: Task, Code: task
+
+Create class attributes:
+
+
+
 ## Author
 
 **Dmitriy Samortsev**
