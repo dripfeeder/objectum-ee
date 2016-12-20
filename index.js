@@ -135,7 +135,7 @@ var startCluster = function (config) {
 				cluster.workers [id].send (JSON.stringify ({restartPort: worker.port}));
 			};
 		};
-		startWorker (worker.port);
+		startWorker (worker.port, worker.port == config.startPort + 1);
 	});
 	if (!config.redis.enabled) {
 		log ("Redis not enabled.");

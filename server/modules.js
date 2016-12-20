@@ -58,7 +58,6 @@ var	redis;
 if (config.redis && config.redis.enabled) {
 	redis = require ("redis");
 }
-var pg = require ("pg");
 var express = require ("express");
 var formidable = require ("formidable");
 var nodemailer = require ("nodemailer");
