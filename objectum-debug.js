@@ -3277,11 +3277,13 @@ var Import = function () {
 								cb ();
 							}});
 						},
+						/*
 						function (cb) {
 							storage.startTransaction ({session: session, remoteAddr: "127.0.0.1", description: "import_" + options.code, success: function () {
 								cb ();
 							}});
 						},
+						*/
 						function (cb) {
 							if (!storage.connection.dbEngine || (storage.connection.dbEngine && !storage.connection.dbEngine.enabled)) {
 								me.removeTOC ({success: function () {
@@ -3299,12 +3301,12 @@ var Import = function () {
 							} else {
 								cb ();
 							};
-						},
+						}/*,
 						function (cb) {
 							storage.commitTransaction ({session: session, success: function () {
 								cb ();
 							}});
-						}
+						}*/
 					], function (err) {
 						cb ();
 					});
