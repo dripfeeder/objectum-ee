@@ -9905,7 +9905,7 @@ db.clear = function (options) {
 	Init project folder
 */
 db.init = function (cfg, cb) {
-	var rootDir = cfg.rootDir;
+	var rootDir = cfg.rootDir, appDir;
 	async.series ([
 		function (cb) {
 			fs.mkdir (rootDir, function (err) {
@@ -9948,7 +9948,17 @@ db.init = function (cfg, cb) {
 			});
 		},
 		function (cb) {
-			fs.readFile (config.rootDir + "/server/project-app/schema/schema-app.js", function (err, data) {
+			fs.stat (config.rootDir + "/server/project-app/schema/schema-app.js", function (err, stats) {
+				if (err) {
+					appDir = config.rootDir + "/node_modules/objectum-ee/server/project-app"
+				} else {
+					appDir = config.rootDir + "/server/project-app"
+				};
+				cb ();
+			});
+		},
+		function (cb) {
+			fs.readFile (appDir + "/schema/schema-app.js", function (err, data) {
 				if (err) {
 					return cb (err);
 				};
@@ -9956,7 +9966,7 @@ db.init = function (cfg, cb) {
 			});
 		},
 		function (cb) {
-			fs.readFile (config.rootDir + "/server/project-app/plugins/vo.js", function (err, data) {
+			fs.readFile (appDir + "/plugins/vo.js", function (err, data) {
 				if (err) {
 					return cb (err);
 				};
@@ -9964,7 +9974,7 @@ db.init = function (cfg, cb) {
 			});
 		},
 		function (cb) {
-			fs.readFile (config.rootDir + "/server/project-app/plugins/plugins.js", function (err, data) {
+			fs.readFile (appDir + "/plugins/plugins.js", function (err, data) {
 				if (err) {
 					return cb (err);
 				};
@@ -9972,7 +9982,7 @@ db.init = function (cfg, cb) {
 			});
 		},
 		function (cb) {
-			fs.readFile (config.rootDir + "/server/project-app/plugins/compiler.jar", function (err, data) {
+			fs.readFile (appDir + "/plugins/compiler.jar", function (err, data) {
 				if (err) {
 					return cb (err);
 				};

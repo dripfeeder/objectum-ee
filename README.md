@@ -2,7 +2,7 @@
 Objectum platform makes it easy to create realtime single page applications that run in both Node.js and browsers.  
 Objectum includes a powerful user interface constructor called Visual Objectum that creates grids, tree grids, forms, etc. Automatically generates source code for CRUD (create, read, update, delete) functions.
 
-## Learn by Example project "To-do list"
+## Learn by Example project "To-Do list" (url)
 
 Create directories:
 ```bash
@@ -73,7 +73,7 @@ var $o = require ("/opt/objectum/node/objectum");
 $o.db.execute ({
 	code: "todo",
 	fn: "init",
-	name: "To-do list",
+	name: "To-Do list",
 	locale: "en" // en, ru
 });
 ```
@@ -160,7 +160,7 @@ cd /opt/objectum/projects/todo/bin
 node remove.js
 ```
 
-## Visual Objectum - user interface constructor
+## Build user interface by Visual Objectum
 
 Create class. Name: Task, Code: task
 
