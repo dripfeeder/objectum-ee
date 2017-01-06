@@ -162,51 +162,51 @@ node remove.js
 
 ## Build user interface by Visual Objectum
 
-1. Create class
+### 1. Create class
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/class-create.png)
 
-2. Create class attribute
+### 2. Create class attribute
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/classAttr-create.png)
 
-3. Create card
+### 3. Create card
 
-3.1. Open action layout
+#### 3.1. Open action layout
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/action-layout.png)
 
-3.2. Open card
+#### 3.2. Open card
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/card-open.png)
 
-3.3. Add field to card
+#### 3.3. Add field to card
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/card.png)
 
-4. Create view
+### 4. Create view
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/view-create.png)
 
-5. Create query
+### 5. Create query
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/view-query.png)
 
-6. Create layout
+### 6. Create layout
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/view-layout.png)
 
-7. Add table to layout
+### 7. Add table to layout
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/olap.png)
 
-8. Create menu
+### 8. Create menu
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/menu.png)
 
-9. Create menu item
+### 9. Create menu item
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/menuItem.png)
 
-10. Create admin account (login: adm) and select administrator menu
+### 10. Create admin account (login: adm) and select administrator menu
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/access.png)
 
-11. Build project
+### 11. Build project
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/project.png)
 
-12. Reload browser page. Login as "adm". You can add, remove and open tasks.
+### 12. Reload browser page. Login as "adm". You can add, remove and open tasks.
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/todo.png)
 
-Advanced learning
+## Advanced learning
 
 Dictionary
 ...
