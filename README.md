@@ -8,8 +8,8 @@ Create directories:
 ```bash
 mkdir /opt/objectum/node
 mkdir /opt/objectum/projects
-mkdir /opt/objectum/projects/tm
-mkdir /opt/objectum/projects/tm/bin
+mkdir /opt/objectum/projects/todo
+mkdir /opt/objectum/projects/todo/bin
 ```
 
 Install:
@@ -22,15 +22,15 @@ You must have installed [PostgreSQL 9.x](https://www.postgresql.org/download/) (
 
 Add project configuration (postgres password: 12345):
 ```bash
-cat > /opt/objectum/projects/tm/config.json
+cat > /opt/objectum/projects/todo/config.json
 {
-	"rootDir": "/opt/objectum/projects/tm",
+	"rootDir": "/opt/objectum/projects/todo",
 	"adminPassword": "D033E22AE348AEB5660FC2140AEC35850C4DA997",
 	"database": "postgres",
 	"host": "localhost",
 	"port": 5432,
-	"db": "tm",
-	"dbUser": "tm",
+	"db": "todo",
+	"dbUser": "todo",
 	"dbPassword": "1",
 	"dbaUser": "postgres",
 	"dbaPassword": "12345",
@@ -53,7 +53,7 @@ module.exports = {
 	"projectsDir": "/opt/objectum/projects",
 	"port": 8100,
 	"storages": {
-		"tm": require ("/opt/objectum/projects/tm/config.json")
+		"todo": require ("/opt/objectum/projects/todo/config.json")
 	}
 }
 ```
@@ -68,10 +68,10 @@ module.exports = new objectum.Objectum (config);
 
 Add script:
 ```bash
-cat > /opt/objectum/projects/tm/bin/init.js
+cat > /opt/objectum/projects/todo/bin/init.js
 var $o = require ("/opt/objectum/node/objectum");
 $o.db.execute ({
-	code: "tm",
+	code: "todo",
 	fn: "init",
 	name: "To-do list",
 	locale: "en" // en, ru
@@ -80,47 +80,47 @@ $o.db.execute ({
 
 Init project folder:
 ```bash
-cd /opt/objectum/projects/tm/bin
+cd /opt/objectum/projects/todo/bin
 node init.js
 ```
 
 Prepare tablespace folder:
 ```bash
-mkdir /opt/objectum/projects/tm/db
-chown postgres:postgres /opt/objectum/projects/tm/db
+mkdir /opt/objectum/projects/todo/db
+chown postgres:postgres /opt/objectum/projects/todo/db
 ```
 
 Add script:
 ```bash
-cat > /opt/objectum/projects/tm/bin/create.js
+cat > /opt/objectum/projects/todo/bin/create.js
 var $o = require ("/opt/objectum/node/objectum");
 $o.db.execute ({
-	code: "tm",
+	code: "todo",
 	fn: "create",
-	path: "/opt/objectum/projects/tm/db"
+	path: "/opt/objectum/projects/todo/db"
 });
 ```
 
 Create storage:
 ```bash
-cd /opt/objectum/projects/tm/bin
+cd /opt/objectum/projects/todo/bin
 node create.js
 ```
 
 Add script:
 ```bash
-cat > /opt/objectum/projects/tm/bin/import.js
+cat > /opt/objectum/projects/todo/bin/import.js
 var $o = require ("/opt/objectum/node/objectum");
 $o.db.execute ({
-	code: "tm",
+	code: "todo",
 	fn: "import",
-	file: "/opt/objectum/projects/tm/schema/schema-app.js" // parent storage
+	file: "/opt/objectum/projects/todo/schema/schema-app.js" // parent storage
 });
 ```
 
 Import storage structure:
 ```bash
-cd /opt/objectum/projects/tm/bin
+cd /opt/objectum/projects/todo/bin
 node import.js
 ```
 
@@ -132,7 +132,7 @@ node index.js:
 
 Start platform with forever:
 ```bash
-forever start -a -l /opt/objectum/node/objectum.log -o /dev/null -e /opt/objectum/node/objectum-error.log --sourceDir /opt/objectum/node -c "--nouse-idle-notification --expose-gc" index.js
+forever start -a -l /opt/objectum/node/objectum.log -o /dev/null -e /opt/objectum/node/objectum-error.log --sourceDir /opt/objectum/node index.js
 ```
 
 Stop platform with forever:
@@ -140,23 +140,23 @@ Stop platform with forever:
 forever stop index.js
 ```
 
-Open URL: http://localhost:8100/projects/tm/  
+Open URL: http://localhost:8100/projects/todo/
 Login: admin  
 Password: admin  
 
 Add script:
 ```bash
-cat > /opt/objectum/projects/tm/bin/remove.js
+cat > /opt/objectum/projects/todo/bin/remove.js
 var $o = require ("/opt/objectum/node/objectum");
 $o.db.execute ({
-	code: "tm",
+	code: "todo",
 	fn: "remove"
 });
 ```
 
-Remove storage (drop tablespace, role, user from PostgreSQL):
+You can remove storage (drop tablespace, role, user from PostgreSQL):
 ```bash
-cd /opt/objectum/projects/tm/bin
+cd /opt/objectum/projects/todo/bin
 node remove.js
 ```
 
@@ -164,9 +164,34 @@ node remove.js
 
 Create class. Name: Task, Code: task
 
-Create class attributes:
+Create class attribute. Name: Name, Code: name
+
+Create form.
+
+Create view
+
+Create query
+
+Create layout
+
+Create menu
+
+Create admin account
 
 
+Advanced learning
+
+Deployment
+
+Storages mixing? Conflicts
+
+Objectum API (async)
+
+Objectum API (sync, only client side)
+
+Objectum Firewall
+
+![alt tag](https://raw.github.com/objectum/xlsx-chart/master/xlsx-chart.png)
 
 ## Author
 
