@@ -217,6 +217,7 @@ Ext.define ("$o.Views.Widget", {
 										var me = this;
 										var query = me.down ("*[attr=id.query]").getValue ();
 										query = eval ("(" + query + ")");
+										query.limit = 1;
 										var r = $o.execute ({sql: query, noException: 1});
 										if (r.error) {
 											common.message ($o.getString ("Error in query") + ":\n" + r.error);

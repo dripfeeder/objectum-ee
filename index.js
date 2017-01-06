@@ -164,7 +164,7 @@ module.exports = {
 };
 try {
 	if (process.argv [1].indexOf (__dirname) > -1) {
-		startCluster (require (__dirname + "/config"));
+		start (require (__dirname + "/config"));
 	};
 } catch (e) {
 	if (!cluster.isMaster) {
