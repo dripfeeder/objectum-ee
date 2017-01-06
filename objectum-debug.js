@@ -4060,24 +4060,28 @@ meta.fnClassAttr = function (request, response, next) {
 	   		if (request.storageFn == "create") {
 	   			tableOptions.success = function (options) {
 	   				var values = options.values;
-					var type = "$tnumber$";
-					switch (values [4]) {
-					case 2:
-						type = "$tnumber_value$";
-						break;
-					case 1:
-					case 5:
-						type = "$ttext$";
-						break;
-					case 3:
-						type = "$ttimestamp$";
-						break;
-					};
-					var tocField = tableOptions.values [2] + "_" + values [0];
-					var toc = storage.getClass (values [1]).toc;
-					storage.client.createField ({toc: toc, tocField: tocField, caId: values [0], type: type, success: function () {
+	   				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
+						var type = "$tnumber$";
+						switch (values [4]) {
+						case 2:
+							type = "$tnumber_value$";
+							break;
+						case 1:
+						case 5:
+							type = "$ttext$";
+							break;
+						case 3:
+							type = "$ttimestamp$";
+							break;
+						};
+						var tocField = tableOptions.values [2] + "_" + values [0];
+						var toc = storage.getClass (values [1]).toc;
+						storage.client.createField ({toc: toc, tocField: tocField, caId: values [0], type: type, success: function () {
+							projects.send ({request: request, response: response, msg: "{header: {error: ''},data: [" + JSON.stringify (values) + "]}"});
+						}});
+					} else {
 						projects.send ({request: request, response: response, msg: "{header: {error: ''},data: [" + JSON.stringify (values) + "]}"});
-					}});
+					};
 	   			};
 		   		meta.tableCreate (tableOptions);
 			};

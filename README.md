@@ -163,12 +163,13 @@ node remove.js
 ## Build user interface by Visual Objectum
 
 Create class. Name: Task, Code: task
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/class-create.png)
 
 Create class attribute. Name: Name, Code: name
 
 Create form.
 
-Create view
+Create view. Name: Tasks, Code: tasks
 
 Create query
 
@@ -181,17 +182,26 @@ Create admin account
 
 Advanced learning
 
-Deployment
+Dictionary
+...
 
-Storages mixing? Conflicts
+Table
+...
+
+Deployment
+...
+
+Storages mixing
+...
 
 Objectum API (async)
+...
 
 Objectum API (sync, only client side)
+...
 
 Objectum Firewall
-
-![alt tag](https://raw.github.com/objectum/xlsx-chart/master/xlsx-chart.png)
+...
 
 ## Author
 
