@@ -4,6 +4,9 @@ Objectum includes a powerful user interface constructor called Visual Objectum t
 
 ## Learn by Example project "To-Do list" (url)
 
+[Build user interface by Visual Objectum](#visual-objectum)  
+[Advanced learning](#advanced)  
+
 Create directories:
 ```bash
 mkdir /opt/objectum/node
@@ -160,6 +163,7 @@ cd /opt/objectum/projects/todo/bin
 node remove.js
 ```
 
+<a name="visual-objectum"/>
 ## Build user interface by Visual Objectum
 
 ### 1. Create class
@@ -206,6 +210,7 @@ node remove.js
 ### 12. Reload browser page. Login as "adm". You can add, remove and open tasks.
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/todo.png)
 
+<a name="advanced"/>
 ## Advanced learning
 
 Dictionary
@@ -224,6 +229,9 @@ Objectum API (async)
 ...
 
 Objectum API (sync, only client side)
+...
+
+Reports
 ...
 
 Objectum Firewall
