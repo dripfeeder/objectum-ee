@@ -8,7 +8,7 @@ Objectum includes a powerful user interface constructor called Visual Objectum t
 [Build user interface by Visual Objectum](#visual-objectum)  
 [Advanced learning](#advanced)  
 
-<a href="https://github.com/objectum/todo">https://github.com/objectum/todo</a>  
+Complete project <a href="https://github.com/objectum/todo">https://github.com/objectum/todo</a>  
 
 <a name="init"/>
 ## Initialization
@@ -73,6 +73,13 @@ cat > /opt/objectum/node/objectum.js
 var objectum = require ("objectum-ee");
 var config = require ("./config");
 module.exports = new objectum.Objectum (config);
+```
+
+Add script:
+```bash
+cat > /opt/objectum/node/index.js
+var objectum = require ("objectum-ee");
+objectum.start (require ("./config"));
 ```
 
 Add script:
