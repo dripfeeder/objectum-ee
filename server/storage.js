@@ -139,7 +139,7 @@ var Storage = function (options) {
 	storage.inTransaction = function (session) {
 		return storage.clientPool [session.id];
 	};
-	storage.startTransaction = function (options) {
+	storage.startTransaction = function (options, cb) {
 		options = options || {};
 		options.session = options.session || {};
 		var success = options.success;
@@ -193,22 +193,34 @@ var Storage = function (options) {
 								removed: []
 							}
 						};
+						if (cb) {
+							cb (null, options.id);
+						} else
 						if (success) {
 							success ({revision: options.id});
-						}			
+						}
 					};
 					options.failure = function (err) {
+						if (cb) {
+							cb (new VError (err, "Storage.startTransaction"));
+						} else
 						if (failure) {
 							failure (new VError (err, "Storage.startTransaction"));
 						};
 					};
 					storage.createRevision (options);
 				}, failure: function (err) {
+					if (cb) {
+						cb (new VError (err, "Storage.startTransaction"));
+					} else
 					if (failure) {
 						failure (new VError (err, "Storage.startTransaction"));
 					};
 				}});
 			}, failure: function (err) {
+				if (cb) {
+					cb (new VError (err, "Storage.startTransaction"));
+				} else
 				if (failure) {
 					failure (new VError (err, "Storage.startTransaction"));
 				};
@@ -216,7 +228,7 @@ var Storage = function (options) {
 		});
 	};
 	// Commit transaction
-	storage.commitTransaction = function (options) {
+	storage.commitTransaction = function (options, cb) {
 		log.debug ({cls: "Storage", fn: "commitTransaction"});
 		options = options || {};
 		options.session = options.session || {};
@@ -234,28 +246,40 @@ var Storage = function (options) {
 						storage.redisPub.publish (config.redis.db + "-" + storage.code + "-revisions", JSON.stringify (storage.revisions [revision]));
 					};
 					delete storage.revision [session.id];
+					if (cb) {
+						cb (null, revision);
+					} else
 					if (options.success) {
 						options.success ({revision: revision});
 					}			
 				}, failure: function (err) {
+					if (cb) {
+						cb (new VError (err, "Storage.commitTransaction"));
+					} else
 					if (failure) {
 						failure (new VError (err, "Storage.commitTransaction"));
 					};
 				}});
 			} else {
 				delete storage.clientPool [session.id];
+				if (cb) {
+					cb ();
+				} else
 				if (options.success) {
 					options.success ({});
 				}			
 			};
 		} else {
+			if (cb) {
+				cb ();
+			} else
 			if (options.success) {
 				options.success ({});
 			}			
 		};
 	};
 	// Rollback transaction
-	storage.rollbackTransaction = function (options) {
+	storage.rollbackTransaction = function (options, cb) {
 		log.debug ({cls: "Storage", fn: "rollbackTransaction"});
 		options = options || {};
 		options.session = options.session || {};
@@ -267,6 +291,9 @@ var Storage = function (options) {
 				var revision = storage.revision [session.id];
 				delete storage.revisions [revision];
 				delete storage.revision [session.id];
+				if (cb) {
+					cb (null, revision);
+				} else
 				if (options.success) {
 					options.success ({revision: revision});
 				};
@@ -278,15 +305,24 @@ var Storage = function (options) {
 				var revision = storage.revision [session.id];
 				delete storage.revisions [revision];
 				delete storage.revision [session.id];
+				if (cb) {
+					cb (null, revision);
+				} else
 				if (options.success) {
 					options.success ({revision: revision});
 				}			
 			}, failure: function (err) {
+				if (cb) {
+					cb (new VError (err, "Storage.rollbackTransaction"));
+				} else
 				if (options.failure) {
 					options.failure (new VError (err, "Storage.rollbackTransaction"));
 				};
 			}});
 		} else {
+			if (cb) {
+				cb ();
+			} else
 			if (options.success) {
 				options.success ({});
 			}			
@@ -719,7 +755,7 @@ var Storage = function (options) {
 		};
 	};
 	// {session, id, success}
-	storage.getObject = function (options) {
+	storage.getObject = function (options, cb) {
 		log.debug ({cls: "Storage", fn: "getObject", id: options.id});
 		options = options || {};
 		var success = options.success;
@@ -730,6 +766,9 @@ var Storage = function (options) {
 		storage.redisClient.hset ("sessions", session.id + "-clock", config.clock);
 		var revision = session.revision;
 		if (!objectId || Number (objectId) == NaN) {
+			if (cb) {
+				cb (null, null);
+			} else
 			if (success) {
 				success ({object: null});
 			};
@@ -885,13 +924,21 @@ var Storage = function (options) {
 			}
 		], function (err, results) {
 			if (err) {
-				success ({object: null});
+				if (cb) {
+					cb (new VError (err, "storage.getObject"));
+				} else {
+					success ({object: null});
+				};
 			} else {
-				success ({object: object});
+				if (cb) {
+					cb (null, object);
+				} else {
+					success ({object: object});
+				};
 			};
 		});
 	},
-	storage.createObject = function (options) {
+	storage.createObject = function (options, cb) {
 		if (typeof (options) == "string") {
 			options = {code: options};
 		};
@@ -922,7 +969,11 @@ var Storage = function (options) {
 		], function (err, results) {
 			if (err == "cancel" || !storage.revision [session.id]) {
 				console.log ("cancel or no transaction, session " + JSON.stringify (session));
-				success ({object: null});
+				if (cb) {
+					cb (null, null);
+				} else {
+					success ({object: null});
+				};
 				return;
 			};
 			storage.clsChange ({classId: classId});
@@ -950,11 +1001,14 @@ var Storage = function (options) {
 					}, failure: cb});
 				}, function (err) {
 					if (err) {
+						if (cb) {
+							cb (new VError (err, "Storage.createObject"));
+						} else
 						if (failure) {
 							failure (new VError (err, "Storage.createObject"));
 						};
 					} else {
-						if (success) {
+						if (cb || success) {
 							var o = new storage.tobject ({code: "tobject"});
 							o.data.id = objectId;
 							o.data.fclass_id = classId;
@@ -972,13 +1026,20 @@ var Storage = function (options) {
 								object: o,
 								storage: storage,
 								success: function (options) {
-									success (userOptions);
+									if (cb) {
+										cb (null, userOptions.object);
+									} else {
+										success (userOptions);
+									};
 								}
 							});
 						}
 					};
 				});
 			}, failure: function (err) {
+				if (cb) {
+					cb (new VError (err, "Storage.createObject"));
+				} else
 				if (failure) {
 					failure (new VError (err, "Storage.createObject"));
 				};
@@ -1233,7 +1294,7 @@ var Storage = function (options) {
 		});
 	};
 	// save changes to database
-	storage.tobject.prototype.commit = function (options) {
+	storage.tobject.prototype.commit = function (options, cb) {
 		log.debug ({cls: "Object", fn: "commit"});
 		options = options || {};
 		options.session = options.session || {};
@@ -1264,6 +1325,9 @@ var Storage = function (options) {
 			}
 		], function (err, results) {
 			if (err == "cancel" || !storage.revision [session.id]) {
+				if (cb) {
+					cb ();
+				} else
 				if (success) {
 					success ();
 				};
@@ -1278,8 +1342,18 @@ var Storage = function (options) {
 					storage.revisions [storage.revision [session.id]].objects.removed.push (objectId);
 				};
 				storage.clsChange ({session: session, classId: object.get ("fclass_id")});
-				storage.removeObject ({session: session, object: object, success: success, failure: function (err) {
-					failure (new VError (err, "Object.commit"));
+				storage.removeObject ({session: session, object: object, success: function () {
+					if (cb) {
+						cb ();
+					} else {
+						success ();
+					};
+				}, failure: function (err) {
+					if (cb) {
+						cb (new VError (err, "Object.commit"));
+					} else {
+						failure (new VError (err, "Object.commit"));
+					};
 				}});
 			} else {
 				var attrs = [];
@@ -1298,6 +1372,9 @@ var Storage = function (options) {
 					}
 				}
 				if (!attrs.length) {
+					if (cb) {
+						cb ();
+					} else
 					if (success) {
 						success ();
 					}
@@ -1462,6 +1539,9 @@ var Storage = function (options) {
 						}
 					], function (err, results) {
 						if (err) {
+							if (cb) {
+								cb (new VError (err, "Object.commit"));
+							} else
 							if (failure) {
 								failure (new VError (err, "Object.commit"));
 							} else {
@@ -1472,6 +1552,9 @@ var Storage = function (options) {
 							}
 						} else {
 							storage.redisClient.hdel (storage.code + "-objects", objectId + "-data");
+							if (cb) {
+								cb ();
+							} else
 							if (success) {
 								success ();
 							}
@@ -1481,8 +1564,8 @@ var Storage = function (options) {
 			};
 		});
 	};
-	storage.tobject.prototype.sync = function (options) {
-		this.commit.call (this, options);
+	storage.tobject.prototype.sync = function (options, cb) {
+		this.commit.call (this, options, cb);
 	};
 	// remove object
 	storage.tobject.prototype.remove = function () {
