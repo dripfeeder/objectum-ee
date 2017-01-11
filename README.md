@@ -4,10 +4,10 @@ Objectum includes a powerful user interface constructor called Visual Objectum t
 
 ## Learn by Example project "To-Do list"
 
-[Initialization](#init)  
-[Build user interface by Visual Objectum](#visual-objectum)  
-[[Classes]](#classes)  
-[Advanced learning](#advanced)  
+* [Initialization](#init)  
+* [Build user interface by Visual Objectum](#visual-objectum)  
+	* [Classes](#classes)  
+* [Advanced learning](#advanced)  
 
 Complete project <a href="https://github.com/objectum/todo">https://github.com/objectum/todo</a>  
 
