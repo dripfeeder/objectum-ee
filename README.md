@@ -14,6 +14,17 @@ Objectum includes a powerful user interface constructor called Visual Objectum t
 	* [Building](#building)  
 * [Advanced learning](#advanced)  
 	* [Dictionary](#dictionary)  
+	* [Table](#table)  
+	* [Deployment](#deployment)  
+	* [Objectum API](#api)  
+		* [Client](#api-client)  
+		* [Server](#api-server)  
+		* [Sync (only client side)](#api-sync)  
+	* [Reports](#reports)  
+	* [Locale](#locale)  
+	* [Cluster](#cluster)  
+	* [Objectum Firewall](#firewall)  
+	* [Storages mixing](#mixing)
 
 Complete project <a href="https://github.com/objectum/todo">https://github.com/objectum/todo</a>  
 
@@ -243,25 +254,55 @@ node remove.js
 8. Build project and reload browser page  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/todo-dict.png)  
 
+<a name="table"/>
 ### Table  
 under construction  
 
+<a name="deployment"/>
 ### Deployment  
 under construction  
 
-### Storages mixing  
+<a name="api"/>
+### Objectum API
+startTransaction  
+commitTransaction  
+rollbackTransaction  
+
+createObject  
+getObject  
+sync  
+removeObject  
+
+<a name="api-client"/>
+### Client  
 under construction  
 
-### Objectum API (async)  
+<a name="api-server"/>
+### Server  
 under construction  
 
-### Objectum API (sync, only client side)  
+<a name="api-sync"/>
+### Sync (only client side)  
 under construction  
 
+<a name="reports"/>
 ### Reports  
 under construction  
 
+<a name="locale"/>
+### Locale  
+under construction  
+
+<a name="cluster"/>
+### Cluster  
+under construction  
+
+<a name="firewall"/>
 ### Objectum Firewall  
+under construction  
+
+<a name="mixing"/>
+### Storages mixing  
 under construction  
 
 ## Author
