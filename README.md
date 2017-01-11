@@ -187,96 +187,82 @@ node remove.js
 ## Build user interface by Visual Objectum
 
 <a name="class"/>
-### 1. Create class
+1. Create class  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/class-create.png)
-
-### 2. Create class attribute
+2. Create class attribute  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/classAttr-create.png)
-
 <a name="card"/>
-### 3. Create card
-
-#### 3.1. Open action layout
+3. Create card  
+3.1. Open action layout  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/action-layout.png)
-
-#### 3.2. Open card
+3.2. Open card  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/card-open.png)
-
-#### 3.3. Add field to card
+3.3. Add field to card  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/card.png)
-
-### 4. Create view
+4. Create view  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/view-create.png)
-
 <a name="query"/>
-### 5. Create query
+5. Create query  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/view-query.png)
-
 <a name="layout"/>
-### 6. Create layout
+6. Create layout  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/view-layout.png)
-
-### 7. Add table to layout
+7. Add table to layout  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/olap.png)
-
 <a name="menu"/>
-### 8. Create menu
+8. Create menu  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/menu.png)
-
-### 9. Create menu item
+9. Create menu item  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/menuItem.png)
-
-### 10. Create admin account (login: adm) and select administrator menu
+10. Create admin account (login: adm) and select administrator menu  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/access.png)
-
 <a name="building"/>
-### 11. Build project
+11. Build project  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/project.png)
-
-### 12. Reload browser page. Login as "adm". You can add, remove and open tasks.
+12. Reload browser page. Login as "adm". You can add, remove and open tasks.  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/todo.png)
 
 <a name="advanced"/>
 ## Advanced learning
 
 <a name="dictionary"/>
-### Dictionary
-1. Create dict "status"
+### Dictionary  
+1. Create dict "status"  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/dict-create.png)
-2. On message "Create standard dictionary (card, view)?" press "Yes".
-3. Create menu item for dictionary
+2. On message "Create standard dictionary (card, view)?" press "Yes".  
+3. Create menu item for dictionary  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/menuItem-dict.png)
-4. Create items
+4. Create items  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/dict.png)
-5. Create class attribute "status" in "task"
+5. Create class attribute "status" in "task"  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/task-dict.png)
-6. Open action layout and add field 
+6. Open action layout and add field  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/dict-field.png)
-7. Add column to view query
+7. Add column to view query  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/query-dict.png)
-8. Build project and reload browser page
+8. Build project and reload browser page  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/todo-dict.png)
 
-Table
-...
+### Table  
+under construction  
 
-Deployment
-...
+### Deployment  
+under construction  
 
-Storages mixing
-...
+### Storages mixing  
+under construction  
 
-Objectum API (async)
-...
+### Objectum API (async)  
+under construction  
 
-Objectum API (sync, only client side)
-...
+### Objectum API (sync, only client side)  
+under construction  
 
-Reports
-...
+### Reports  
+under construction  
 
-Objectum Firewall
-...
+### Objectum Firewall  
+under construction  
 
 ## Author
 
