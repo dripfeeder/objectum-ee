@@ -4,9 +4,10 @@ Objectum includes a powerful user interface constructor called Visual Objectum t
 
 ## Learn by Example project "To-Do list"
 
-[Initialization](#init)  
-[Build user interface by Visual Objectum](#visual-objectum)  
-[Advanced learning](#advanced)  
+[### Initialization](#init)  
+[### Build user interface by Visual Objectum](#visual-objectum)  
+[#### Classes](#classes)  
+[### Advanced learning](#advanced)  
 
 Complete project <a href="https://github.com/objectum/todo">https://github.com/objectum/todo</a>  
 
@@ -179,6 +180,7 @@ node remove.js
 <a name="visual-objectum"/>
 ## Build user interface by Visual Objectum
 
+<a name="classes"/>
 ### 1. Create class
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/class-create.png)
 
@@ -226,8 +228,22 @@ node remove.js
 <a name="advanced"/>
 ## Advanced learning
 
-Dictionary
-...
+### Dictionary
+1. Create dict "status"
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/dict-create.png)
+2. On message "Create standard dictionary (card, view)?" press "Yes".
+3. Create menu item for dictionary
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/menuItem-dict.png)
+4. Create items
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/dict.png)
+5. Create class attribute "status" in "task"
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/task-dict.png)
+6. Open action layout and add field 
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/dict-field.png)
+7. Add column to view query
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/query-dict.png)
+8. Build project and reload browser page
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/todo-dict.png)
 
 Table
 ...

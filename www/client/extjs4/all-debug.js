@@ -17060,7 +17060,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 			style: "margin-right: 5px",
 			items: [{
 				xtype: "$conffield", 
-				fieldLabel: "Класс",
+				fieldLabel: $o.getString ("Class"),
 				width: "100%",
 				labelWidth: 100,
 				name: "class_" + n, 
