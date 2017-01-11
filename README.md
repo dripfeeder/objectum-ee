@@ -6,8 +6,14 @@ Objectum includes a powerful user interface constructor called Visual Objectum t
 
 * [Initialization](#init)  
 * [Build user interface by Visual Objectum](#visual-objectum)  
-	* [Classes](#classes)  
+	* [Class](#class)  
+	* [Card](#card)  
+	* [Query](#query)  
+	* [Layout](#layout)  
+	* [Menu](#menu)  
+	* [Building](#building)  
 * [Advanced learning](#advanced)  
+	* [Dictionary](#dictionary)  
 
 Complete project <a href="https://github.com/objectum/todo">https://github.com/objectum/todo</a>  
 
@@ -180,13 +186,14 @@ node remove.js
 <a name="visual-objectum"/>
 ## Build user interface by Visual Objectum
 
-<a name="classes"/>
+<a name="class"/>
 ### 1. Create class
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/class-create.png)
 
 ### 2. Create class attribute
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/classAttr-create.png)
 
+<a name="card"/>
 ### 3. Create card
 
 #### 3.1. Open action layout
@@ -201,15 +208,18 @@ node remove.js
 ### 4. Create view
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/view-create.png)
 
+<a name="query"/>
 ### 5. Create query
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/view-query.png)
 
+<a name="layout"/>
 ### 6. Create layout
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/view-layout.png)
 
 ### 7. Add table to layout
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/olap.png)
 
+<a name="menu"/>
 ### 8. Create menu
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/menu.png)
 
@@ -219,6 +229,7 @@ node remove.js
 ### 10. Create admin account (login: adm) and select administrator menu
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/access.png)
 
+<a name="building"/>
 ### 11. Build project
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/project.png)
 
@@ -228,6 +239,7 @@ node remove.js
 <a name="advanced"/>
 ## Advanced learning
 
+<a name="dictionary"/>
 ### Dictionary
 1. Create dict "status"
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/dict-create.png)
