@@ -1253,8 +1253,8 @@ var Storage = function (options) {
 							async.map (cascade, function (objectId, cb) {
 								storage.getObject ({session: session, id: objectId, success: function (options) {
 									storage.removeObject ({session: session, object: options.object, success: function (options) {
-										cascadeNum += options.cascadeNum;
-										setnullNum += options.setnullNum;
+										cascadeNum += options ? options.cascadeNum : 0;
+										setnullNum += options ? options.setnullNum : 0;
 										cb ();
 									}, failure: function (err) {
 										cb ();
