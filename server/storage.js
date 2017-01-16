@@ -1224,7 +1224,7 @@ var Storage = function (options) {
 				storage.suspendEvent ("beforeremoveobject");
 				storage.getDependentObjects ({session: session, object: options.object, success: function (options) {
 					cascade = options.cascade;
-					cascadeNum = cascade.length;
+					cascadeNum = cascade ? cascade.length : 0;
 					setnull = options.setnull;
 					setnullNum = setnull.length;
 					async.parallel ([

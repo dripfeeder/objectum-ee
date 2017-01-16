@@ -5179,8 +5179,8 @@ projects.removeObject = function (request, response, next) {
 							},
 							function (cb) {
 								o.commit ({session: request.session, success: function (options) {
-									cascadeNum = options.cascadeNum;
-									setnullNum = options.setnullNum;
+									cascadeNum = options ? options.cascadeNum : null;
+									setnullNum = options ? options.setnullNum : null;
 									cb ();
 								}, failure: cb});
 							}
@@ -8509,7 +8509,7 @@ var Storage = function (options) {
 				storage.suspendEvent ("beforeremoveobject");
 				storage.getDependentObjects ({session: session, object: options.object, success: function (options) {
 					cascade = options.cascade;
-					cascadeNum = cascade.length;
+					cascadeNum = cascade ? cascade.length : 0;
 					setnull = options.setnull;
 					setnullNum = setnull.length;
 					async.parallel ([

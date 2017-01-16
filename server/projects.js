@@ -734,8 +734,8 @@ projects.removeObject = function (request, response, next) {
 							},
 							function (cb) {
 								o.commit ({session: request.session, success: function (options) {
-									cascadeNum = options.cascadeNum;
-									setnullNum = options.setnullNum;
+									cascadeNum = options ? options.cascadeNum : null;
+									setnullNum = options ? options.setnullNum : null;
 									cb ();
 								}, failure: cb});
 							}
