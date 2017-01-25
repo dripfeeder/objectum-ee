@@ -1422,7 +1422,7 @@ system.vo.buildMenu = function () {
 				{"a": "system.action"}
 			],
 			where: [
-				{"a": "___fid"}, "in", actions.join (".,.").split (".")
+				{"a": "___fend_id"}, "=", 2147483647, "and", {"a": "___fid"}, "in", actions.join (".,.").split (".")
 			]
 		});
 	};
