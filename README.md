@@ -258,7 +258,22 @@ node remove.js
 
 <a name="table"/>
 ### Table  
-under construction  
+1. Create class "comment" with attributes: text, task  
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment-class.png)  
+2. Open action "comment.card" layout and add field  
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment-card.png)  
+3. Change action "task.create"  
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment-action.png)  
+4. Create view "comments" and query for comments  
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment-query.png)  
+5. Open action layout and convert card to splitter  
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment-convert.png)  
+6. Add table for comments  
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment-olap.png)  
+7. Add option  
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment-option.png)  
+8. Build project and reload browser page  
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment.png)  
 
 <a name="deployment"/>
 ### Deployment  
