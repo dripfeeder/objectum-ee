@@ -317,47 +317,49 @@ Just export "todo" and import "todo" to "todo_my" for update to new version of s
 <a name="api"/>
 ### Objectum API
 
-startTransaction  - start transaction. Only one transaction for one session allowed.
-commitTransaction - commit transaction.
-rollbackTransaction - rollback transaction.
-createObject - create object
-getObject - get object
-set - set attribute value
-sync - save object changes to storage
-remove - remove object
+startTransaction  - start transaction. Only one transaction for one session allowed.  
+commitTransaction - commit transaction.  
+rollbackTransaction - rollback transaction.  
+createObject - create object  
+getObject - get object  
+set - set attribute value  
+sync - save object changes to storage  
+remove - remove object  
 
 <a name="api-client"/>
 ### Client  
 ```bash
 storage.startTransaction ("description", function (err) {
-	...
 });
-...
-storage.commitTransaction (function (err) {
-	...
-});
-...
+```
 
-storage.rollbackTransaction (function (err) {
-	...
+```bash
+storage.commitTransaction (function (err) {
 });
-...
+```
+
+```bash
+storage.rollbackTransaction (function (err) {
+});
+```
+
+```bash
 storage.createObject ("class", function (err, object) {
 	var id = object.get ("id");
-	...
 });
-...
+```
+
+```bash
 storage.getObject (id, function (err, object) {
 	object.set ("text", "Changed text");
 	object.sync (function (err) {
-		...
 	});
-	...
 });
-...
+```
+
+```bash
 object.remove ();
 object.sync (function (err) {
-	...
 });
 ```
 
