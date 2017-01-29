@@ -23,7 +23,7 @@ Objectum includes a powerful user interface constructor called Visual Objectum t
 		* [Client](#api-client)  
 		* [Server](#api-server)  
 		* [Sync (only client side)](#api-sync)  
-	* [Reports](#reports)  
+	* [Reports (only client side)](#reports)  
 	* [Locale](#locale)  
 	* [Cluster](#cluster)  
 	* [Objectum Firewall](#firewall)  
@@ -325,6 +325,7 @@ getObject - get object
 set - set attribute value  
 sync - save object changes to storage  
 remove - remove object  
+execute - execute SQL query (only SELECT)
 
 <a name="api-client"/>
 ### Client  
@@ -363,6 +364,31 @@ object.sync (function (err) {
 });
 ```
 
+```bash
+storage.execute ({
+	asArray: true,
+	select: [
+		{"a": "id"}, "id",
+		{"a": "name"}, "name",
+		{"b": "name"}, "status"
+	],
+	from: [
+		{"a": "task"},
+		"left-join", {"b": "spr.status"}, "on", [{"a": "status"}, "=", {"b": "id"}]
+	],
+	where: [
+		{"a": "name"}, "like", "Buy%", "and", {"a": "id"}, "in", [1000, 1002, 1003, 1004, 1005].join (".,.").split (".")
+	],
+	order: [
+		{"a": "name"}
+	]
+}, function (err, recs) {
+	_.each (recs, function (rec) {
+		console.log (rec.id, rec.name, rec.status);
+	});
+});
+```
+
 <a name="api-server"/>
 ### Server  
 ```bash
@@ -394,6 +420,30 @@ object.remove ();
 object.sync ({session: session}, function (err) {
 });
 ```
+```bash
+storage.execute ({session: session, sql: {
+	asArray: true,
+	select: [
+		{"a": "id"}, "id",
+		{"a": "name"}, "name",
+		{"b": "name"}, "status"
+	],
+	from: [
+		{"a": "task"},
+		"left-join", {"b": "spr.status"}, "on", [{"a": "status"}, "=", {"b": "id"}]
+	],
+	where: [
+		{"a": "name"}, "like", "Buy%", "and", {"a": "id"}, "in", [1000, 1002, 1003, 1004, 1005].join (".,.").split (".")
+	],
+	order: [
+		{"a": "name"}
+	]
+}}, function (err, recs) {
+	_.each (recs, function (rec) {
+		console.log (rec.id, rec.name, rec.status);
+	});
+});
+```
 
 <a name="api-sync"/>
 ### Sync (only client side)  
@@ -419,10 +469,61 @@ object.sync ();
 object.remove ();
 object.sync ();
 ```
+```bash
+var recs = $o.execute ({
+	asArray: true,
+	select: [
+		{"a": "id"}, "id",
+		{"a": "name"}, "name",
+		{"b": "name"}, "status"
+	],
+	from: [
+		{"a": "task"},
+		"left-join", {"b": "spr.status"}, "on", [{"a": "status"}, "=", {"b": "id"}]
+	],
+	where: [
+		{"a": "name"}, "like", "Buy%", "and", {"a": "id"}, "in", [1000, 1002, 1003, 1004, 1005].join (".,.").split (".")
+	],
+	order: [
+		{"a": "name"}
+	]
+});
+```
 
 <a name="reports"/>
-### Reports  
-under construction  
+### Reports (only client side) 
+```bash
+var rows = [{
+	cells: [{
+		text: "Cell 1 1", style: "border", rowspan: 2
+	}, {
+		text: "Cell 1 2", style: "border", colspan: 2
+	}]
+}, {
+	startIndex: 2, cells: [{
+		text: "Cell 2 2", style: "border"
+	}, {
+		text: "Cell 2 3", style: "border"
+	}]
+}];
+var report = new $report.xmlss ();
+report.sheets = [
+	new $report.sheet ({
+		name: "Sheet1", 
+		orientation: "landscape",
+		autoFitHeight: true,
+		margins: {
+			left: 15,
+			top: 15,
+			right: 15,
+			bottom: 15
+		},
+		columns: [15, 15, 15],
+		rows: rows
+	})
+];
+report.preview ();  
+```
 
 <a name="locale"/>
 ### Locale  
