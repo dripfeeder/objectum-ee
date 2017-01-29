@@ -367,34 +367,31 @@ object.sync (function (err) {
 ### Server  
 ```bash
 storage.startTransaction ({session: session, description: "description"}, function (err) {
-	...
 });
-...
+```
+```bash
 storage.commitTransaction ({session: session}, function (err) {
-	...
 });
-...
-
+```
+```bash
 storage.rollbackTransaction ({session: session}, function (err) {
-	...
 });
-...
+```
+```bash
 storage.createObject ({session: session, code: "class"}, function (err, object) {
 	var id = object.get ("id");
-	...
 });
-...
+```
+```bash
 storage.getObject ({session: session, id: id}, function (err, object) {
 	object.set ("text", "Changed text");
 	object.sync ({session: session}, function (err) {
-		...
 	});
-	...
 });
-...
+```
+```bash
 object.remove ();
 object.sync ({session: session}, function (err) {
-	...
 });
 ```
 
@@ -402,18 +399,23 @@ object.sync ({session: session}, function (err) {
 ### Sync (only client side)  
 ```bash
 $o.startTransaction ("description");
-...
+```
+```bash
 $o.commitTransaction ();
-...
+```
+```bash
 $o.rollbackTransaction ();
-...
+```
+```bash
 $o.createObject ("class");
 var id = object.get ("id");
-...
+```
+```bash
 var object = $o.getObject (id);
 object.set ("text", "Changed text");
 object.sync ();
-...
+```
+```bash
 object.remove ();
 object.sync ();
 ```
