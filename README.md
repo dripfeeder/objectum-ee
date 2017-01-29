@@ -266,7 +266,7 @@ node remove.js
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment-action.png)  
 4. Create view "comments" and query for comments  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment-query.png)  
-5. Open action layout and convert card to splitter  
+5. Open action "task.card" layout and convert card to splitter  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment-convert.png)  
 6. Add table for comments  
 ![alt tag](https://raw.github.com/objectum/todo/master/resources/images/comment-olap.png)  
@@ -277,30 +277,144 @@ node remove.js
 
 <a name="deployment"/>
 ### Deployment  
-under construction  
+Add script:  
+```bash
+cat > /opt/objectum/projects/todo/bin/export.js
+var $o = require ("/opt/objectum/node/objectum");
+$o.db.execute ({
+	code: "todo",
+	fn: "export",
+	file: "../schema/schema-todo.js",
+	filterClasses: ["task", "comment"]
+});
+```
+
+Export storage:  
+```bash
+cd /opt/objectum/projects/todo/bin
+node export.js
+```
+
+Add script:
+```bash
+cat > /opt/objectum/projects/todo_my/bin/import.js
+var $o = require ("/opt/objectum/node/objectum");
+$o.db.execute ({
+	code: "todo_my",
+	fn: "import",
+	file: "/opt/objectum/projects/todo/schema/schema-todo.js" // parent storage
+});
+```
+
+Import your storage "todo" to new created storage "todo_my":
+```bash
+cd /opt/objectum/projects/todo_my/bin
+node import.js
+```
+
+Just export "todo" and import "todo" to "todo_my" for update to new version of storage "todo". Stop platform before import storage.
 
 <a name="api"/>
 ### Objectum API
-startTransaction  
-commitTransaction  
-rollbackTransaction  
 
-createObject  
-getObject  
-sync  
-removeObject  
+startTransaction  - start transaction. Only one transaction for one session allowed.
+commitTransaction - commit transaction.
+rollbackTransaction - rollback transaction.
+createObject - create object
+getObject - get object
+set - set attribute value
+sync - save object changes to storage
+remove - remove object
 
 <a name="api-client"/>
 ### Client  
-under construction  
+```bash
+storage.startTransaction ("description", function (err) {
+	...
+});
+...
+storage.commitTransaction (function (err) {
+	...
+});
+...
+
+storage.rollbackTransaction (function (err) {
+	...
+});
+...
+storage.createObject ("class", function (err, object) {
+	var id = object.get ("id");
+	...
+});
+...
+storage.getObject (id, function (err, object) {
+	object.set ("text", "Changed text");
+	object.sync (function (err) {
+		...
+	});
+	...
+});
+...
+object.remove ();
+object.sync (function (err) {
+	...
+});
+```
 
 <a name="api-server"/>
 ### Server  
-under construction  
+```bash
+storage.startTransaction ({session: session, description: "description"}, function (err) {
+	...
+});
+...
+storage.commitTransaction ({session: session}, function (err) {
+	...
+});
+...
+
+storage.rollbackTransaction ({session: session}, function (err) {
+	...
+});
+...
+storage.createObject ({session: session, code: "class"}, function (err, object) {
+	var id = object.get ("id");
+	...
+});
+...
+storage.getObject ({session: session, id: id}, function (err, object) {
+	object.set ("text", "Changed text");
+	object.sync ({session: session}, function (err) {
+		...
+	});
+	...
+});
+...
+object.remove ();
+object.sync ({session: session}, function (err) {
+	...
+});
+```
 
 <a name="api-sync"/>
 ### Sync (only client side)  
-under construction  
+```bash
+$o.startTransaction ("description");
+...
+$o.commitTransaction ();
+...
+$o.rollbackTransaction ();
+...
+$o.createObject ("class");
+var id = object.get ("id");
+...
+var object = $o.getObject (id);
+object.set ("text", "Changed text");
+object.sync ();
+...
+object.remove ();
+object.sync ();
+```
 
 <a name="reports"/>
 ### Reports  
