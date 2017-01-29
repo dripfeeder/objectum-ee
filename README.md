@@ -1,4 +1,7 @@
 # Objectum Enterprise Edition - javascript app platform
+
+<a href="README_RU.md">Русская версия</a>  
+
 Objectum platform makes it easy to create realtime single page applications that run in both Node.js and browsers.  
 Objectum includes a powerful user interface constructor called Visual Objectum that creates grids, tree grids, forms, etc. Automatically generates source code for CRUD (create, read, update, delete) functions.
 
@@ -24,7 +27,6 @@ Objectum includes a powerful user interface constructor called Visual Objectum t
 	* [Locale](#locale)  
 	* [Cluster](#cluster)  
 	* [Objectum Firewall](#firewall)  
-	* [Storages mixing](#mixing)
 
 Complete project <a href="https://github.com/objectum/todo">https://github.com/objectum/todo</a>  
 
@@ -299,10 +301,6 @@ under construction
 
 <a name="firewall"/>
 ### Objectum Firewall  
-under construction  
-
-<a name="mixing"/>
-### Storages mixing  
 under construction  
 
 ## Author
