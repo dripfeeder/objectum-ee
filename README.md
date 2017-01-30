@@ -527,15 +527,59 @@ report.preview ();
 
 <a name="locale"/>
 ### Locale  
-under construction  
+You can add another locale file in this folder
+https://github.com/objectum/objectum-ee/tree/master/www/client/extjs4/locale
+Change "locale" in projects/todo/index.html
+```bash
+<script type="text/javascript" charset="UTF-8">
+	$o.app.start ({"code": "todo", "name": "To-Do list", "version":"1.0", "locale": "en"});
+</script>
+```
 
 <a name="cluster"/>
 ### Cluster  
-under construction  
+Install [Redis](https://redis.io/download)
+Change platform configuration:
+```bash
+module.exports = {
+	"rootDir": "/opt/objectum/node",
+	"projectsDir": "/opt/objectum/projects",
+	"port": 8100,
+	"storages": {
+		"todo": require ("/opt/objectum/projects/todo/config.json")
+	},
+	"redis": {
+		"enabled": true,
+		"host": "127.0.0.1",
+		"port": 6379,
+		"resetCache": true
+	},
+	"cluster": {
+		"www": {
+			"port": 8100,
+			"workers": 3
+		},
+		"app": {
+			"workers": 3
+		}
+	}
+}
+```
+www-worker - work on www.port  
+app.worker - work on www.port ++ (8101, 8102, 8103). Service worker on 8101, not used for user requests.  
+
+Change index.js for start in cluster mode:
+```bash
+var objectum = require ("objectum-ee");
+objectum.startCluster (require ("./config"));
+```
 
 <a name="firewall"/>
 ### Objectum Firewall  
-under construction  
+Install firewall <a href="https://github.com/objectum/objectum-firewall">https://github.com/objectum/objectum-firewall</a>  
+Create configuration config.js:
+```bash
+```
 
 ## Author
 
