@@ -538,7 +538,7 @@ Change "locale" in projects/todo/index.html
 
 <a name="cluster"/>
 ### Cluster  
-Install [Redis](https://redis.io/download)
+Install [Redis](https://redis.io/download)  
 Change platform configuration:
 ```bash
 module.exports = {
@@ -552,7 +552,8 @@ module.exports = {
 		"enabled": true,
 		"host": "127.0.0.1",
 		"port": 6379,
-		"resetCache": true
+		"resetCache": true,
+		"db": 1
 	},
 	"cluster": {
 		"www": {
@@ -565,21 +566,26 @@ module.exports = {
 	}
 }
 ```
-www-worker - work on www.port  
-app.worker - work on www.port ++ (8101, 8102, 8103). Service worker on 8101, not used for user requests.  
+www-worker - work on cluster.www.port  
+app.worker - work on cluster.www.port ++ (8101, 8102, 8103). Service worker on 8101, not used for user requests.  
 
 Change index.js for start in cluster mode:
 ```bash
 var objectum = require ("objectum-ee");
 objectum.startCluster (require ("./config"));
 ```
+Cluster architecture:
+![alt tag](https://raw.github.com/objectum/todo/master/resources/images/objectum-cluster.png)  
 
 <a name="firewall"/>
 ### Objectum Firewall  
 Install firewall <a href="https://github.com/objectum/objectum-firewall">https://github.com/objectum/objectum-firewall</a>  
+Example for role "Commentator"
+Can CRUD comments for tasks. Other functions blocked on API level.
 Create configuration config.js:
 ```bash
 ```
+
 
 ## Author
 
