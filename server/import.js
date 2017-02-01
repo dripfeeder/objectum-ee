@@ -295,7 +295,7 @@ var Import = function () {
 						sql =
 							"insert into _class_attr (" + fields ["_class_attr"].join (",") + ", fclass_code) (\n" +
 							"\tselect a." + fields ["_class_attr"].join (",a.") + ",b.fcode from tclass_attr a\n" +
-							"\tinner join tclass b on (a.fclass_id = b.fid)\n" +
+							"\tinner join tclass b on (a.fclass_id = b.fid and b.fend_id = " + storage.maxRevision + ")\n" +
 							"\twhere a.fend_id = " + storage.maxRevision + "\n" +
 							")\n"
 						;
