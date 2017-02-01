@@ -5508,7 +5508,7 @@ Ext.define ("$o", {
 					if (v && typeof (v) == "object" && v.getMonth () && v.getFullYear () == 2000 && v.getMonth () == 1 && v.getDate () == 2 && v.getHours () == 3 && v.getMinutes () == 4 && v.getSeconds () == 5) {
 						v = "$CURRENT_TIMESTAMP$";
 					};
-					if (ca.getDataType () == "bool") {
+					if (ca.getDataType () == "bool" && v !== null) {
 						v = v ? 1 : 0;
 					};
 					if (ca.getDataType () == "date" && v && v != "$CURRENT_TIMESTAMP$") {
