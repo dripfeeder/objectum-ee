@@ -8926,6 +8926,7 @@ var Storage = function (options) {
 		var failure = options.failure;
 		var session = options.session;
 		options.storage = storage;
+		storage.addOrderId (options.sql);
 		var query = new Query (options);
 		query.generate ();
 		var fields = query.fields;
@@ -9113,6 +9114,35 @@ var Storage = function (options) {
 		});
 		return r;
 	};
+	storage.addOrderId = function (sql) {
+		var alias; for (alias in sql.from [0]) {break;};
+		var order = sql.orderAfter || sql.order;
+		order = order || [];
+		var has = 0;
+		for (var i = 0; i < order.length; i ++) {
+			if (typeof (order [i]) == "object") {
+				for (var a in order [i]) {
+					if (order [i][a] == "id") {
+						has = 1;
+					};
+				};
+			};
+		};
+		if (!has) {
+			if (["system.class", "system.class_attr", "system.view", "system.view_attr", "system.action", "system.action_attrs", "system.object", "system.object_attr", "system.revision"].indexOf (sql.from [0][alias]) == -1) {
+				if (order.length) {
+					order.push (",");
+				};
+				var f = {}; f [alias] = "id";
+				order.push (f);
+			};
+		};
+		if (sql.orderAfter) {
+			sql.orderAfter = order;
+		} else {
+			sql.order = order;
+		}
+	},
 	storage.getContent = function (options) {
 		var viewId = options.viewId;
 		var column = options.column;
@@ -9165,36 +9195,7 @@ var Storage = function (options) {
 				viewQuery.order = order;
 			}
 		};
-		function addOrderId (sql) {
-			var alias; for (alias in sql.from [0]) {break;};
-			var order = sql.orderAfter || sql.order;
-			order = order || [];
-			var has = 0;
-			for (var i = 0; i < order.length; i ++) {
-				if (typeof (order [i]) == "object") {
-					for (var a in order [i]) {
-						if (order [i][a] == "id") {
-							has = 1;
-						};
-					};
-				};
-			};
-			if (!has) {
-				if (["system.class", "system.class_attr", "system.view", "system.view_attr", "system.action", "system.action_attrs", "system.object", "system.object_attr", "system.revision"].indexOf (sql.from [0][alias]) == -1) {
-					if (order.length) {
-						order.push (",");
-					};
-					var f = {}; f [alias] = "id";
-					order.push (f);
-				};
-			};
-			if (sql.orderAfter) {
-				sql.orderAfter = order;
-			} else {
-				sql.order = order;
-			}
-		};
-		addOrderId (viewQuery);
+		storage.addOrderId (viewQuery);
 		var query, rows, totalRow, sql, classes = [];
 		async.series ([
 			function (cb) {
