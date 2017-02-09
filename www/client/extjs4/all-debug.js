@@ -9345,6 +9345,7 @@ Ext.define ("$o.Card.Widget", {
 		};
 		n.vtype = ca.getVType ();
 		Ext.applyIf (item, n);
+		item.fieldLabel = $o.getString (item.fieldLabel);
 	},
 	createFields: function () {
 		var me = this;
@@ -9357,7 +9358,7 @@ Ext.define ("$o.Card.Widget", {
 				Ext.apply (item, {
 					xtype: "textfield",
 					anchor: "-20",
-					fieldLabel: item.caption || item.fieldLabel || "unknown",
+					fieldLabel: $o.getString (item.caption || item.fieldLabel || "unknown"),
 					labelStyle: "color: red;",
 					style: "color: red;",
 					readOnly: true,
