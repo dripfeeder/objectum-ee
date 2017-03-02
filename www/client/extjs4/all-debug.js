@@ -7675,8 +7675,8 @@ Ext.define ("$o.Base.Grid", {
 					scope = listeners [options.event].scope;
 				}
 				var fn = typeof (listeners [options.event].fn) == "string" ? eval ("(" + listeners [options.event].fn + ")") : listeners [options.event].fn;
-				var arguments = $o.util.clone (listeners [options.event].arguments);
-				fn.call (scope, arguments || {});
+				var args = $o.util.clone (listeners [options.event].arguments);
+				fn.call (scope, args || {});
 			} else {
 				var fn = typeof (listeners [options.event]) == "string" ? eval ("(" + listeners [options.event] + ")") : listeners [options.event];
 				fn.call (scope, {});
@@ -20682,7 +20682,7 @@ Ext.define ("$o.app", {
 				if (record) {
 					tab = me.tp.add ({
 						id: tabId,
-						title: record.get ("name"),
+						title: $o.getString (record.get ("name")),
 						iconCls: record.get ("iconCls"),
 						closable: true,
 						layout: "fit",
@@ -25724,6 +25724,9 @@ system.vo.buildMenu = function () {
 	} else
 	if ($o.currentUser == "autologin") {
 		menuId = common.getConf ("autologinMenu").value;
+		if (!menuId) {
+			return;
+		};
 	} else {
 		var oUser = $o.getObject ($o.userId);
 		if ($o.getClass (oUser.get ("classId")).getFullCode () == "subject.human.vo_adm") {
@@ -25760,6 +25763,9 @@ system.vo.buildMenu = function () {
 			{"a": "npp"}, ",", {"a": "name"}
 		]
 	});
+	if (!m.length) {
+		return;
+	};
 	var r = common.execSQL ({
 		select: [
 			{"a":"id"}, "id",
@@ -25976,18 +25982,22 @@ system.vo.buildMenu = function () {
 	case "top":
 		$o.app.tb.add (menu);
 		$o.app.tb.doLayout ();
+		$o.app.tb.show ();
 		break;
 	case "left":
 		$o.app.lb.add (menu);
 		$o.app.lb.doLayout ();
+		$o.app.lb.show ();
 		break;
 	case "right":
 		$o.app.rb.add (menu);
 		$o.app.rb.doLayout ();
+		$o.app.rb.show ();
 		break;
 	case "bottom":
 		$o.app.bb.add (menu);
 		$o.app.bb.doLayout ();
+		$o.app.bb.show ();
 		break;
 	};
 };

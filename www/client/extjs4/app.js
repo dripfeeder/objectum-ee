@@ -524,7 +524,7 @@ Ext.define ("$o.app", {
 				if (record) {
 					tab = me.tp.add ({
 						id: tabId,
-						title: record.get ("name"),
+						title: $o.getString (record.get ("name")),
 						iconCls: record.get ("iconCls"),
 						closable: true,
 						layout: "fit",

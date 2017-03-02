@@ -1345,6 +1345,9 @@ system.vo.buildMenu = function () {
 	} else
 	if ($o.currentUser == "autologin") {
 		menuId = common.getConf ("autologinMenu").value;
+		if (!menuId) {
+			return;
+		};
 	} else {
 		var oUser = $o.getObject ($o.userId);
 		if ($o.getClass (oUser.get ("classId")).getFullCode () == "subject.human.vo_adm") {
@@ -1381,6 +1384,9 @@ system.vo.buildMenu = function () {
 			{"a": "npp"}, ",", {"a": "name"}
 		]
 	});
+	if (!m.length) {
+		return;
+	};
 	var r = common.execSQL ({
 		select: [
 			{"a":"id"}, "id",
@@ -1597,18 +1603,22 @@ system.vo.buildMenu = function () {
 	case "top":
 		$o.app.tb.add (menu);
 		$o.app.tb.doLayout ();
+		$o.app.tb.show ();
 		break;
 	case "left":
 		$o.app.lb.add (menu);
 		$o.app.lb.doLayout ();
+		$o.app.lb.show ();
 		break;
 	case "right":
 		$o.app.rb.add (menu);
 		$o.app.rb.doLayout ();
+		$o.app.rb.show ();
 		break;
 	case "bottom":
 		$o.app.bb.add (menu);
 		$o.app.bb.doLayout ();
+		$o.app.bb.show ();
 		break;
 	};
 };

@@ -430,8 +430,8 @@ Ext.define ("$o.Base.Grid", {
 					scope = listeners [options.event].scope;
 				}
 				var fn = typeof (listeners [options.event].fn) == "string" ? eval ("(" + listeners [options.event].fn + ")") : listeners [options.event].fn;
-				var arguments = $o.util.clone (listeners [options.event].arguments);
-				fn.call (scope, arguments || {});
+				var args = $o.util.clone (listeners [options.event].arguments);
+				fn.call (scope, args || {});
 			} else {
 				var fn = typeof (listeners [options.event]) == "string" ? eval ("(" + listeners [options.event] + ")") : listeners [options.event];
 				fn.call (scope, {});
