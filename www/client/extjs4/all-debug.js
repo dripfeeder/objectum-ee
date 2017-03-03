@@ -20669,10 +20669,10 @@ Ext.define ("$o.app", {
 				};
 			};
 		} else {
-			if (Ext.getClassName (center) == "Ext.tab.Panel") {
+			//if (Ext.getClassName (center) == "Ext.tab.Panel") {
 				items.closable = true;
 				tabId = items.id;
-			};
+			//};
 		};
 		if (!items) {
 			return;
