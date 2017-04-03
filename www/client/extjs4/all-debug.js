@@ -20637,6 +20637,7 @@ Ext.define ("$o.app", {
 			},
 			items: items
 		});
+		Ext.window.Window.prototype.maxHeight = Ext.getBody ().getViewSize ().height;
 	},
 	/*
 		Показывает представление (view, editView, class, items)
