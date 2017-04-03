@@ -700,14 +700,19 @@ Ext.define ("$o.IconSelector.Widget", {
 			xtype: "textfield",
 			name: "name",
 			flex: 1,
-			readOnly: true,
+			//readOnly: true,
 			value: me.value ? me.value : "",
 			listeners: {
+				change: function () {
+					me.value = this.getValue ();
+				}
+/*
 				render: function (c) {
 	                c.getEl ().on ("mousedown", function (e, t, eOpts) {
 						me.down ("button[name=choose]").handler.call (me);
 	                });
 				}
+*/
 			}
 		}]; 
 		me.addEvents ("change");

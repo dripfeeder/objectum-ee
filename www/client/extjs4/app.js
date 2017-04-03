@@ -474,6 +474,7 @@ Ext.define ("$o.app", {
 			},
 			items: items
 		});
+		Ext.window.Window.prototype.maxHeight = Ext.getBody ().getViewSize ().height;
 	},
 	/*
 		Показывает представление (view, editView, class, items)
@@ -511,10 +512,10 @@ Ext.define ("$o.app", {
 				};
 			};
 		} else {
-			//if (Ext.getClassName (center) == "Ext.tab.Panel") {
+			if (!items.hasOwnProperty ("closable")) {
 				items.closable = true;
-				tabId = items.id;
-			//};
+			};
+			tabId = items.id;
 		};
 		if (!items) {
 			return;
