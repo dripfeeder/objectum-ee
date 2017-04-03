@@ -42,7 +42,7 @@ var jsServer = [
 var jsClient = [
     "./client/api/async.js",
     "./client/api/sha1.js",
-    "./client/api/underscore.js",
+    "./client/api/lodash.min.js",
     "./client/api/backbone.js",
     "./client/api/api.js",
     "./client/api/util.js",

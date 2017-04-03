@@ -1,4 +1,5 @@
-var _ = require ("underscore");
+var _ = require ("lodash");
+_.findWhere = _.findLast;
 if (!config) {
 	config = require ("./config");
 };
