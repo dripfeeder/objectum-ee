@@ -40,13 +40,13 @@ var jsServer = [
     "./server/footer.js"
 ];
 var jsClient = [
-    "./client/api/async.js",
-    "./client/api/sha1.js",
-    "./client/api/lodash.min.js",
-    "./client/api/backbone.js",
+    "./www/third-party/js/async.js",
+    "./www/third-party/js/sha1.js",
+    "./www/third-party/js/lodash.min.js",
+    "./www/third-party/js/backbone.js",
     "./client/api/api.js",
     "./client/api/util.js",
-    "./client/api/json2.js",
+    "./www/third-party/js/json2.js",
     "./client/extjs4/grid.js",
     "./client/extjs4/fields.js",
     "./client/extjs4/card.js",

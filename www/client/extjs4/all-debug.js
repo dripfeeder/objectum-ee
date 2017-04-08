@@ -20432,6 +20432,7 @@ $zu.dialog.getNameAndCodeAndType = function (options) {
 	Underscore -> Lodash
  */
 _.findWhere = _.findLast;
+_.where = _.filter;
 
 // Common util for all projects
 Ext.namespace (

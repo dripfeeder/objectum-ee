@@ -1,5 +1,6 @@
 var _ = require ("lodash");
 _.findWhere = _.findLast;
+_.where = _.filter;
 if (!config) {
 	config = require ("./config");
 };
@@ -26,17 +27,6 @@ if (!config.news) {
 		gcInterval: 300000
 	};
 }
-/*
-if (!config.rootDir) {
-	config.rootDir = config.objectumDir + "/node";
-}
-if (!config.projectsDir) {
-	config.projectsDir = config.objectumDir + "/projects";
-}
-if (!config.wwwRoot) {
-	config.wwwRoot = config.objectumDir + "/node/www";
-}
-*/
 config.wwwRoot = __dirname + "/www";
 if (_.isArray (config.storages) && config.projectsDir) {
 	var storages = {};

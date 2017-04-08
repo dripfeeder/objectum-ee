@@ -286,18 +286,7 @@ var Query = function (options) {
 					objectField = "tobject_attr.fid";
 				}
 			}
-			var eventResult = storage.fireEvent ("generatequeryblock", {
-				cls: cls,
-				objectField: objectField,
-				session: session,
-				tables: tables,
-				where: where,
-				alias: alias
-			});
-			if (eventResult && eventResult.where) {
-				where = eventResult.where;
-			};
-			return storage.client.database == "mssql" ? 
+			return storage.client.database == "mssql" ?
 				"(select top 9223372036854775807 " + fields.join (",") + " from " + tables.join (",") + where + ") " + alias : 
 				"(select " + fields.join (",") + " from " + tables.join (",") + where + ") " + alias
 			;

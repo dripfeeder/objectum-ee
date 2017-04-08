@@ -1,5 +1,6 @@
 ﻿/*
-	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
+	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.
+	deprecated. Events disabled
 */
 var Ose = function (options) {
 	var storage = options.storage;

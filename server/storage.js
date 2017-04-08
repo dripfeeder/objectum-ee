@@ -777,20 +777,6 @@ var Storage = function (options) {
 		var object;
 		async.series ([
 			function (cb) {
-				storage.fireEvent ("beforegetobject", {
-					objectId: objectId,
-					session: session,
-					storage: storage,
-					success: function (options) {
-						if (options && options.cancel) {
-							cb ("cancel");
-						} else {
-							cb ();
-						};
-					}
-				});
-			},
-			function (cb) {
 				storage.redisClient.hmget (storage.code + "-objects" + (revision || ""), [objectId + "-data"], function (err, result) {
 					var o = new storage.tobject ({code: "tobject"});
 					if (result && result [0]) {
@@ -907,20 +893,6 @@ var Storage = function (options) {
 						};
 					}
 				});
-			},
-			function (cb) {
-				storage.fireEvent ("aftergetobject", {
-					object: object,
-					session: session,
-					storage: storage,
-					success: function (options) {
-						if (options && options.cancel) {
-							cb ("cancel");
-						} else {
-							cb ();
-						};
-					}
-				});
 			}
 		], function (err, results) {
 			if (err) {
@@ -953,18 +925,7 @@ var Storage = function (options) {
 		var session = options.session;
 		async.series ([
 			function (cb) {
-				storage.fireEvent ("beforecreateobject", {
-					classId: classId,
-					session: session,
-					storage: storage,
-					success: function (options) {
-						if (options && options.cancel) {
-							cb ("cancel");
-						} else {
-							cb ();
-						};
-					}
-				});
+				cb ();
 			}
 		], function (err, results) {
 			if (err == "cancel" || !storage.revision [session.id]) {
@@ -1020,19 +981,11 @@ var Storage = function (options) {
 								storage.revisions [storage.revision [session.id]].objects.created.push (objectId);
 								storage.revisions [storage.revision [session.id]].objects.classId [objectId] = classId;
 							};
-							storage.fireEvent ("aftercreateobject", {
-								classId: classId,
-								session: session,
-								object: o,
-								storage: storage,
-								success: function (options) {
-									if (cb) {
-										cb (null, userOptions.object);
-									} else {
-										success (userOptions);
-									};
-								}
-							});
+							if (cb) {
+								cb (null, userOptions.object);
+							} else {
+								success (userOptions);
+							};
 						}
 					};
 				});
@@ -1207,18 +1160,7 @@ var Storage = function (options) {
 		var setnullNum;
 		async.series ([
 			function (cb) {
-				storage.fireEvent ("beforeremoveobject", {
-					object: options.object,
-					session: session,
-					storage: storage,
-					success: function (options) {
-						if (options && options.cancel) {
-							cb ("cancel");
-						} else {
-							cb ();
-						};
-					}
-				});
+				cb ();
 			},
 			function (cb) {
 				storage.suspendEvent ("beforeremoveobject");
@@ -1309,18 +1251,7 @@ var Storage = function (options) {
 				if (object.removed) {
 					cb ();
 				} else {
-					storage.fireEvent ("beforecommitobject", {
-						object: object,
-						session: session,
-						storage: storage,
-						success: function (options) {
-							if (options && options.cancel) {
-								cb ("cancel");
-							} else {
-								cb ();
-							};
-						}
-					});
+					cb ();
 				};
 			}
 		], function (err, results) {
