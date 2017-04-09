@@ -2,10 +2,10 @@
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 //
 global.db = {};
-global.dbTablesSQL = JSON.stringify (fs.readFileSync (__dirname + "/tables.sql", "utf8"));
-global.dbIndexesSQL = JSON.stringify (fs.readFileSync (__dirname + "/indexes.sql", "utf8"));
-global.dbDataSQL = JSON.stringify (fs.readFileSync (__dirname + "/data.sql", "utf8"));
-global.dbEngineSQL = JSON.stringify (fs.readFileSync (__dirname + "/engine.sql", "utf8"));
+global.dbTablesSQL = fs.readFileSync (__dirname + "/tables.sql", "utf8");
+global.dbIndexesSQL = fs.readFileSync (__dirname + "/indexes.sql", "utf8");
+global.dbDataSQL = fs.readFileSync (__dirname + "/data.sql", "utf8");
+global.dbEngineSQL = fs.readFileSync (__dirname + "/engine.sql", "utf8");
 //	Factory of databases clients
 db.create = function (options) {
 	if (options.connection.database == "postgres") {
@@ -132,6 +132,8 @@ db.execute = function (options) {
 			};
 			if (cfg.success) {
 				cfg.success ();
+			} else {
+				process.exit (1);
 			};
 		};
 	});
