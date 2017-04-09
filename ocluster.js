@@ -2,7 +2,7 @@
 //	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 //
 var config = JSON.parse (process.env.config);
-var $o = new (require (__dirname + "/objectum-debug").Objectum)(config);
+var $o = new (require (__dirname + "/server/index").Objectum)(config);
 if (process.env.port == config.cluster.www.port) {
 	// www worker
 	var mimetypes = $o.mimetypes;
