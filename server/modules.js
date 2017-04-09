@@ -1,4 +1,4 @@
-var _ = require ("lodash");
+let _ = require ("lodash");
 _.findWhere = _.findLast;
 _.where = _.filter;
 if (!config) {
@@ -29,39 +29,39 @@ if (!config.news) {
 }
 config.wwwRoot = __dirname + "/www";
 if (_.isArray (config.storages) && config.projectsDir) {
-	var storages = {};
+	let storages = {};
 	_.each (config.storages, function (code) {
 		storages [code] = require (config.projectsDir + "/" + code + "/config.json");
 	});
 	config.storages = storages;
 }
 
-var async = require ("async");
-var pg = require ("pg");
+let async = require ("async");
+let pg = require ("pg");
 pg.defaults.poolSize = 0;
 pg.defaults.poolIdleTimeout = 120000;
 pg.defaults.reapIntervalMillis = 60000;
-var util = require ("util");
-var fs = require ("fs");
-var http = require ("http");
-var url = require ("url");
-var	redis;
+let util = require ("util");
+let fs = require ("fs");
+let http = require ("http");
+let url = require ("url");
+let	redis;
 if (config.redis && config.redis.enabled) {
 	redis = require ("redis");
 }
-var express = require ("express");
-var formidable = require ("formidable");
-var nodemailer = require ("nodemailer");
-var simplesmtp = require ("simplesmtp");
-var smtp = simplesmtp.createServer ();
-var MailParser = require ("mailparser").MailParser;
-var VError = require ("verror");
-var Backbone = require ("backbone");
-var log;
+let express = require ("express");
+let formidable = require ("formidable");
+let nodemailer = require ("nodemailer");
+let simplesmtp = require ("simplesmtp");
+let smtp = simplesmtp.createServer ();
+let MailParser = require ("mailparser").MailParser;
+let VError = require ("verror");
+let Backbone = require ("backbone");
+let log;
 try {
 	config.log = config.log || {};
 	config.log.level = config.log.level || "info";
-	var bunyan = require ("bunyan");
+	let bunyan = require ("bunyan");
 	log = bunyan.createLogger ({
 		name: "objectum",
 		level: config.log.level || "info",
@@ -72,7 +72,7 @@ try {
 		}]
 	});
 } catch (e) {
-	var levelNum = {"fatal": 60, "error": 50, "warn": 40, "info": 30, "debug": 20, "trace": 10};
+	let levelNum = {"fatal": 60, "error": 50, "warn": 40, "info": 30, "debug": 20, "trace": 10};
 	config.log.levelNum = levelNum [config.log.level];
 	function msgLog (level, opts, msg) {
 		if (level < config.log.levelNum) {
@@ -95,10 +95,10 @@ try {
 		trace: function (opts, msg) {msgLog (10, opts, msg);}
 	};
 };
-var sql;
+let sql;
 if (process.platform == "win32") {
 	if (!config.mssql || config.mssql.enabled) {
-		var tokens = process.version.split (".");
+		let tokens = process.version.split (".");
 		if (tokens [1] <= 8 && tokens [2] <= 26) { // <= v0.8.26
 			try {
 				sql = require ("msnodesql");
@@ -107,7 +107,7 @@ if (process.platform == "win32") {
 		};
 	};
 };
-var redisEmulator = {
+let redisEmulator = {
 	m: {},
 	del: function (key, cb) {
 		delete this.m [key];
@@ -116,10 +116,10 @@ var redisEmulator = {
 		};
 	},
 	keys: function (mask, cb) {
-		var r = [];
+		let r = [];
 		if (mask && mask [mask.length - 1] == "*") {
-			var m = mask.substr (0, mask.length - 1);
-			for (var key in this.m) {
+			let m = mask.substr (0, mask.length - 1);
+			for (let key in this.m) {
 				if (key.substr (0, m.length) == m) {
 					r.push (key);
 				};
@@ -136,7 +136,7 @@ var redisEmulator = {
 	subscribe: function (channel) {
 	},
 	publish: function (channel, message) {
-		for (var i = 0; i < this.subscribers.length; i ++) {
+		for (let i = 0; i < this.subscribers.length; i ++) {
 			(this.subscribers [i]) (channel, message);
 		};
 	},
@@ -167,8 +167,8 @@ var redisEmulator = {
 		};
 	},
 	hdel: function () {
-		var key = arguments [0];
-		for (var i = 1; i < arguments.length; i ++) {
+		let key = arguments [0];
+		for (let i = 1; i < arguments.length; i ++) {
 			if (typeof (arguments [i]) != "function" && this.m [key] && this.m [key][arguments [i]]) {
 				delete this.m [key][arguments [i]];
 			};
@@ -186,7 +186,7 @@ var redisEmulator = {
 	},
 	hmset: function (key, hdata, cb) {
 		this.m [key] = this.m [key] || {};
-		for (var field in hdata) {
+		for (let field in hdata) {
 			this.m [key][field] = String (hdata [field]);
 		};
 		if (cb) {
@@ -201,8 +201,8 @@ var redisEmulator = {
 	},
 	hmget: function (key, keys, cb) {
 		this.m [key] = this.m [key] || {};
-		var r = [];
-		for (var i = 0; i < keys.length; i ++) {
+		let r = [];
+		for (let i = 0; i < keys.length; i ++) {
 			r.push (this.m [key][keys [i]]);
 		};
 		if (cb) {
@@ -210,8 +210,8 @@ var redisEmulator = {
 		};
 	},
 	hgetall: function (key, cb) {
-		var r = {};
-		for (var field in this.m [key]) {
+		let r = {};
+		for (let field in this.m [key]) {
 			r [field] = this.m [key][field];
 		};
 		if (cb) {
@@ -220,7 +220,7 @@ var redisEmulator = {
 	},
 	hsetnx: function (key, field, value, cb) {
 		this.m [key] = this.m [key] || {};
-		var r = 0;
+		let r = 0;
 		if (!this.m [key] [field]) {
 			this.m [key] [field] = value;
 			r = 1;
@@ -230,8 +230,8 @@ var redisEmulator = {
 		};
 	},
 	hkeys: function (key, cb) {
-		var r = [];
-		for (var field in this.m [key]) {
+		let r = [];
+		for (let field in this.m [key]) {
 			r.push (field);
 		};
 		if (cb) {
@@ -259,7 +259,7 @@ var redisEmulator = {
 	},
 	srem: function (key, value, cb) {
 		this.m [key] = this.m [key] || [];
-		var pos = this.m [key].indexOf (String (value));
+		let pos = this.m [key].indexOf (String (value));
 		if (pos > -1) {
 			this.m [key].splice (pos, 1);
 		};
@@ -310,6 +310,6 @@ if (!config.redis.enabled) {
 		}
 	};
 };
-var redisClient;
-var redisPub;
-var redisSub;
+let redisClient;
+let redisPub;
+let redisSub;

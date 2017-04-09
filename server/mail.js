@@ -1,23 +1,23 @@
-﻿var smtpTransport = nodemailer.createTransport ("SMTP", config.mail.smtp);
-var mailSender = {
+﻿let smtpTransport = nodemailer.createTransport ("SMTP", config.mail.smtp);
+global.mailSender = {
 	smtpTransport: {}
 };
 mailSender.send = function (options) {
-	var success = options.success;
-	var failure = options.failure;
-	var storage = options.session ? options.session.storage : null;
+	let success = options.success;
+	let failure = options.failure;
+	let storage = options.session ? options.session.storage : null;
 	if (_.has (config.mail, "enabled") && !config.mail.enabled) {
 		if (success) {
 			success ();
 		}
 		return;
 	}
-	var st = smtpTransport;
-	var dstHost = options.to.split ("@")[1];
+	let st = smtpTransport;
+	let dstHost = options.to.split ("@")[1];
 	if (storage && storage.config.smtp && storage.config.smtp.host) {
 		options.from = storage.config.smtp.sender || options.from;
 		if (!mailSender.smtpTransport [storage.code]) {
-			var smtpCfg = {
+			let smtpCfg = {
 				host: storage.config.smtp.host,
 				maxConnections: 50,
 				port: 25,
@@ -40,7 +40,7 @@ mailSender.send = function (options) {
 			options.from = config.mail.smtp [dstHost].forceSender || options.from;
 		};
 	};
-	var mailOptions = {
+	let mailOptions = {
 		from: options.from,
 		to: options.to,
 		envelope: {
@@ -69,11 +69,11 @@ mailSender.send = function (options) {
 	});
 };
 mailSender.saveFailed = function (options) {
-	var storage = options.storage;
+	let storage = options.storage;
 	if (options.sendFailed || !storage) {
 		return;
 	};
-	var l = {
+	let l = {
 		from: options.from,
 		to: options.to,
 		subject: options.subject,
@@ -91,8 +91,8 @@ mailSender.saveFailed = function (options) {
 	Отправляет неотправленные письма. Завершение после 1-й неудачной попытки.
 */
 mailSender.sendFailed = function () {
-	var storages = [];
-	for (var storageCode in projects.storagePool) {
+	let storages = [];
+	for (let storageCode in projects.storagePool) {
 		storages.push (projects.storagePool [storageCode]);
 	};
 	async.eachSeries (storages, function (storage, cb) {
@@ -101,12 +101,12 @@ mailSender.sendFailed = function () {
 			"where fsending_date is null\n" +
 			"order by fid\n"
 		, success: function (options) {
-			var r = options.result.rows;
+			let r = options.result.rows;
 			async.eachSeries (options.result.rows, function (row, cb) {
 				async.series ([
 					function (cb) {
 						try {
-							var l = JSON.parse (row.fmessage);
+							let l = JSON.parse (row.fmessage);
 							l.success = function() {
 								cb ();
 							};

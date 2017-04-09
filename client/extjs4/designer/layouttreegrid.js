@@ -3,13 +3,13 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 	alias: ["widget.$o.layouttreegrid", "widget.$layouttreegrid"],
 	cmpCode: "treegrid",
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || {
 			treegrid: {
 				id: "cmp-" + (me.layoutDesigner.counter ++)
 			}
 		};
-		var dataAttrs = me.getData ();
+		let dataAttrs = me.getData ();
 		me.items = {
 			xtype: "tabpanel",
 			items: [{
@@ -60,11 +60,11 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 					confRef: "view",
 					choose: {
 						type: "custom", fn: function () {
-							var field = this;
+							let field = this;
 							dialog.getView ({hasQuery: 1, success: function (options) {
 								field.setValue (options.id);
 								me.changeAttr ("view", options.id ? $o.getView (options.id).getFullCode () : undefined)
-								var data = me.getData ();
+								let data = me.getData ();
 								me.down ("*[name='idAttr']").getStore ().loadData (data);
 								me.down ("*[name='idAttr']").setValue (null);
 								me.down ("*[name='parent']").getStore ().loadData (data);
@@ -160,14 +160,14 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 		this.callParent (arguments);
 	},
 	getData: function () {
-		var me = this;
-		var r = [];
+		let me = this;
+		let r = [];
 		if (me.value.treegrid.view) {
-			var v = $o.getView (me.value.treegrid.view);
-			for (var attr in v.attrs) {
-				var va = v.attrs [attr];
+			let v = $o.getView (me.value.treegrid.view);
+			for (let attr in v.attrs) {
+				let va = v.attrs [attr];
 				if (va.get ("classAttr")) {
-					var ca = $o.getClassAttr (va.get ("classAttr"));
+					let ca = $o.getClassAttr (va.get ("classAttr"));
 					if (!(ca.get ("type") == 2 || ca.get ("type") == 12 || ca.get ("type") >= 1000)) {
 						continue;
 					};
@@ -178,10 +178,10 @@ Ext.define ("$o.LayoutTreegrid.Widget", {
 		return r;
 	},
 	validator: function () {
-		var me = this.up ("panel[cmpCode='treegrid']");
-		var of = me.down ("*[name='view']");
-		var idField = me.down ("*[name='idAttr']");
-		var parentField = me.down ("*[name='parent']");
+		let me = this.up ("panel[cmpCode='treegrid']");
+		let of = me.down ("*[name='view']");
+		let idField = me.down ("*[name='idAttr']");
+		let parentField = me.down ("*[name='parent']");
 		if (!idField.getValue () || !parentField.getValue () || idField.getValue () == parentField.getValue ()) {
 			me.down ("button[name='ok']").disable ();
 			return true;

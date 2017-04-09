@@ -7,7 +7,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.initCounter (me.value);
 		me.value = me.value || me.createEmpty ();
 		me.treeStore = Ext.create ('Ext.data.TreeStore', {
@@ -48,9 +48,9 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				    		iconCls: "gi_circle_plus",
 				    		name: "create",
 				    		handler: function () {
-								var cmp = me.createEmpty ();
+								let cmp = me.createEmpty ();
 								cmp.panel.title = "Закладка";
-								var tp = me.getCmp (me.selected.id);
+								let tp = me.getCmp (me.selected.id);
 								tp.tab.items.push (cmp);
 								me.addCmp (cmp.panel.id);
 				    		},
@@ -64,9 +64,9 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 								common.confirm ({message: "Вы уверены?", scope: this, fn: function (btn) {
 									if (btn == "yes") {
 										if (!me.removeTab (me.selected.id)) {
-											var cmp = me.createEmpty ();
-											var c = me.getCmp (me.selected.id);
-											for (var a in c) {
+											let cmp = me.createEmpty ();
+											let c = me.getCmp (me.selected.id);
+											for (let a in c) {
 												delete c [a];
 											};
 											Ext.apply (c, cmp);
@@ -96,8 +96,8 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				    	listeners: {
 				    		select: function (srm, record, index, eOpts) {
 				    			if (record) {
-									var id = record.get ("text").split ("(id:")[1].split (")")[0];
-									var code = me.getCmpCode (id);
+									let id = record.get ("text").split ("(id:")[1].split (")")[0];
+									let code = me.getCmpCode (id);
 									if (code != "panel") {
 					    				me.down ("button[name='edit']").enable ();
 					    				me.selected = {
@@ -151,10 +151,10 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		this.callParent (arguments);
 	},
 	edit: function () {
-		var me = this;
-		var id = me.selected.id;
-		var code = me.selected.code;
-		var win = Ext.create ("Ext.Window", {
+		let me = this;
+		let id = me.selected.id;
+		let code = me.selected.code;
+		let win = Ext.create ("Ext.Window", {
 			width: me.getCmpWidth (code),
 			height: me.getCmpHeight (code),
 		    resizeable: false,
@@ -182,15 +182,15 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		win.show ();
 	},
 	getCmpCode: function (id) {
-		var me = this;
-		var find = function (layout) {
+		let me = this;
+		let find = function (layout) {
 			if (typeof (layout) == "object") {
-				for (var a in layout) {
+				for (let a in layout) {
 					if (layout [a]) {
 						if (layout [a].id == id) {
 							return a;
 						};
-						var r = find (layout [a]);
+						let r = find (layout [a]);
 						if (r) {
 							return r;
 						};
@@ -198,8 +198,8 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				};
 			};
 			if (layout.items) {
-				for (var i = 0; i < layout.items.length; i ++) {
-					var r = find (layout.items [i]);
+				for (let i = 0; i < layout.items.length; i ++) {
+					let r = find (layout.items [i]);
 					if (r) {
 						return r;
 					};
@@ -209,15 +209,15 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		return find (me.value);
 	},
 	getCmpValue: function (id) {
-		var me = this;
-		var find = function (layout) {
+		let me = this;
+		let find = function (layout) {
 			if (typeof (layout) == "object") {
-				for (var a in layout) {
+				for (let a in layout) {
 					if (layout [a]) {
 						if (layout [a].id == id) {
 							return layout;
 						};
-						var r = find (layout [a]);
+						let r = find (layout [a]);
 						if (r) {
 							return r;
 						};
@@ -225,8 +225,8 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 				};
 			};
 			if (layout.items) {
-				for (var i = 0; i < layout.items.length; i ++) {
-					var r = find (layout.items [i]);
+				for (let i = 0; i < layout.items.length; i ++) {
+					let r = find (layout.items [i]);
 					if (r) {
 						return r;
 					};
@@ -354,17 +354,17 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		}
 	},
 	getTreeRecord: function (layout) {
-		var me = this;
+		let me = this;
 		layout = layout || me.value;
-		var code; for (code in layout) {if (code != "designer") break;};
-		var cmp = layout [code];
-		var rec = {
+		let code; for (code in layout) {if (code != "designer") break;};
+		let cmp = layout [code];
+		let rec = {
 			text: me.getCmpName (code) + (cmp.title ? (": " + cmp.title) : "") + " (id:" + cmp.id + ")"
 		};
 		if (cmp.items && code != "panel" && code != "card") {
 			rec.expanded = 0;
 			rec.children = [];
-			for (var i = 0; i < cmp.items.length; i ++) {
+			for (let i = 0; i < cmp.items.length; i ++) {
 				rec.children.push (me.getTreeRecord (cmp.items [i]));
 			};
 		} else {
@@ -373,32 +373,32 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		return rec;
 	},
 	initCounter: function (l) {
-		var me = this;
+		let me = this;
 		l = l || {};
 		me.counter = me.counter || 1;
 		if (typeof (l) == "object") {
-			for (var a in l) {
+			for (let a in l) {
 				if (l [a]) {
 					me.initCounter (l [a]);
 				};
 			};
 		};
 		if (l.items) {
-			for (var i = 0; i < l.items.length; i ++) {
+			for (let i = 0; i < l.items.length; i ++) {
 				me.initCounter (l.items [i]);
 			};
 		};
 		if (l.id) {
-			var n = l.id.split ("-");
+			let n = l.id.split ("-");
 			if (n.length > 1 && Number (n [1]) >= me.counter) {
 				me.counter = Number (n [1]) + 1;
 			};
 		};
 	},
 	createEmpty: function () {
-		var me = this;
-		var id = "cmp-" + (me.counter ++);
-		var cmp = {
+		let me = this;
+		let id = "cmp-" + (me.counter ++);
+		let cmp = {
 			panel: {
 				id: id,
 				layout: {
@@ -418,9 +418,9 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		return cmp;
 	},
 	build: function (options) {
-		var me = this;
+		let me = this;
 		options = options || {};
-		var container = me.down ("*[region='center']");
+		let container = me.down ("*[region='center']");
 		container.removeAll ();
 		container.add ({
 			xtype: "$o.layout",
@@ -442,12 +442,12 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		me.down ("codemirrortextarea[name='json']").setValue (JSON.stringify (me.value, null, "\t"));
 	},
 	selectCmp: function (options) {
-		var me = this;
-		var onClick = function () {
+		let me = this;
+		let onClick = function () {
 			options.success (this.cmpCode);
 			win.close ();
 		};
-		var win = Ext.create ("Ext.Window", {
+		let win = Ext.create ("Ext.Window", {
 			width: 560,
 			height: 100,
 		    bodyPadding: 5,
@@ -535,17 +535,17 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		win.show ();
 	},
 	getCmp: function (id) {
-		var me = this;
-		var get = function (layout) {
+		let me = this;
+		let get = function (layout) {
 			if (typeof (layout) != "object") {
 				return;
 			};
-			for (var a in layout) {
+			for (let a in layout) {
 				if (layout [a]) {
 					if (layout [a].id == id) {
 						return layout;
 					};
-					var c = get (layout [a]);
+					let c = get (layout [a]);
 					if (c) {
 						return c;
 					};
@@ -556,23 +556,23 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 	},
 	// Удаляет закладку (последнюю не удаляет)
 	removeTab: function (id) {
-		var me = this;
-		var remove = function (layout) {
+		let me = this;
+		let remove = function (layout) {
 			if (typeof (layout) != "object") {
 				return;
 			};
-			for (var a in layout) {
+			for (let a in layout) {
 				if (layout [a]) {
 					if (a == "tab" && layout [a].items.length > 1) {
-						for (var i = 0; i < layout [a].items.length; i ++) {
-							var code; for (code in layout [a].items [i]) {break;};
+						for (let i = 0; i < layout [a].items.length; i ++) {
+							let code; for (code in layout [a].items [i]) {break;};
 							if (layout [a].items [i][code].id == id) {
 								layout [a].items.splice (i, 1);
 								return 1;
 							};
 						};
 					};
-					var i = remove (layout [a]);
+					let i = remove (layout [a]);
 					if (i) {
 						return i;
 					};
@@ -582,12 +582,12 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		return remove (me.value);
 	},
 	replaceCmp: function (id, cmpNew) {
-		var me = this;
-		var replace = function (layout) {
+		let me = this;
+		let replace = function (layout) {
 			if (typeof (layout) != "object") {
 				return;
 			};
-			for (var a in layout) {
+			for (let a in layout) {
 				if (layout [a]) {
 					if (layout [a].id == id && ["split", "tab", "olap", "treegrid", "card", "cardConf", "chart", "image", "frame", "panel"].indexOf (a) > -1) {
 						delete layout [a];
@@ -601,10 +601,10 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		replace (me.value);
 	},
 	addCmp: function (id) {
-		var me = this;
+		let me = this;
 		me.addCmpActive = 1;
 		me.selectCmp ({success: function (code) {
-			var win = Ext.create ("Ext.Window", {
+			let win = Ext.create ("Ext.Window", {
 				width: me.getCmpWidth (code),
 				height: me.getCmpHeight (code), 
 			    resizeable: false,
@@ -633,12 +633,12 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		}});
 	},
 	getValue: function () {
-		var me = this;
-		var v = me.down ("codemirrortextarea[name='json']").getValue ();
+		let me = this;
+		let v = me.down ("codemirrortextarea[name='json']").getValue ();
 		return v;
 	},
 	setValue: function (value) {
-		var me = this;
+		let me = this;
 		if (!value) {
 			me.counter = 1;
 			value = me.createEmpty ();
@@ -651,7 +651,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 					throw "invalid";
 				};
 			} catch (e) {
-				var container = me.down ("*[region='center']");
+				let container = me.down ("*[region='center']");
 				container.removeAll ();
 				container.add ({
 					layout: {
@@ -682,7 +682,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		me.down ("button[name='prevValue']").disable ();
 	},
 	setReadOnly: function (ro) {
-		var me = this;
+		let me = this;
 		/*
 		if (ro) {
 			me.disable ();
@@ -700,23 +700,23 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		}
 	*/
 	updateLayoutTags: function (l) {
-		var me = this;
-		var noCls = null;
-		var process = function (layout) {
+		let me = this;
+		let noCls = null;
+		let process = function (layout) {
 			if (typeof (layout) == "object") {
-				for (var a in layout) {
+				for (let a in layout) {
 					if (layout [a]) {
 						if (a == "card" && layout [a].object) {
 							layout [a].readOnly = 1;
-							var id = {};
-							var tags = layout [a].object.length ? layout [a].object : [layout [a].object];
-							for (var j = 0; j < tags.length; j ++) {
-								var o = $o.createObject (tags [j].cls, "local");
+							let id = {};
+							let tags = layout [a].object.length ? layout [a].object : [layout [a].object];
+							for (let j = 0; j < tags.length; j ++) {
+								let o = $o.createObject (tags [j].cls, "local");
 								id [tags [j].tag] = o.get ("id");
 							};
 							function processItems (items) {
-								for (var i = 0; i < items.length; i ++) {
-									var item = items [i];
+								for (let i = 0; i < items.length; i ++) {
+									let item = items [i];
 									if (item.objectId && item.objectId.substr && item.objectId.substr (0, 2) == "[#") {
 										if (id [item.objectId]) {
 											item.objectId = id [item.objectId];
@@ -736,7 +736,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 						} else
 						/*
 						if (Ext.isArray (layout [a])) {
-							for (var i = 0; i < layout [a].length; i ++) {
+							for (let i = 0; i < layout [a].length; i ++) {
 								if (layout [a][i] && layout [a][i].substr && layout [a][i].substr (0, 2) == "[#") {
 									layout [a][i] = 0;
 								};
@@ -753,7 +753,7 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 					};
 				};
 				if (layout.items) {
-					for (var i = 0; i < layout.items.length; i ++) {
+					for (let i = 0; i < layout.items.length; i ++) {
 						process (layout.items [i]);
 					};
 				};
@@ -766,9 +766,9 @@ Ext.define ("$o.LayoutDesigner.Widget", {
 		return l;
 	},
 	setHandlers: function () {
-		var me = this;
-		var buttons = me.query ("button[name='selectCmp']");
-		for (var i = 0; i < buttons.length; i ++) {
+		let me = this;
+		let buttons = me.query ("button[name='selectCmp']");
+		for (let i = 0; i < buttons.length; i ++) {
 			buttons [i].on ("click", function () {
 				if (!me.addCmpActive) {
 					me.addCmp (this.cmpId);

@@ -4,8 +4,8 @@
 Ext.define ("$o.app.view", {
 	singleton: true,
 	getItems: function (record) {
-		var me = this;
-		var items = {
+		let me = this;
+		let items = {
 			id: "e" + record.get ("id"),
 			xtype: "tabpanel",
 			title: record.get ("name") || record.get ("code"),
@@ -53,7 +53,7 @@ Ext.define ("$o.app.view", {
 		return items;
 	},
 	saveCommon: function () {
-		var me = this;
+		let me = this;
 		console.log (me);
 	}
 });

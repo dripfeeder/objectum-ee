@@ -62,7 +62,7 @@ var currentTimestamp = function () {
 };
 var start = function (config) {
 	config = config.config || config;
-	var $o = new (require (__dirname + "/objectum-debug").Objectum)(config);
+	var $o = new (require (__dirname + "/server/index").Objectum)(config);
 	$o.server.init ({objectum: $o, success: function () {
 		$o.server.start ({port: $o.config.startPort});
 	}});
@@ -89,7 +89,7 @@ var startMaster = function (config) {
 };
 var startCluster = function (config) {
 	config = config.config || config;
-	var $o = new (require (__dirname + "/objectum-debug").Objectum)(config);
+	var $o = new (require (__dirname + "/server/index").Objectum)(config);
 	cluster.setupMaster ({
 	    exec: __dirname + "/ocluster.js"
 	});
@@ -160,7 +160,7 @@ module.exports = {
 	start: start,
 	startMaster: startMaster,
 	startCluster: startCluster,
-	Objectum: require (__dirname + "/objectum-debug").Objectum
+	Objectum: require (__dirname + "/server/index").Objectum
 };
 try {
 	if (process.argv [1].indexOf (__dirname) > -1) {

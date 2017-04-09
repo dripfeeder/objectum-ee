@@ -16,12 +16,12 @@ Ext.define ("$o.Tree.Widget", {
 	scroll: true,
 	layout: "anchor",
   	initComponent: function () {		
-		var me= this;
-		var view = me.$view = me.queryId ? $o.viewsMap [me.queryId] : $o.getView ({code: me.$query});
-		var viewId = me.viewId = view.get ("id");
-		var query = view.get ("query");
+		let me= this;
+		let view = me.$view = me.queryId ? $o.viewsMap [me.queryId] : $o.getView ({code: me.$query});
+		let viewId = me.viewId = view.get ("id");
+		let query = view.get ("query");
 		delete me.query;
-		var fields = me.createViewModel ({view: view});
+		let fields = me.createViewModel ({view: view});
 		Ext.define ("$o.View." + viewId + ".Model", {
 			extend: "Ext.data.Model",
 			fields: fields
@@ -29,9 +29,9 @@ Ext.define ("$o.Tree.Widget", {
 		me.columns = [];
 	    // Открытые узлы (id)
 	    me.$opened = [];
-		for (var i = 0; i < fields.length; i ++) {
-			var f = fields [i];
-			var column = {
+		for (let i = 0; i < fields.length; i ++) {
+			let f = fields [i];
+			let column = {
 				text: $o.getString (f.header),
 				tooltip: $o.getString (f.header),
 				dataIndex: f.name,
@@ -141,10 +141,10 @@ Ext.define ("$o.Tree.Widget", {
 		this.$opened.splice (this.$opened.indexOf (rec.get (this.fields.id)), 1)
 	},
 	refresh: function (options) {
-		var me = this;
+		let me = this;
 		options = options || {};
-		var callback = options.callback;
-		var record;
+		let callback = options.callback;
+		let record;
 		if (me.getSelectionModel ().hasSelection ()) {
 			record = me.getSelectionModel ().getSelection ();
 			record = record [0];
@@ -154,8 +154,8 @@ Ext.define ("$o.Tree.Widget", {
 //				me.store.load (Ext.apply (options, {callback: function () {
 				me.store.load ({callback: function () {
 					if (record && me.getRootNode ().findChild (me.fields.id, record.get (me.fields.id))) {
-						for (var i = 0; i < me.records.length; i ++) {
-							var rec = me.records [i];
+						for (let i = 0; i < me.records.length; i ++) {
+							let rec = me.records [i];
 							if (rec.get (me.fields.id) == record.get (me.fields.id)) {
 								me.getSelectionModel ().deselectAll ();
 								me.getSelectionModel ().select (rec);
@@ -175,15 +175,15 @@ Ext.define ("$o.Tree.Widget", {
 		};
 	},
 	loadListener: function (treeStore, node, records, successful, eOpts) {
-		var me = this;
+		let me = this;
 		me.records = me.records || [];
-		var fieldId = me.fields.id;
-		var process = function (records) {
-			for (var i = 0; i < records.length; i ++) {
-				var rec1 = records [i];
-				var has = false;
-				for (var j = 0; j < me.records.length; j ++) {
-					var rec2 = me.records [j];
+		let fieldId = me.fields.id;
+		let process = function (records) {
+			for (let i = 0; i < records.length; i ++) {
+				let rec1 = records [i];
+				let has = false;
+				for (let j = 0; j < me.records.length; j ++) {
+					let rec2 = me.records [j];
 					if (rec1.get (fieldId) == rec2.get (fieldId)) {
 						me.records [j] = rec1;
 						has = true;
@@ -202,11 +202,11 @@ Ext.define ("$o.Tree.Widget", {
 	},
 	// {filter: ["&id", "=", id]}
 	selectRow: function (options) {
-		var me = this;
+		let me = this;
 		if (options.filter) {
-			var id = options.filter [2];
-			for (var i = 0; i < me.records.length; i ++) {
-				var rec = me.records [i];
+			let id = options.filter [2];
+			for (let i = 0; i < me.records.length; i ++) {
+				let rec = me.records [i];
 				if (rec.get (me.fields.id) == id) {
 					me.getSelectionModel ().deselectAll ();
 					me.getSelectionModel ().select (rec);

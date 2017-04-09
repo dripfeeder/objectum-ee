@@ -7,7 +7,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.store = new Ext.data.ArrayStore ({
 			fields: ["id", "text"],
 			data: []
@@ -39,7 +39,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 								confRef: "class",
 								choose: {
 									type: "custom", fn: function () {
-										var objectfield = this;
+										let objectfield = this;
 										dialog.getClass ({success: function (options) {
 											objectfield.setValue (options.id);
 										}});
@@ -106,7 +106,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 							name: "attrs",
 					    	listeners: {
 					    		change: function (value) {
-									var v = me.decodeQuery ();
+									let v = me.decodeQuery ();
 									if (!v) {
 										return;
 									};
@@ -152,7 +152,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 							    	xtype: "$querysort",
 							    	listeners: {
 							    		change: function (value) {
-											var v = me.decodeQuery ();
+											let v = me.decodeQuery ();
 											if (!v) {
 												return;
 											};
@@ -181,10 +181,10 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		this.callParent (arguments);
 	},
 	decodeQuery: function () {
-		var me = this;
-		var container = me.down ("*[name=constructor]");
+		let me = this;
+		let container = me.down ("*[name=constructor]");
 		container.getEl ().unmask (true);
-		var v = me.down ("codemirrortextarea[name='json']").getValue ();
+		let v = me.down ("codemirrortextarea[name='json']").getValue ();
 		try {
 			v = JSON.parse (v);
 			return v;
@@ -194,33 +194,33 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		};
 	},
 	updateFrom: function () {
-		var me = this;
+		let me = this;
 		// class
-		var selectedClass = me.down ("*[name=class]").getValue ();
+		let selectedClass = me.down ("*[name=class]").getValue ();
 		if (!selectedClass) {
 			return;
 		};
-		var selectedClassCode = $o.getClass (selectedClass).getFullCode ();
-		var v = me.decodeQuery ();
+		let selectedClassCode = $o.getClass (selectedClass).getFullCode ();
+		let v = me.decodeQuery ();
 		if (!v) {
 			return;
 		};
 		v.from = [{"a": selectedClassCode}];
 		// classes
-		var sc = me.down ("*[name=classes]").query ("panel");
-		for (var i = 0; i < sc.length; i ++) {
-			var n = sc [i].n;
-			var clsId = me.down ("*[name=class_" + n + "]").getValue ();
-			var attr1 = me.down ("*[name=attr1_" + n + "]").getValue ();
-			var attr2 = me.down ("*[name=attr2_" + n + "]").getValue ();
-			var join = me.down ("*[name=join_" + n + "]").getValue ();
+		let sc = me.down ("*[name=classes]").query ("panel");
+		for (let i = 0; i < sc.length; i ++) {
+			let n = sc [i].n;
+			let clsId = me.down ("*[name=class_" + n + "]").getValue ();
+			let attr1 = me.down ("*[name=attr1_" + n + "]").getValue ();
+			let attr2 = me.down ("*[name=attr2_" + n + "]").getValue ();
+			let join = me.down ("*[name=join_" + n + "]").getValue ();
 			if (clsId && attr1 && attr2 && join) {
-				var cls = {};
+				let cls = {};
 				cls [n] = $o.getClass (clsId).getFullCode ();
 				v.from = v.from.concat (join, cls, "on");
-				var a1 = {};
+				let a1 = {};
 				a1 [attr1.split (":")[0]] = attr1.split (":")[1];
-				var a2 = {};
+				let a2 = {};
 				a2 [attr2.split (":")[0]] = attr2.split (":")[1];
 				v.from.push ([a1, "=", a2]);
 			};
@@ -231,14 +231,14 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		if (typeof (n) == "object") {
 			n = null;
 		};
-		var me = this;
-		var classes = me.down ("*[name=classes]");
+		let me = this;
+		let classes = me.down ("*[name=classes]");
 		if (!n) {
-			var panels = classes.query ("panel");
-			var aliases = "abcdefghijklmnopqrstuvwxyz";
-			for (var i = 0; i < aliases.length; i ++) {
-				var has = 0;
-				for (var j = 0; j < panels.length; j ++) {
+			let panels = classes.query ("panel");
+			let aliases = "abcdefghijklmnopqrstuvwxyz";
+			for (let i = 0; i < aliases.length; i ++) {
+				let has = 0;
+				for (let j = 0; j < panels.length; j ++) {
 					if (panels [j].n == aliases [i]) {
 						has = 1;
 						break;
@@ -281,17 +281,17 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				listeners: {
 					change: function () {
 						me.updateAttrsStore ();
-						var attr1 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Attribute") + " 1']");
-						var attr2 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Attribute") + " 2']");
+						let attr1 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Attribute") + " 1']");
+						let attr2 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Attribute") + " 2']");
 						if (!attr1.getValue () && !attr2.getValue ()) {
-							var cls1 = me.down ("*[name=class]").getValue ();
-							var cls2 = this.getValue ();
+							let cls1 = me.down ("*[name=class]").getValue ();
+							let cls2 = this.getValue ();
 							if (cls1 && cls2) {
-								var attrs1 = $o.getClass (cls1).attrs;
-								var alias1 = me.down ("*[name=alias]").getValue ();
-								var alias2 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Alias") + "']").getValue ();
-								for (var attr in attrs1) {
-									var ca = attrs1 [attr];
+								let attrs1 = $o.getClass (cls1).attrs;
+								let alias1 = me.down ("*[name=alias]").getValue ();
+								let alias2 = this.up ("*").down ("*[fieldLabel='" + $o.getString ("Alias") + "']").getValue ();
+								for (let attr in attrs1) {
+									let ca = attrs1 [attr];
 									if (ca.get ("type") == cls2) {
 										attr1.setValue (alias1 + ":" + attr);
 										attr2.setValue (alias2 + ":id");
@@ -382,7 +382,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				iconCls: "gi_circle_minus",
 				style: "margin-top: 5px",
 				handler: function () {
-					var p = this.up ("panel");
+					let p = this.up ("panel");
 					classes.remove (p);
 					classes.doLayout ();
 					me.updateAttrsStore ();
@@ -396,8 +396,8 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		classes.doLayout ();
 	},
 	updateFilter: function (value) {
-		var me = this;
-		var v = me.decodeQuery ();
+		let me = this;
+		let v = me.decodeQuery ();
 		if (!v) {
 			return;
 		};
@@ -405,25 +405,25 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		me.down ("codemirrortextarea[name='json']").setValue (JSON.stringify (v, null, "\t"));
 	},
 	updateClasses: function () {
-		var me = this;
-		var classArr = [], classAliases = {}, aliases = [];
+		let me = this;
+		let classArr = [], classAliases = {}, aliases = [];
 		function setAlias (clsId, alias) {
 			classAliases [clsId] = alias;
-			var cls = $o.getClass (clsId);
+			let cls = $o.getClass (clsId);
 			if (cls.get ("parent")) {
 				setAlias (cls.get ("parent"), alias);
 			};
 		};
-		var clsId = me.down ("*[name=class]").getValue (), cls;
+		let clsId = me.down ("*[name=class]").getValue (), cls;
 		if (clsId) {
 			classArr.push (clsId);
 			setAlias (clsId, me.down ("*[name=alias]").getValue ());
 			aliases.push (me.down ("*[name=alias]").getValue ());
 		};
-		var classes = me.down ("*[name=classes]").query ("panel");
-		for (var i = 0; i < classes.length; i ++) {
-			var clsId = me.down ("*[name=class_" + classes [i].n + "]").getValue ();
-			var alias = me.down ("*[name=alias_" + classes [i].n + "]").getValue ();
+		let classes = me.down ("*[name=classes]").query ("panel");
+		for (let i = 0; i < classes.length; i ++) {
+			let clsId = me.down ("*[name=class_" + classes [i].n + "]").getValue ();
+			let alias = me.down ("*[name=alias_" + classes [i].n + "]").getValue ();
 			if (clsId) {
 				classArr.push (clsId);
 				setAlias (clsId, alias);
@@ -435,10 +435,10 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		me.down ("*[name=sort]").setClasses (classArr, classAliases, aliases);
 	},
 	validator: function () {
-		var me = this;
+		let me = this;
 	},
 	clear: function () {
-		var me = this;
+		let me = this;
 		me.down ("*[name=class]").setValue (null);
 		me.down ("*[name=classes]").removeAll ();
 		me.down ("*[name=attrs]").setValue (null);
@@ -446,27 +446,27 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		me.down ("*[name=sort]").setValue (null);
 	},
 	buildForm: function (v) {
-		var me = this;
+		let me = this;
 		v = v || {};
 		me.down ("*[name=alias]").setValue ("a");
 		if (v.from && v.from.length) {
-			var clsCode; for (clsCode in v.from [0]) {break;};
+			let clsCode; for (clsCode in v.from [0]) {break;};
 			me.down ("*[name=alias]").setValue (clsCode);
 			clsCode = v.from [0][clsCode];
-			var cls = $o.getClass (clsCode);
+			let cls = $o.getClass (clsCode);
 			me.down ("*[name=class]").setValue (cls.get ("id"));
-			for (var i = 1; i < v.from.length; i += 4) {
-				var alias; for (alias in v.from [i + 1]) {break;};
-				var n = alias;
+			for (let i = 1; i < v.from.length; i += 4) {
+				let alias; for (alias in v.from [i + 1]) {break;};
+				let n = alias;
 				me.addClass (n);
-				var clsAdd = $o.getClass (v.from [i + 1][alias]);
+				let clsAdd = $o.getClass (v.from [i + 1][alias]);
 				me.down ("*[name=class_" + n + "]").setValue (clsAdd.get ("id"));
-				var attr1 = v.from [i + 3][0];
+				let attr1 = v.from [i + 3][0];
 				for (alias in attr1) {
 					me.down ("*[name=attr1_" + n + "]").setValue (alias + ":" + attr1 [alias]);
 					break;
 				};
-				var attr2 = v.from [i + 3][2];
+				let attr2 = v.from [i + 3][2];
 				for (alias in attr2) {
 					me.down ("*[name=attr2_" + n + "]").setValue (alias + ":" + attr2 [alias]);
 					break;
@@ -489,20 +489,20 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		};
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		return me.down ("codemirrortextarea[name='json']").getValue ();
 	},
 	updateAliases: function (v) {
 		if (!v) {
 			return;
 		};
-		var me = this;
-		var aliases = {}, alias;
+		let me = this;
+		let aliases = {}, alias;
 		if (v.from) {
 			for (alias in v.from [0]) {break;};
 			aliases [alias] = "a";
-			var n = 1;
-			for (var i = 1; i < v.from.length; i += 4) {
+			let n = 1;
+			for (let i = 1; i < v.from.length; i += 4) {
 				for (alias in v.from [i + 1]) {break;};
 				aliases [alias] = "c" + n;
 				n ++;
@@ -512,7 +512,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 					return;
 				};
 				if (Ext.isArray (o)) {
-					for (var i = 0; i < o.length; i ++) {
+					for (let i = 0; i < o.length; i ++) {
 						update (o [i]);
 					};
 				} else
@@ -531,15 +531,15 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		};
 	},
 	setValue: function (value) {
-		var me = this;
-		var container = me.down ("*[name=constructor]");
+		let me = this;
+		let container = me.down ("*[name=constructor]");
 		container.getEl ().unmask (true);
 		if (!value) {
 			value = {
 				designer: 1
 			};
 		};
-		var text = typeof (value) == "object" ? JSON.stringify (value, null, "\t") : value;
+		let text = typeof (value) == "object" ? JSON.stringify (value, null, "\t") : value;
 		me.down ("codemirrortextarea[name='json']").setValue (text);
 		if (typeof (value) == "string") {
 			try {
@@ -559,7 +559,7 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		me.down ("codemirrortextarea[name='json']").setValue (text);
 	},
 	setReadOnly: function (ro) {
-		var me = this;
+		let me = this;
 		/*
 		if (ro) {
 			me.disable ();
@@ -570,16 +570,16 @@ Ext.define ("$o.QueryDesigner.Widget", {
 		*/
 	},
 	updateAttrsStore: function () {
-		var me = this;
-		var data = [];
-		var classes = me.query ("*[confRef=class]");
-		var aliases = [me.down ("*[name=alias]")].concat (me.query ("*[fieldLabel=" + $o.getString ("Alias") + "]"));
-		for (var i = 0; i < classes.length; i ++) {
+		let me = this;
+		let data = [];
+		let classes = me.query ("*[confRef=class]");
+		let aliases = [me.down ("*[name=alias]")].concat (me.query ("*[fieldLabel=" + $o.getString ("Alias") + "]"));
+		for (let i = 0; i < classes.length; i ++) {
 			if (!classes [i].getValue () || !aliases [i].getValue ()) {
 				continue;
 			};
-			var alias;
-			for (var j = 0; j < aliases.length; j ++) {
+			let alias;
+			for (let j = 0; j < aliases.length; j ++) {
 				if ((classes [i].name.split ("_") == 1 && aliases [j].name.split ("_") == 1) ||
 					(classes [i].name.split ("_")[1] == aliases [j].name.split ("_")[1])
 				) {
@@ -588,10 +588,10 @@ Ext.define ("$o.QueryDesigner.Widget", {
 				};
 			};
 			data.push ([alias + ":id", alias + ":id"]);
-			var clsId = classes [i].getValue ();
-			var cls = $o.getClass (clsId);
-			for (var attr in cls.attrs) {
-				var ca = cls.attrs [attr];
+			let clsId = classes [i].getValue ();
+			let cls = $o.getClass (clsId);
+			for (let attr in cls.attrs) {
+				let ca = cls.attrs [attr];
 				if (ca.get ("type") == 2 || ca.get ("type") == 12 || ca.get ("type") >= 1000) {
 					data.push ([alias + ":" + attr, alias + ":" + ca.toString ()]);
 				};

@@ -6,7 +6,7 @@
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.tbar = [{
 			text: "Ок",
 			name: "ok",
@@ -25,8 +25,8 @@
 			name: "make_split",
 			iconCls: "gi_share_alt",
 			handler: function () {
-				var ta = me.down ("codemirrortextarea[name='json']");
-				var cmp = {
+				let ta = me.down ("codemirrortextarea[name='json']");
+				let cmp = {
 					split: {
 						id: "cmp-" + (me.layoutDesigner.counter ++),
 						orientation: "horizontal",
@@ -43,10 +43,10 @@
 			name: "make_tab",
 			iconCls: "gi_bookmark",
 			handler: function () {
-				var ta = me.down ("codemirrortextarea[name='json']");
-				var tabCmp = JSON.parse (ta.getValue ());
+				let ta = me.down ("codemirrortextarea[name='json']");
+				let tabCmp = JSON.parse (ta.getValue ());
 				tabCmp [me.cmpCode].title = tabCmp [me.cmpCode].title || "Закладка";
-				var cmp = {
+				let cmp = {
 					tab: {
 						id: "cmp-" + (me.layoutDesigner.counter ++),
 						items: [tabCmp]
@@ -61,13 +61,13 @@
 		this.callParent (arguments);
 	},
 	changeAttr: function (attr, value) {
-		var me = this;
-		var ta = me.down ("codemirrortextarea[name='json']");
-		var cmp = ta.getValue ();
+		let me = this;
+		let ta = me.down ("codemirrortextarea[name='json']");
+		let cmp = ta.getValue ();
 		cmp = JSON.parse (cmp);
-		var tokens = attr.split (".");
-		var root = cmp [me.cmpCode];
-		for (var i = 0; i < tokens.length; i ++) {
+		let tokens = attr.split (".");
+		let root = cmp [me.cmpCode];
+		for (let i = 0; i < tokens.length; i ++) {
 			root [tokens [i]] = root [tokens [i]] || {};
 			if (i == tokens.length - 1) {
 				root [tokens [i]] = value;
@@ -85,11 +85,11 @@
 		ta.setValue (JSON.stringify (cmp, null, "\t"));
 	},
 	save: function (options) {
-		var me = this;
+		let me = this;
 		me.fireEvent ("beforesave", options);
-		var ta = me.down ("codemirrortextarea[name='json']");
+		let ta = me.down ("codemirrortextarea[name='json']");
 //		try {
-			var value = JSON.parse (ta.getValue ());
+			let value = JSON.parse (ta.getValue ());
 			me.value = value;
 			me.fireEvent ("aftersave", value);
 			me.fireEvent ("change", value);
@@ -98,7 +98,7 @@
 //		};
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		return me.value;
 	}
 });

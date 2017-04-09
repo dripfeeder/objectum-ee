@@ -7,12 +7,12 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || [];
 		if (!me.classMode) {
 			me.$view = $o.getView (me.$viewId);
 		};
-		var grid = me.getItems ();
+		let grid = me.getItems ();
 		grid.width = "100%";
 		grid.flex = 1;
 		me.items = grid;
@@ -37,22 +37,22 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		this.callParent (arguments);
 	},
 	build: function () {
-		var me = this;
-		var items = me.getItems ();
+		let me = this;
+		let items = me.getItems ();
 		me.removeAll ();
 		me.add (items);
 		me.doLayout ();
 	},
 	createCondition: function () {
-		var me = this;
-		var conditionType = "$o.layoutcondition"
+		let me = this;
+		let conditionType = "$o.layoutcondition"
 		if (me.classMode) {
 			conditionType = "$o.querycondition"; 
 		};
 		if (me.reportMode) {
 			conditionType = "$o.reportcondition"; 
 		};
-		var win = Ext.create ("Ext.Window", {
+		let win = Ext.create ("Ext.Window", {
 			width: 600,
 			height: 400,
 			layout: "fit",
@@ -87,14 +87,14 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		win.show ();
 	},
 	getItems: function () {
-		var me = this;
-		var data = [];
+		let me = this;
+		let data = [];
 		function getConditions (arr, n) {
-			for (var i = 0; i < arr.length; i ++) {
-				var npp = (n ? n : "") + (i + 1) + ".";
-				var space = "";
+			for (let i = 0; i < arr.length; i ++) {
+				let npp = (n ? n : "") + (i + 1) + ".";
+				let space = "";
 				if (npp.split (".").length > 2) {
-					for (var j = 0; j < npp.length; j ++) {
+					for (let j = 0; j < npp.length; j ++) {
 						space += "_";
 					};
 				};
@@ -126,7 +126,7 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		if (me.value) {
 			getConditions (me.value);
 		};
-	    var store = Ext.create ("Ext.data.Store", {
+	    let store = Ext.create ("Ext.data.Store", {
 	        data: data,
 	        fields: [{
 	        	name: "attr", type: "string"
@@ -136,7 +136,7 @@ Ext.define ("$o.LayoutFilter.Widget", {
 	        	name: "value", type: "string"
 	        }]
 	    });
-		var grid = Ext.create ("Ext.grid.Panel", {
+		let grid = Ext.create ("Ext.grid.Panel", {
 			store: store,
 			columns: [{
 				header: $o.getString ("Attribute"), width: 100, dataIndex: "attr", renderer: me.cellRenderer
@@ -152,8 +152,8 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		return grid;
 	},
 	getAttrName: function (attr, viewCode) {
-		var me = this;
-		var r = attr;
+		let me = this;
+		let r = attr;
 		if (viewCode && $o.getView (viewCode).attrs [attr]) {
 			r = $o.getView (viewCode).attrs [attr].toString ();
 		} else
@@ -161,10 +161,10 @@ Ext.define ("$o.LayoutFilter.Widget", {
 			r = me.$view.attrs [attr].toString ();
 		} else
 		if (me.classMode && typeof (attr) == "object") {
-			var clsId, alias; for (alias in attr) {break;};
-			for (var i = 0; i < me.$aliases.length; i ++) {
+			let clsId, alias; for (alias in attr) {break;};
+			for (let i = 0; i < me.$aliases.length; i ++) {
 				if (me.$aliases [i] == alias) {
-					var cls = $o.getClass (me.$classes [i]);
+					let cls = $o.getClass (me.$classes [i]);
 					if (cls.attrs [attr [alias]]) {
 						r = alias + ":" + cls.attrs [attr [alias]].toString ();
 						break;
@@ -175,7 +175,7 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		return r;
 	},
 	getOperName: function (oper) {
-		var o = {};
+		let o = {};
 		o ["="] = $o.getString ("equal") + " (=)";
 		o ["<>"] = $o.getString ("not equal") + " (<>)";
 		o ["<"] = $o.getString ("less") + " (<)";
@@ -188,7 +188,7 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		return o [oper];
 	},
 	getValueName: function (v) {
-		var me = this;
+		let me = this;
 		if (Ext.isArray (v)) {
 			return v.join (", ");
 		} else
@@ -196,9 +196,9 @@ Ext.define ("$o.LayoutFilter.Widget", {
 			if (me.classMode) {
 				return me.getAttrName (v);
 			} else {
-				var cmp = me.layoutDesigner.getCmp (v.id);
-				var cmpCode = me.layoutDesigner.getCmpCode (v.id);
-				var otherView = cmp [cmpCode].view;
+				let cmp = me.layoutDesigner.getCmp (v.id);
+				let cmpCode = me.layoutDesigner.getCmpCode (v.id);
+				let otherView = cmp [cmpCode].view;
 				return me.getAttrName (v.attr, otherView);
 			};
 		} else {
@@ -207,7 +207,7 @@ Ext.define ("$o.LayoutFilter.Widget", {
 	},
 	cellRenderer: function (value, metaData, record, rowIndex, colIndex, store) {
 		if (value) {
-			var tip = value;
+			let tip = value;
 			if (typeof (tip) == "string") {
 				tip = tip.split ('"').join ("'");
 			}
@@ -216,27 +216,27 @@ Ext.define ("$o.LayoutFilter.Widget", {
 		return value;
 	},
 	setValue: function (value) {
-		var me = this;
+		let me = this;
 		me.value = value;
 		me.build ();
 	},
 	setViewId: function (id) {
-		var me = this;
+		let me = this;
 		me.$viewId = id;
 		me.$view = $o.getView (me.$viewId);
 	},
 	setCmpId: function (id) {
-		var me = this;
+		let me = this;
 		me.$cmpId = id;
 	},
 	setClasses: function (classes, classAliases, aliases) {
-		var me = this;
+		let me = this;
 		me.$classes = classes;
 		me.$classAliases = classAliases;
 		me.$aliases = aliases;
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		return me.value;
 	}
 });

@@ -1,7 +1,7 @@
 /*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
-var projects = {};
+global.projects = {};
 projects.init = function (options) {
 	redisClient = redis.createClient (config.redis.port, config.redis.host);
 	redisPub = redis.createClient (config.redis.port, config.redis.host);
@@ -23,7 +23,7 @@ projects.init = function (options) {
 	], function (err) {
 		redisSub.on ("message", function (channel, message) {
 			if (channel == config.redis.db + "-storages") {
-				var r = JSON.parse (message);
+				let r = JSON.parse (message);
 				if (r.free && projects.storagePool) {
 					projects.storagePool [r.free].freeResources ();
 					delete projects.storagePool [r.free];
@@ -35,8 +35,8 @@ projects.init = function (options) {
 				};
 			};
 			if (channel == config.redis.db + "-sessions") {
-				var r = JSON.parse (message);
-				var session = projects.sessions [r.removed];
+				let r = JSON.parse (message);
+				let session = projects.sessions [r.removed];
 				if (session && session.storage) {
 					session.storage.rollbackTransaction ({session: session});
 				};
@@ -45,13 +45,13 @@ projects.init = function (options) {
 				};
 			};
 			if (channel == config.redis.db + "-connections") {
-				var r = JSON.parse (message);
+				let r = JSON.parse (message);
 				if (r.terminate) {
-					for (var storageCode in projects.storagePool) {
-						var storage = projects.storagePool [storageCode];
-						var has = 0;
-						for (var sid in storage.clientPool) {
-							var client = storage.clientPool [sid];
+					for (let storageCode in projects.storagePool) {
+						let storage = projects.storagePool [storageCode];
+						let has = 0;
+						for (let sid in storage.clientPool) {
+							let client = storage.clientPool [sid];
 							if (client.pid == r.terminate) {
 								has = 1;
 								log.info ({cls: "connections"}, "connections disconnect " + r.terminate);
@@ -76,9 +76,9 @@ projects.init = function (options) {
 	});
 };
 projects.loadConfig = function (options) {
-	var storageCode = options.code;
-	var success = options.success;
-	var failure = options.failure;
+	let storageCode = options.code;
+	let success = options.success;
+	let failure = options.failure;
 	if (!config.storages.hasOwnProperty (storageCode) && config.projectsDir) {
 		fs.readFile (config.projectsDir + "/" + storageCode + "/config.json", function (err, data) {
 			if (err) {
@@ -99,21 +99,21 @@ projects.loadConfig = function (options) {
 	};
 };
 projects.getHandler = function (request, response, next) {
-	var tokens = request.url.split ("/");
+	let tokens = request.url.split ("/");
 	if (tokens.length == 3) {
 		tokens.push ("");
 		response.redirect (tokens.join ("/"));
 		return;
 	};
-	var storageCode = tokens [2];
-	var pathname = "/" + tokens.slice (3).join ("/");
+	let storageCode = tokens [2];
+	let pathname = "/" + tokens.slice (3).join ("/");
 	if (pathname == "/") {
 		pathname = "/index.html";
 	}
 	pathname = pathname.split ("?")[0];
 	projects.loadConfig ({
 		code: storageCode, success: function () {
-			var filePath = config.storages [storageCode].rootDir + pathname;
+			let filePath = config.storages [storageCode].rootDir + pathname;
 			server.www ({request: request, response: response, next: next, filePath: filePath, nocache: pathname.substr (0, 6) == "/files"});
 		}, failure: function (err) {
 			response.end ("unknown url: " + request.url);
@@ -122,8 +122,8 @@ projects.getHandler = function (request, response, next) {
 };
 projects.startProjectPlugins = function (options) {
 	options = options || {};
-	var success = options.success;
-	var storage = options.storage;
+	let success = options.success;
+	let storage = options.storage;
 	async.series ([
 		function (cb) {
 			if (config.storages [storage.code].pluginStarted || config.storages [storage.code].disablePlugins) {
@@ -131,10 +131,10 @@ projects.startProjectPlugins = function (options) {
 				return;
 			};
 			config.storages [storage.code].pluginStarted = 1;
-			var pluginsFile = config.storages [storage.code].rootDir + "/plugins/plugins.js"
+			let pluginsFile = config.storages [storage.code].rootDir + "/plugins/plugins.js"
 			fs.exists (pluginsFile, function (exists) {
 				if (exists) {
-					var m = require (pluginsFile);
+					let m = require (pluginsFile);
 					async.series ([
 						function (cb) {
 							if (m.init && server.objectum) {
@@ -170,11 +170,11 @@ projects.startProjectPlugins = function (options) {
 projects.storagePool = {};
 projects.getStorage = function (options) {
 	log.info ({cls: "projects", fn: "getStorage", code: options.storageCode});
-	var request = options.request;
-	var response = options.response;
-	var success = options.success;
-	var failure = options.failure;
-	var storageCode = options.storageCode;
+	let request = options.request;
+	let response = options.response;
+	let success = options.success;
+	let failure = options.failure;
+	let storageCode = options.storageCode;
    	if (!projects.storagePool [storageCode]) {
    		async.series ([
    			function (cb) {
@@ -184,7 +184,7 @@ projects.getStorage = function (options) {
 					redisClient.del (storageCode + "-sequences");
 					redisClient.del (storageCode + "-vars");
 					redisClient.keys (storageCode + "-objects*", function (err, result) {
-						for (var i = 0; i < result.length; i ++) {
+						for (let i = 0; i < result.length; i ++) {
 							redisClient.del (result [i]);
 						};
 						cb ();
@@ -224,9 +224,9 @@ projects.getStorage = function (options) {
    			function (cb) {
 				if (projects.storagePool [storageCode].visualObjectum.timeMachine && projects.storagePool [storageCode].visualObjectum.timeMachine.showDates) {
 					projects.storagePool [storageCode].query ({sql: "select fid, fdate from trevision where ftoc=1 order by fdate desc", success: function (options) {
-						var r = [];
-						for (var i = 0; i < options.result.rows.length; i ++) {
-							var row = options.result.rows [i];
+						let r = [];
+						for (let i = 0; i < options.result.rows.length; i ++) {
+							let row = options.result.rows [i];
 							r.push ({id: row.fid, date: row.fdate});
 						};
 						projects.storagePool [storageCode].visualObjectum.timeMachine.dates = r;
@@ -261,7 +261,7 @@ projects.getStorage = function (options) {
 };
 projects.sessions = {};
 projects.saveSession = function (session) {
-	var hdata = {};
+	let hdata = {};
 	hdata [session.id + "-id"] = session.id;
 	hdata [session.id + "-username"] = session.username;
 	hdata [session.id + "-clock"] = String (session.activity.clock);
@@ -280,16 +280,16 @@ projects.saveSession = function (session) {
 	redisClient.hmset ("sessions", hdata);
 };
 projects.tryLogin = function (options) {
-	var success = options.success;
-	var storage = options.storage;
-	var session = options.session;
-	var authOld = options.authOld;
-	var sessionId = session.id;
-	var cookies = options.cookies;
+	let success = options.success;
+	let storage = options.storage;
+	let session = options.session;
+	let authOld = options.authOld;
+	let sessionId = session.id;
+	let cookies = options.cookies;
 	projects.sessions [sessionId] = session;
 	projects.saveSession (session);
-	var roleId = "null";
-	var menuId = "null";
+	let roleId = "null";
+	let menuId = "null";
 	if (storage.subjectRoles [session.userId]) {
 		roleId = storage.subjectRoles [session.userId].role;
 		menuId = storage.subjectRoles [session.userId].menu;
@@ -307,14 +307,14 @@ projects.tryLogin = function (options) {
 	};
 };
 projects.authActiveDirectory = function (opts, cb) {
-	var storage = opts.storage;
-	var login = opts.login;
-	var password = opts.password;
-	var config = storage.config.activeDirectory;
+	let storage = opts.storage;
+	let login = opts.login;
+	let password = opts.password;
+	let config = storage.config.activeDirectory;
 	if (storage.authRecords [login] && config) {
 		try {
-			var ActiveDirectory = require ("activedirectory");
-			var ad = new ActiveDirectory (config);
+			let ActiveDirectory = require ("activedirectory");
+			let ad = new ActiveDirectory (config);
 			ad.authenticate (login, password, function (err, auth) {
 				if (!err && auth) {
 					cb ("complete");
@@ -331,13 +331,13 @@ projects.authActiveDirectory = function (opts, cb) {
 };
 projects.checkAuth = function (request, response, next) {
 	// Аутентификация администратора
-	var authorizeAdmin = function (options) {
-		var storage = options.storage;
-		var login = options.login;
-		var password = options.password;
-		var authOld = options.authOld;
+	let authorizeAdmin = function (options) {
+		let storage = options.storage;
+		let login = options.login;
+		let password = options.password;
+		let authOld = options.authOld;
 		if (login == "admin" && password == config.storages [storage.code].adminPassword) {
-			var sessionId = sha.hex_sha1 (common.getRemoteAddress (request) + new Date ().getTime () + Math.random ());
+			let sessionId = sha.hex_sha1 (common.getRemoteAddress (request) + new Date ().getTime () + Math.random ());
 			projects.sessions [sessionId] = {
 				id: sessionId,
 				username: "admin",
@@ -371,13 +371,13 @@ projects.checkAuth = function (request, response, next) {
 			return false;
 		};
 	};
-	var authorizeAutologin = function (options) {
-		var storage = options.storage;
-		var login = options.login;
-		var password = options.password;
-		var authOld = options.authOld;
+	let authorizeAutologin = function (options) {
+		let storage = options.storage;
+		let login = options.login;
+		let password = options.password;
+		let authOld = options.authOld;
 		if (login == "autologin" && config.storages [storage.code].autologin) {
-			var sessionId = sha.hex_sha1 (common.getRemoteAddress (request) + new Date ().getTime () + Math.random ());
+			let sessionId = sha.hex_sha1 (common.getRemoteAddress (request) + new Date ().getTime () + Math.random ());
 			projects.sessions [sessionId] = {
 				id: sessionId,
 				username: "autologin",
@@ -412,13 +412,13 @@ projects.checkAuth = function (request, response, next) {
 		};
 	};
 	// Аутентификация пользователя
-	var authorizeUser = function (options) {
-		var storage = options.storage;
-		var login = options.login;
-		var password = options.password;
-		var passwordPlain = options.passwordPlain;
-		var authOld = options.authOld;
-		var rows, userId, sessionId, session;
+	let authorizeUser = function (options) {
+		let storage = options.storage;
+		let login = options.login;
+		let password = options.password;
+		let passwordPlain = options.passwordPlain;
+		let authOld = options.authOld;
+		let rows, userId, sessionId, session;
 		if (storage.authRecords [login] && storage.authRecords [login].tryNum >= 3 && config.clock - storage.authRecords [login].lastTry < 600) {
 			if (authOld) {
 				return projects.send ({request: request, response: response, msg: "wait " + (600 - (config.clock - storage.authRecords [login].lastTry))});
@@ -478,7 +478,7 @@ projects.checkAuth = function (request, response, next) {
 		});
 	};
 	// Пользователь аутентифицирован на данной ноде
-	var authorized = function (options) {
+	let authorized = function (options) {
 		request.session = projects.sessions [request.session.id];
 		request.session.activity.clock = config.clock;
 		redisClient.hset ("sessions", request.session.id + "-clock", config.clock);
@@ -486,12 +486,12 @@ projects.checkAuth = function (request, response, next) {
 	};
    	if (request.query.authorize == 1) {
    		/*
-   		var tokens = request.body.split ("\n");
-   		var login = tokens [0];
-   		var password = tokens [1];
-   		var passwordPlain = tokens.length > 2 ? tokens [2] : null;
+   		let tokens = request.body.split ("\n");
+   		let login = tokens [0];
+   		let password = tokens [1];
+   		let passwordPlain = tokens.length > 2 ? tokens [2] : null;
    		*/
-   		var login, password, passwordPlain, opts, authOld = false;
+   		let login, password, passwordPlain, opts, authOld = false;
    		try {
    			opts = JSON.parse (request.body);
    			login = opts.username;
@@ -499,15 +499,15 @@ projects.checkAuth = function (request, response, next) {
    			passwordPlain = opts.passwordPlain;
    		} catch (e) {
    			authOld = true;
-	   		var tokens = request.body.split ("\n");
+	   		let tokens = request.body.split ("\n");
 	   		login = tokens [0];
 	   		password = tokens [1];
 	   		passwordPlain = tokens.length > 2 ? tokens [2] : null;
    		};
-		var tokens = request.url.split ("/");
-		var storageCode = tokens [2];
+		let tokens = request.url.split ("/");
+		let storageCode = tokens [2];
 		projects.getStorage ({request: request, response: response, storageCode: storageCode, success: function (options) {
-			var storage = options.storage;
+			let storage = options.storage;
 			if (!authorizeAdmin ({storage: storage, login: login, password: password, authOld: authOld})) {
 				if (!authorizeAutologin ({storage: storage, login: login, password: password, authOld: authOld})) {
 					authorizeUser ({storage: storage, login: login, password: password, passwordPlain: passwordPlain, authOld: authOld});
@@ -534,8 +534,8 @@ projects.checkAuth = function (request, response, next) {
 // Сообщить пользователю ошибку
 // Обработчик на клиенте в storage.parseResponse
 projects.sendError = function (options) {
-	var request = options.request;
-	var response = options.response;
+	let request = options.request;
+	let response = options.response;
 	if (options.error && typeof (options.error) == "object") {
 		if (options.error.message) {
 			options.error = options.error.message;
@@ -549,8 +549,8 @@ projects.sendError = function (options) {
 }
 // Сообщить пользователю
 projects.send = function (options) {
-	var request = options.request;
-	var response = options.response;
+	let request = options.request;
+	let response = options.response;
 	response.writeHead (200, {
 		"Content-Type": "text/html; charset=utf-8"//,
 		//"Content-Length": Buffer.byteLength (options.msg, "utf8")
@@ -567,8 +567,8 @@ projects.startTransaction = function (request, response, next) {
 			projects.send ({request: request, response: response, msg: "{header: {error: 'forbidden'}}"});
 			return;
    		};
-   		var params = eval ("(" + request.storageParam + ")");
-   		var storage;
+   		let params = eval ("(" + request.storageParam + ")");
+   		let storage;
    		async.series ([
    			function (cb) {
 				projects.getStorage ({request: request, response: response, storageCode: request.storageCode, success: function (options) {
@@ -594,7 +594,7 @@ projects.startTransaction = function (request, response, next) {
 				remoteAddr: common.getRemoteAddress (request), 
 				description: params, 
 				success: function (options) {
-					var revision = options.revision;
+					let revision = options.revision;
 					if (!projects.sessions [request.session.id]) {
 						storage.rollbackTransaction ({session: request.session, success: function (options) {
 							projects.sendError ({request: request, response: response, error: "invalid session in start transaction"});
@@ -620,7 +620,7 @@ projects.commitTransaction = function (request, response, next) {
    		log.debug ({cls: "projects", fn: "commitTransaction", params: request.storageParam});
 		if (projects.sessions [request.session.id].transaction.active) {
 			projects.getStorage ({request: request, response: response, storageCode: request.storageCode, success: function (options) {
-				var storage = options.storage;
+				let storage = options.storage;
 				storage.commitTransaction ({session: request.session, success: function (options) {
 					projects.sessions [request.session.id].transaction.active = false;
 					projects.send ({request: request, response: response, msg: "{header: {error: ''},data: " + options.revision + "}"});
@@ -640,7 +640,7 @@ projects.rollbackTransaction = function (request, response, next) {
    		log.debug ({cls: "projects", fn: "rollbackTransaction"});
 		if (projects.sessions [request.session.id].transaction.active) {
 			projects.getStorage ({request: request, response: response, storageCode: request.storageCode, success: function (options) {
-				var storage = options.storage;
+				let storage = options.storage;
 				storage.rollbackTransaction ({session: request.session, success: function (options) {
 					projects.sessions [request.session.id].transaction.active = false;
 					projects.send ({request: request, response: response, msg: "{header: {error: ''},data: " + options.revision + "}"});
@@ -658,27 +658,27 @@ projects.rollbackTransaction = function (request, response, next) {
 projects.getObject = function (request, response, next) {
    	if (request.storageFn == "getObject") {
    		log.debug ({cls: "projects", fn: "getObject", params: request.storageParam});
-		var storageCode = request.storageCode;
-		var objectId;
+		let storageCode = request.storageCode;
+		let objectId;
 		try {
 			objectId = JSON.parse (request.storageParam);
 		} catch (e) {
-			var r = "{header: {error: ''},data: {id: null, classId: null, attrs: {}}}";
+			let r = "{header: {error: ''},data: {id: null, classId: null, attrs: {}}}";
 			projects.send ({request: request, response: response, msg: r});
 			return;
 		};
 		projects.getStorage ({request: request, response: response, storageCode: storageCode, success: function (options) {
-			var storage = options.storage;
+			let storage = options.storage;
 			projects.sessions [request.session.id].storage = storage;
 			storage.getObject ({session: request.session, id: objectId, success: function (options) {
-				var o = options.object;
-				var r = "{header: {error: ''},data: {";
+				let o = options.object;
+				let r = "{header: {error: ''},data: {";
 				if (!o) {
 					r += "id: null, classId: null, attrs: {";
 				} else {
 					r += "id:" + objectId + ", classId: " + o.data.fclass_id + ", attrs: {";
-					var i = 0;
-					for (var attr in o.data) {
+					let i = 0;
+					for (let attr in o.data) {
 						if (["id", "fclass_id"].indexOf (attr) > -1) {
 							continue;
 						}
@@ -713,13 +713,13 @@ projects.removeObject = function (request, response, next) {
 			return;
    		};
 		if (projects.sessions [request.session.id].transaction.active) {
-			var storageCode = request.storageCode;
-			var objectId = request.storageParam;
+			let storageCode = request.storageCode;
+			let objectId = request.storageParam;
 			projects.getStorage ({request: request, response: response, storageCode: storageCode, success: function (options) {
-				var storage = options.storage;
+				let storage = options.storage;
 				storage.getObject ({session: request.session, id: objectId, success: function (options) {
-					var o = options.object;
-					var cascadeNum, setnullNum;
+					let o = options.object;
+					let cascadeNum, setnullNum;
 					if (o) {
 						o.remove ();
 						async.series ([
@@ -778,21 +778,21 @@ projects.setAttrs = function (request, response, next) {
 			return;
    		};
 		if (projects.sessions [request.session.id].transaction.active) {
-			var s = request.storageParam;
+			let s = request.storageParam;
 			s = s.substr (2, s.length - 4);
-			var tokens = eval (s);
-			var objectId = tokens [0];
-			var attrs = tokens [1];
-			var classId = tokens [2];
-			var storageCode = request.storageCode;
+			let tokens = eval (s);
+			let objectId = tokens [0];
+			let attrs = tokens [1];
+			let classId = tokens [2];
+			let storageCode = request.storageCode;
 			projects.getStorage ({request: request, response: response, storageCode: storageCode, success: function (options) {
-				var storage = options.storage;
-				var setAttrs = function (o) {
-					var currentTimestampAttrs = [];
-					var currentTimestamp = new Date ();
-					var currentTimestampStr = common.getUTCTimestamp (currentTimestamp);
-					for (var attr in attrs) {
-						var val = attrs [attr].value;
+				let storage = options.storage;
+				let setAttrs = function (o) {
+					let currentTimestampAttrs = [];
+					let currentTimestamp = new Date ();
+					let currentTimestampStr = common.getUTCTimestamp (currentTimestamp);
+					for (let attr in attrs) {
+						let val = attrs [attr].value;
 						if (val == "$CURRENT_TIMESTAMP$") {
 							val = currentTimestampStr;
 							currentTimestampAttrs.push (attr);
@@ -818,7 +818,7 @@ projects.setAttrs = function (request, response, next) {
 						if (err) {
 							projects.sendError ({request: request, response: response, error: new VError (err, "projects.setAttrs")});
 						} else {
-							for (var i = 0; i < currentTimestampAttrs.length; i ++) {
+							for (let i = 0; i < currentTimestampAttrs.length; i ++) {
 								o.data [currentTimestampAttrs [i]] = currentTimestamp;
 							}
 							projects.send ({request: request, response: response, msg: "{header: {error: ''}, data: " + common.ToJSONString (o.data) + "}"});
@@ -856,11 +856,11 @@ projects.setAttrs = function (request, response, next) {
 };
 projects.execute = function (request, response, next) {
    	if (request.storageFn == "execute") {
-		var storageCode = request.storageCode;
+		let storageCode = request.storageCode;
 		projects.getStorage ({request: request, response: response, storageCode: storageCode, success: function (options) {
-			var storage = options.storage;		
+			let storage = options.storage;		
 			log.debug ({cls: "projects", fn: "execute", params: request.storageParam});
-			var sql = JSON.parse (request.storageParam.substr (2, request.storageParam.length - 4));
+			let sql = JSON.parse (request.storageParam.substr (2, request.storageParam.length - 4));
 			storage.execute ({session: request.session, sql: sql, resultText: true, success: function (options) {
 				projects.send ({request: request, response: response, msg: "{header: {error: ''},data: " + options.result + "}"});
 			}, failure: function (err) {
@@ -874,19 +874,19 @@ projects.execute = function (request, response, next) {
 projects.news = {};
 projects.news.message = {};
 projects.news.getObj = function (request, response) {
-	var tokens = request.body.split (" ");	
+	let tokens = request.body.split (" ");	
 	if (tokens.length == 2) {
-		var storageCode = tokens [0];
-		var clientRevision = tokens [1];
+		let storageCode = tokens [0];
+		let clientRevision = tokens [1];
 		projects.getStorage ({request: request, response: response, storageCode: storageCode, success: function (options) {
-			var storage = options.storage;
+			let storage = options.storage;
 			setTimeout (function () {
 				if (!projects.sessions [request.session.id]) {
 					response.writeHead (200, {"Content-Type": "text/html; charset=utf-8"});
 					response.end ("{header: {error: 'session removed'}, data: []}");
 					return;
 				};
-				var message = projects.news.message [request.session.id];
+				let message = projects.news.message [request.session.id];
 				if (message) {
 					message = "'" + message + "'";
 					delete projects.news.message [request.session.id];
@@ -898,8 +898,8 @@ projects.news.getObj = function (request, response) {
 					response.end ("{header: {error: ''}, revision: " + storage.lastRevision + ", objects: [], message: " + message + "}");
 				} else {
 					// send changed objects id from clientRevision to lastRevision
-					var r = [];
-					for (var revision in storage.revisions) {
+					let r = [];
+					for (let revision in storage.revisions) {
 						if (revision > clientRevision) {
 							r = r.concat (storage.revisions [revision].objects.changed);
 						}
@@ -918,16 +918,16 @@ projects.news.getObj = function (request, response) {
 };
 // todo: dirty revisions
 projects.news.gc = function () {
-	for (var storageCode in projects.storagePool) {
-		var storage = projects.storagePool [storageCode];
-		var minRevision;
-		for (var sessionId in projects.sessions) {
-			var news = projects.sessions [sessionId].news;
+	for (let storageCode in projects.storagePool) {
+		let storage = projects.storagePool [storageCode];
+		let minRevision;
+		for (let sessionId in projects.sessions) {
+			let news = projects.sessions [sessionId].news;
 			if (projects.sessions [sessionId].storage == storage && (!minRevision || news.revision < minRevision)) {
 				minRevision = news.revision;
 			}
 		}
-		for (var revision in storage.revisions) {
+		for (let revision in storage.revisions) {
 			if (revision < minRevision) {
 				delete storage.revisions [revision];
 				log.debug ({cls: "projects", fn: "news.gc"}, "revision " + revision + " removed");
@@ -937,8 +937,8 @@ projects.news.gc = function () {
 	setTimeout (projects.news.gc, config.news.gcInterval);	
 };
 projects.removeSession = function (options) {
-	var success = options.success;
-	var sessionId = options.sessionId;
+	let success = options.success;
+	let sessionId = options.sessionId;
 	redisClient.hmget ("sessions", [sessionId + "-storageCode", sessionId + "-username"], function (err, r) {
 		redisClient.hdel ("sessions", 
 			sessionId + "-id", sessionId + "-username", sessionId + "-clock", sessionId + "-storageCode", 
@@ -954,12 +954,12 @@ projects.removeTimeoutSessions = function () {
 		return;
 	};
 	log.info ({cls: "projects", fn: "projects.removeTimeoutSessions"});
-	var timeoutInterval = config.session.timeoutInterval / 1000;
+	let timeoutInterval = config.session.timeoutInterval / 1000;
 	redisClient.hgetall ("sessions", function (err, r) {
-		var timeout = [];
-		for (var k in r) {
+		let timeout = [];
+		for (let k in r) {
 			if (k.indexOf ("-clock") > -1 && config.clock > Number (r [k]) && (config.clock - Number (r [k]) > timeoutInterval * 2)) {
-				var sessionId = k.substr (0, k.length - 6);
+				let sessionId = k.substr (0, k.length - 6);
 				timeout.push (sessionId);
 				log.info ({cls: "projects"}, "session removing: " + sessionId + " " + config.clock + " " + r [k] + " " + (timeoutInterval * 2));
 			}
@@ -967,7 +967,7 @@ projects.removeTimeoutSessions = function () {
 		async.map (timeout, function (sessionId, cb) {
 			async.series ([
 				function (cb) {
-					var session = projects.sessions [sessionId];
+					let session = projects.sessions [sessionId];
 					if (session && session.storage) {
 						session.storage.rollbackTransaction ({session: session, success: function (options) {
 							cb ();
@@ -991,8 +991,8 @@ projects.removeTimeoutSessions = function () {
 };
 // {success}
 projects.createStorages = function (options) {
-	var storageCodes = [];
-	for (var storageCode in config.storages) {
+	let storageCodes = [];
+	for (let storageCode in config.storages) {
 		if (config.storages [storageCode].hasOwnProperty ("db")) {
 			storageCodes.push (storageCode);
 		}
@@ -1009,20 +1009,20 @@ projects.createStorages = function (options) {
 	});
 };
 projects.getTableRecords = function (options) {
-	var request = options.request;
-	var response = options.response;
-	var table = options.table;
-	var fields = options.fields;
-	var success = options.success;
-	var mainOptions = options;
+	let request = options.request;
+	let response = options.response;
+	let table = options.table;
+	let fields = options.fields;
+	let success = options.success;
+	let mainOptions = options;
 	projects.getStorage ({request: request, response: response, storageCode: options.storageCode, success: function (options) {
-		var storage = options.storage;		
+		let storage = options.storage;		
 		storage.redisClient.hget (storage.code + "-requests", table, function (err, result) {
 			if (result) {
 				mainOptions.result = result;
 				success.call (mainOptions.scope || this, mainOptions);
 			} else {
-				var filter = "";
+				let filter = "";
 				if (table == "tview") {
 					filter = " and (fsystem is null or (fsystem is not null and fclass_id is not null))";
 				}
@@ -1035,18 +1035,18 @@ projects.getTableRecords = function (options) {
 					"\t" + storage.getCurrentFilter () + filter + "\n" +
 					"order by fid"
 				, success: function (options) {
-					var r = "[";
-					var rows = options.result.rows;
-					for (var i = 0; i < rows.length; i ++) {
+					let r = "[";
+					let rows = options.result.rows;
+					for (let i = 0; i < rows.length; i ++) {
 						if (i) {
 							r += ",";
 						}
 						r += "[";
-						for (var j = 0; j < fields.length; j ++) {
+						for (let j = 0; j < fields.length; j ++) {
 							if (j) {
 								r += ",";
 							}
-							var val = rows [i][fields [j]];
+							let val = rows [i][fields [j]];
 							r += common.ToJSONString (val);
 						}
 						if (table == "tview") {
@@ -1074,9 +1074,9 @@ projects.sendTableRecords = function (options) {
 projects.getAll = function (request, response, next) {
    	if (request.storageFn == "getAll") {
 		log.debug ({cls: "projects", fn: "getAll"});
-		var sendAll = function (options) {
-			var storage = options.storage;
-	   		var r = "{";
+		let sendAll = function (options) {
+			let storage = options.storage;
+	   		let r = "{";
 	   		async.parallel ([
 	   			function (cb) {
 			   		projects.getTableRecords ({
@@ -1132,8 +1132,8 @@ projects.getAll = function (request, response, next) {
 	   			}
 	   		], function (err, results) {
 	   			if (storage.visualObjectum.timeMachine && storage.visualObjectum.timeMachine.dates) {
-	   				var arr = storage.visualObjectum.timeMachine.dates;
-		   			for (var i = 0; i < arr.length; i ++) {
+	   				let arr = storage.visualObjectum.timeMachine.dates;
+		   			for (let i = 0; i < arr.length; i ++) {
 		   				if (typeof (arr [i].date) == "string") {
 		   					arr [i].date = new Date (arr [i].date);
 		   				};
@@ -1150,7 +1150,7 @@ projects.getAll = function (request, response, next) {
 	   		});
    		};
 		projects.getStorage ({request: request, response: response, storageCode: request.storageCode, success: function (options) {
-			var storage = options.storage;		
+			let storage = options.storage;		
 			storage.redisClient.hget (storage.code + "-requests", "all", function (err, result) {
 				if (result) {
 					projects.send ({
@@ -1170,11 +1170,11 @@ projects.getAll = function (request, response, next) {
 projects.getContent = function (request, response, next) {
    	if (request.storageFn == "getContent") {
    		log.debug ({cls: "projects", fn: "getContent", params: request.storageParam});
-		var storageCode = request.storageCode;
+		let storageCode = request.storageCode;
 		projects.getStorage ({request: request, response: response, storageCode: storageCode, success: function (options) {
-			var storage = options.storage;		
-			var tokens = request.storageParam.split (",");
-			var params = tokens.slice (6).join (",");
+			let storage = options.storage;		
+			let tokens = request.storageParam.split (",");
+			let params = tokens.slice (6).join (",");
 			if (params [2] == "!") {
 				params = params.substr (3, params.length - 5);
 			} else {
@@ -1211,12 +1211,12 @@ projects.getContent = function (request, response, next) {
 projects.selectRows = function (request, response, next) {
    	if (request.storageFn == "selectRows") {
    		log.debug ({cls: "projects", fn: "selectRows", params: request.storageParam});
-		var storageCode = request.storageCode;
+		let storageCode = request.storageCode;
 		projects.getStorage ({request: request, response: response, storageCode: storageCode, success: function (options) {
-			var storage = options.storage;		
-			var tokens = request.storageParam.split (",");
-			var viewId = tokens [0];
-			var params = tokens.slice (2).join (",");
+			let storage = options.storage;		
+			let tokens = request.storageParam.split (",");
+			let viewId = tokens [0];
+			let params = tokens.slice (2).join (",");
 			params = params.substr (params.indexOf ("[!") + 2, params.indexOf ("!]") - (params.indexOf ("[!") + 2));
 			params = JSON.parse (params);
 			storage.selectRow ({
@@ -1239,11 +1239,11 @@ projects.selectRows = function (request, response, next) {
 	}
 };
 projects.reloadUniqueValues = function (options) {
-	var storage = options.storage;
-	var success = options.success;
+	let storage = options.storage;
+	let success = options.success;
 	async.map (storage.classAttrs, function (attr, cb) {
 		if (attr.get ("funique")) {
-			var key = storage.code + "-unique-" + attr.get ("fid");
+			let key = storage.code + "-unique-" + attr.get ("fid");
 			log.debug ({cls: "projects"}, "Unique values reloading: " + key);
 			async.series ([
 				function (cb) {
@@ -1273,7 +1273,7 @@ projects.reloadUniqueValues = function (options) {
 					storage.query ({session: {userId: null}, sql: 
 						"select " + attr.toc + " from " + storage.classesMap [attr.get ("fclass_id")].toc + " where " + attr.toc + " is not null"
 					, success: function (options) {
-						var rows = options.result.rows;
+						let rows = options.result.rows;
 						async.map (rows, function (row, cb) {
 							redisClient.sadd (key, row [attr.toc], function (err, result) {
 								cb ();
@@ -1294,15 +1294,15 @@ projects.reloadUniqueValues = function (options) {
 	});
 };
 projects.exist = function (options) {
-	var request = options.request;
-	var response = options.response;
-	var storageCode = options.storageCode;
-	var classCode = options.classCode;
-	var attrCode = options.attrCode;
-	var value = options.value;
+	let request = options.request;
+	let response = options.response;
+	let storageCode = options.storageCode;
+	let classCode = options.classCode;
+	let attrCode = options.attrCode;
+	let value = options.value;
 	projects.getStorage ({request: request, response: response, storageCode: storageCode, success: function (options) {
-		var storage = options.storage;
-		var ca = storage.getClassAttr ({classCode: classCode, attrCode: attrCode});
+		let storage = options.storage;
+		let ca = storage.getClassAttr ({classCode: classCode, attrCode: attrCode});
 		if (ca) {
 			redisClient.sismember (storageCode + "-unique-" + ca.get ("fid"), value, function (err, result) {
 				response.writeHead (200, {"Content-Type": "text/html"});
@@ -1316,18 +1316,18 @@ projects.exist = function (options) {
 	}});
 };
 projects.upload = function (request, response, next) {
-	var session = request.session;
+	let session = request.session;
 	if (request.url.indexOf ("/upload") > -1 && projects.sessions [session.id]) {
-		var storage = session.storage;
+		let storage = session.storage;
 		if (config.storages [storage.code].hasOwnProperty ("upload") && !config.storages [storage.code].upload) {
 			projects.send ({request: request, response: response, msg: "{success: false, error: 'upload disabled'}"});
 			return;
 		};
-		var form = new formidable.IncomingForm ();
+		let form = new formidable.IncomingForm ();
 		form.uploadDir = storage.rootDir + "/files";
 		form.parse (request, function (error, fields, files) {
 			if (files ["file-path"] && files ["file-path"].name) {
-				var filename = storage.rootDir + "/files/" + fields.objectId + "-" + fields.classAttrId + "-" + files ["file-path"].name;
+				let filename = storage.rootDir + "/files/" + fields.objectId + "-" + fields.classAttrId + "-" + files ["file-path"].name;
 				fs.rename (files ["file-path"].path, filename, function (err) {
 					if (err) {
 						log.error ({cls: "projects", fn: "upload", error: "rename error: " + err + ", " + files ["file-path"].path + " -> " + filename});
@@ -1345,18 +1345,18 @@ projects.upload = function (request, response, next) {
 	};
 };
 projects.sendmail = function (request, response, next) {
-	var session = request.session;
+	let session = request.session;
 	if (request.url.indexOf ("/sendmail") > -1 && projects.sessions [session.id]) {
-		var form = new formidable.IncomingForm ();
+		let form = new formidable.IncomingForm ();
 		form.parse (request, function (error, fields, files) {
 			if (error) {
 				log.error ({cls: "projects", fn: "sendmail", error: "sendmail error: " + JSON.stringify (error) + " fields: " + JSON.stringify (fields)});
 				projects.send ({request: request, response: response, msg: "{success: false, error: '" + error + "'}"});
 				return;
 			};
-			var attachments = [];
+			let attachments = [];
 			if (fields.attachments) {
-				var storage = projects.sessions [session.id].storage;
+				let storage = projects.sessions [session.id].storage;
 				_.each (JSON.parse (fields.attachments), function (o) {
 					if (o.filePath) {
 						o.filePath = storage.rootDir + "/files/" + o.filePath;
@@ -1389,7 +1389,7 @@ projects.services = {};
 projects.services.captcha = function (req, res, next) {
 	if (req.url.indexOf ("/services") > -1 && req.query.captcha == 1) {
 		projects.services.images = projects.services.images || [];
-		var images = projects.services.images;
+		let images = projects.services.images;
 		if (!images.length) {
 			images.push ("30E936A16BDF7A13E3854E793FAC7B09D4673EEB.png");
 			images.push ("4802DE61A70652CD389E566D0794EC61D34EE385.png");
@@ -1402,7 +1402,7 @@ projects.services.captcha = function (req, res, next) {
 			images.push ("CE665C570F0DD9E93DE3DAA7EAEBC446CEC2E88B.png");
 			images.push ("D93A9798AFC25B7261E8BB790BF1394C1557B61D.png");
 		};
-		var r = "<img src='/client/extjs4/images/captcha/" + images [common.randomInt (0, images.length - 1)] + "' width=170 height=30> ";
+		let r = "<img src='/client/extjs4/images/captcha/" + images [common.randomInt (0, images.length - 1)] + "' width=170 height=30> ";
 		res.send (r);
 	} else {
 		next ();
@@ -1410,14 +1410,14 @@ projects.services.captcha = function (req, res, next) {
 };
 projects.logout = function (request, response, next) {
 	if (request.query.logout == 1 && request.session) {
-		var sid = request.query.sessionId;
+		let sid = request.query.sessionId;
 		redisClient.hdel ("sessions", 
 			sid + "-id", sid + "-username", sid + "-clock", sid + "-storageCode", 
 			sid + "-newsRevision", sid + "-port", sid + "-userId", sid + "-logined", sid + "-ip"
 		);
 		redisPub.publish (config.redis.db + "-sessions", '{"removed":"' + sid + '"}');
 		response.send ("ok");
-		var session = projects.sessions [sid];
+		let session = projects.sessions [sid];
 		if (session && session.storage) {
 			session.storage.rollbackTransaction ({session: session});
 		};
@@ -1433,17 +1433,17 @@ projects.copyFile = function (req, res, next) {
 		next ();
 		return;
 	};
-	var session = req.session;
+	let session = req.session;
 	if (session && session.storage) {
-		var storage = session.storage;
-		var rootDir = storage.config.rootDir;
-		var srcObjectId = req.query.src_object_id;
-		var srcClassAttrId = req.query.src_class_attr_id;
-		var dstObjectId = req.query.dst_object_id;
-		var dstClassAttrId = req.query.dst_class_attr_id;
-		var filename = req.query.filename;
-		var src = rootDir + "/files/" + srcObjectId + "-" + srcClassAttrId + "-" + filename;
-		var dst = rootDir + "/files/" + dstObjectId + "-" + dstClassAttrId + "-" + filename;
+		let storage = session.storage;
+		let rootDir = storage.config.rootDir;
+		let srcObjectId = req.query.src_object_id;
+		let srcClassAttrId = req.query.src_class_attr_id;
+		let dstObjectId = req.query.dst_object_id;
+		let dstClassAttrId = req.query.dst_class_attr_id;
+		let filename = req.query.filename;
+		let src = rootDir + "/files/" + srcObjectId + "-" + srcClassAttrId + "-" + filename;
+		let dst = rootDir + "/files/" + dstObjectId + "-" + dstClassAttrId + "-" + filename;
 		fs.readFile (src, function (err, data) {
 			if (err) {
 				res.send ({err: 1});
@@ -1469,14 +1469,14 @@ projects.saveToFile = function (req, res, next) {
 		next ();
 		return;
 	};
-	var session = req.session;
+	let session = req.session;
 	if (session && session.storage) {
-		var storage = session.storage;
-		var rootDir = storage.config.rootDir;
-		var objectId = req.query.object_id;
-		var classAttrId = req.query.class_attr_id;
-		var filename = req.query.filename;
-		var path = rootDir + "/files/" + objectId + "-" + classAttrId + "-" + filename;
+		let storage = session.storage;
+		let rootDir = storage.config.rootDir;
+		let objectId = req.query.object_id;
+		let classAttrId = req.query.class_attr_id;
+		let filename = req.query.filename;
+		let path = rootDir + "/files/" + objectId + "-" + classAttrId + "-" + filename;
 		fs.writeFile (path, req.body, function (err) {
 			if (err) {
 				res.send ({err: 1});
@@ -1495,13 +1495,13 @@ projects.logLastTry = function (storage, login, accessGranted) {
 	if (!storage.authRecords [login] || !storage.authRecords [login].hasTryAttrs) {
 		return;
 	}
-	var userId = storage.authRecords [login].objectId;
-	var session = {
+	let userId = storage.authRecords [login].objectId;
+	let session = {
 		id: "logLastTry-" + login,
 		username: userId,
 		userId: userId
 	};
-	var o;
+	let o;
 	async.series ([
 		function (cb) {
 			storage.getObject ({session: session, id: userId, success: function (opts) {

@@ -18,7 +18,7 @@ common.message = function (s, fn) {
 };
 // Confirm
 common.confirm = function (options) {
-	var scope = options.scope ? options.scope : this;
+	let scope = options.scope ? options.scope : this;
 	Ext.Msg.show ({
 		title: $ptitle,
 		msg: options.message,
@@ -32,14 +32,14 @@ common.confirm = function (options) {
 // Признак выбранной записи
 common.recordSelected = function (options) {
 	options = options || {};
-	var olap, attr = options.attr || "id";
+	let olap, attr = options.attr || "id";
 	if (!options.olap) {
 		olap = this;
 	} else {
 		olap = this.relatives [options.olap];
 	};
-	var result = false;
-	var v;
+	let result = false;
+	let v;
 	if (olap.getSelectionModel) {
 		v = olap.getSelectionModel ().hasSelection ();
 	} else {
@@ -49,9 +49,9 @@ common.recordSelected = function (options) {
 		result = true;
 	};
 	/*
-	var result = false;
+	let result = false;
 	if (options.olap && options.attr) {
-		var id = this.zview.getCurrentValue (options.olap, options.attr);
+		let id = this.zview.getCurrentValue (options.olap, options.attr);
 		if (id) {
 			result = true;
 		};
@@ -61,11 +61,11 @@ common.recordSelected = function (options) {
 };
 // options {classCode, attrs, refresh}
 obj.create = function (options) {
-    var object = $zs.createObject (options.classCode);
+    let object = $zs.createObject (options.classCode);
     object.commit ();
-    var id = object.getId ();
+    let id = object.getId ();
     if (options.attrs) {
-    	for (var key in options.attrs) {
+    	for (let key in options.attrs) {
     		if (options.attrs.hasOwnProperty (key)) {
 	    		object.set (key, options.attrs [key]);
 	    	};
@@ -91,14 +91,14 @@ obj.remove = function (options) {
     	common.message ($zr.getString ("object must be selected"));
     	return false;
     };
-    var result = false;
-    var o = $zs.getObject (options.id);
+    let result = false;
+    let o = $zs.getObject (options.id);
     if (o) {
     	if (options.objects) {
-    		var oo = options.objects;
-    		for (var i = 0; i < oo.length; i ++) {
+    		let oo = options.objects;
+    		for (let i = 0; i < oo.length; i ++) {
     			if (oo [i].classCode) {
-					var r = common.execSQL ({
+					let r = common.execSQL ({
 						select: [
 							{"a":"id"}, "id"
 						],
@@ -109,8 +109,8 @@ obj.remove = function (options) {
 							{"a":oo [i].attr}, "=", options.id
 						]
 					});
-					for (var j = 0; j < r.length; j ++) {
-					    var o2 = $zs.getObject (r.get (j, "id"));
+					for (let j = 0; j < r.length; j ++) {
+					    let o2 = $zs.getObject (r.get (j, "id"));
 				    	if (o2) {
 							o2.remove ();
 							o2.commit ();
@@ -118,7 +118,7 @@ obj.remove = function (options) {
 					};
     			} else {
 	    			if (o.get (oo [i])) {
-					    var o2 = $zs.getObject (o.get (oo [i]));
+					    let o2 = $zs.getObject (o.get (oo [i]));
 				    	if (o2) {
 						    o2.remove ();
 						    o2.commit ();
@@ -129,35 +129,35 @@ obj.remove = function (options) {
     	} else {
 			if (!options.force) {
 				options.object = o;
-				var dependentObjects = obj.getDependentObjects (options);
+				let dependentObjects = obj.getDependentObjects (options);
 				if (dependentObjects.length) {
-					var r = '<table id="objDetails" style="font-family:Tahoma !important; font-size:8pt !important;"><tr><td><b>Тип</b></td><td style="padding-left: 5px;"><b>Наименование</b></td></tr>';
-					var numAliveObjects = 0;
-					for (var i = 0; i < dependentObjects.length; i ++) {
-						var o = $zs.getObject (dependentObjects [i]);
+					let r = '<table id="objDetails" style="font-family:Tahoma !important; font-size:8pt !important;"><tr><td><b>Тип</b></td><td style="padding-left: 5px;"><b>Наименование</b></td></tr>';
+					let numAliveObjects = 0;
+					for (let i = 0; i < dependentObjects.length; i ++) {
+						let o = $zs.getObject (dependentObjects [i]);
 						if (!o) {
 							continue;
 						};
 						numAliveObjects ++;
-						var name;
+						let name;
 						try {
 							name = o.get ('name') || ('id: ' + o.get ('id'));
 						} catch (e) {
 							name = 'id: ' + o.get ('id');
 						};
-						var clsName = $zs.classesMap [o.get ('classId')].stub.get ('name');
+						let clsName = $zs.classesMap [o.get ('classId')].stub.get ('name');
 						if (clsName.substr (0, 8) == 'section_') {
 							clsName = 'Данные';
 							name = '';
 							if (o.get ('subject')) {
-								var oo = $zs.getObject (o.get ('subject'));
+								let oo = $zs.getObject (o.get ('subject'));
 								name += oo.get ('name');
 							};
 							if (o.get ('repDate')) {
 								if (name) {
 									name += ', ';
 								};
-								var oo = $zs.getObject (o.get ('repDate'));
+								let oo = $zs.getObject (o.get ('repDate'));
 								name += oo.get ('name');
 							};
 						};
@@ -168,7 +168,7 @@ obj.remove = function (options) {
 					if (numAliveObjects) {
 						common.message ("Количество зависимых объектов: " + dependentObjects.length + ' (id: ' + JSON.stringify (dependentObjects) + ')<br><a href="#" id="detailsLink">Подробности</a>');
 						Ext.get ("detailsLink").on ("click", function () {
-							var w = window.open ("", "window1", "width=600, height=400, resizable=yes, scrollbars=yes, status=yes, top=10, left=10");
+							let w = window.open ("", "window1", "width=600, height=400, resizable=yes, scrollbars=yes, status=yes, top=10, left=10");
 							w.document.open ();
 							w.document.write (r);
 						}, this);
@@ -191,10 +191,10 @@ obj.remove = function (options) {
 // obj.getValue (o, "attr1.attr2.name");
 // obj.getValue (args, "$attr1.attr2.name");
 obj.getValue = function (o, path) {
-	var r = null;
+	let r = null;
 	if (path && path [0] == "$") {
-		var tokens = path.split (".");
-		var arg = tokens [0].substr (1, tokens [0].length - 1);
+		let tokens = path.split (".");
+		let arg = tokens [0].substr (1, tokens [0].length - 1);
 		if (o [arg]) {
 			o = $o.getObject (o [arg]);
 			tokens.splice (0, 1);
@@ -202,8 +202,8 @@ obj.getValue = function (o, path) {
 		};
 	};
 	if (o) {
-		var tokens = path.split (".");
-		for (var i = 0; i < tokens.length; i ++) {
+		let tokens = path.split (".");
+		for (let i = 0; i < tokens.length; i ++) {
 			if (tokens [i] == "$date") {
 				return r ? r.toString ("d.m.Y") : r;
 			};
@@ -224,11 +224,11 @@ obj.getValue = function (o, path) {
 common.getValue = obj.getValue;
 // DD.MM.YYYY
 common.currentDate = function () {
-	var d = new Date ();
-	var dd = d.getDate ();
-	var mm = d.getMonth () + 1;
-	var yyyy = d.getFullYear ();
-	var s = "";
+	let d = new Date ();
+	let dd = d.getDate ();
+	let mm = d.getMonth () + 1;
+	let yyyy = d.getFullYear ();
+	let s = "";
 
 	if (dd < 10)
 		s += "0";
@@ -248,10 +248,10 @@ common.getDate = function (d) {
 	if (!d) {
 		return "";
 	};
-	var dd = d.getDate ();
-	var mm = d.getMonth () + 1;
-	var yyyy = d.getFullYear ();
-	var s = "";
+	let dd = d.getDate ();
+	let mm = d.getMonth () + 1;
+	let yyyy = d.getFullYear ();
+	let s = "";
 
 	if (dd < 10)
 		s += "0";
@@ -267,7 +267,7 @@ common.getDate = function (d) {
 	return s;
 };
 common.getDateFromDDMMYYYY = function (d) {
-	var r = null;
+	let r = null;
 	if (d && d.length == 10 && d [2] == "." && d [5] == ".") {
 		r = new Date (d.substr (6, 4), d.substr (3, 2) - 1, d.substr (0, 2));
 	}
@@ -275,11 +275,11 @@ common.getDateFromDDMMYYYY = function (d) {
 }
 // HH:MM:SS
 common.currentTime = function () {
-	var d = new Date ();
-	var hh = d.getHours ();
-	var mm = d.getMinutes ();
-	var ss = d.getSeconds ();
-	var s = "";
+	let d = new Date ();
+	let hh = d.getHours ();
+	let mm = d.getMinutes ();
+	let ss = d.getSeconds ();
+	let s = "";
 
 	if (hh < 10)
 		s += "0";
@@ -307,10 +307,10 @@ common.getDate = function (d) {
 	if (!d) {
 		return "";
 	};
-	var dd = d.getDate ();
-	var mm = d.getMonth () + 1;
-	var yyyy = d.getFullYear ();
-	var s = "";
+	let dd = d.getDate ();
+	let mm = d.getMonth () + 1;
+	let yyyy = d.getFullYear ();
+	let s = "";
 
 	if (dd < 10)
 		s += "0";
@@ -330,10 +330,10 @@ common.getDateISO = function (d) {
 	if (!d) {
 		return d;
 	};
-	var dd = d.getDate ();
-	var mm = d.getMonth () + 1;
-	var yyyy = d.getFullYear ();
-	var s = String (yyyy) + "-";
+	let dd = d.getDate ();
+	let mm = d.getMonth () + 1;
+	let yyyy = d.getFullYear ();
+	let s = String (yyyy) + "-";
 	if (mm < 10) {
 		s += "0";
 	}
@@ -346,10 +346,10 @@ common.getDateISO = function (d) {
 };
 // HH:MM:SS
 common.getTime = function (d) {
-	var hh = d.getHours ();
-	var mm = d.getMinutes ();
-	var ss = d.getSeconds ();
-	var s = "";
+	let hh = d.getHours ();
+	let mm = d.getMinutes ();
+	let ss = d.getSeconds ();
+	let s = "";
 
 	if (hh < 10)
 		s += "0";
@@ -374,10 +374,10 @@ common.getTimestamp = function (d) {
 };
 // DD.MM.YYYY
 common.getUTCDate = function (d) {
-	var dd = d.getUTCDate ();
-	var mm = d.getUTCMonth () + 1;
-	var yyyy = d.getUTCFullYear ();
-	var s = "";
+	let dd = d.getUTCDate ();
+	let mm = d.getUTCMonth () + 1;
+	let yyyy = d.getUTCFullYear ();
+	let s = "";
 
 	if (dd < 10)
 		s += "0";
@@ -394,10 +394,10 @@ common.getUTCDate = function (d) {
 };
 // HH:MM:SS
 common.getUTCTime = function (d) {
-	var hh = d.getUTCHours ();
-	var mm = d.getUTCMinutes ();
-	var ss = d.getUTCSeconds ();
-	var s = "";
+	let hh = d.getUTCHours ();
+	let mm = d.getUTCMinutes ();
+	let ss = d.getUTCSeconds ();
+	let s = "";
 
 	if (hh < 10)
 		s += "0";
@@ -425,21 +425,21 @@ common.getJulianDay = function (d) {
     if (d == '') {
         return 0;
     };
-	var dd = d.getDate ();
-	var mm = d.getMonth () + 1;
-	var yy = d.getFullYear ();
+	let dd = d.getDate ();
+	let mm = d.getMonth () + 1;
+	let yy = d.getFullYear ();
 /*    if (mm < 3) {
         mm += 12;
         yy --;
     };
-    var jd = parseInt (yy * 365.25) + parseInt (mm * 30.6 + 0.7) + dd;
+    let jd = parseInt (yy * 365.25) + parseInt (mm * 30.6 + 0.7) + dd;
     return jd;*/
     jd = Math.floor ( 1461 * ( yy + 4800 + ( mm - 14 ) / 12)) / 4 + Math.floor (Math.floor ( 367 * ( mm - 2 - 12 * (( mm - 14 ) / 12))) / 12) - 3 * Math.floor (Math.floor ( yy + 4900 + ( mm - 14 ) / 12) / 100) / 4 + dd - 32075;
     return Math.floor (jd);
 };
 // Юлианский день -> Date
 common.getDateByJulianDay = function (jd) {
-	var l, n, i, j, d, m, y;
+	let l, n, i, j, d, m, y;
 	l = jd + 68569;
 	n = Math.floor (( 4 * l ) / 146097);
 	l = Math.floor (l - ( 146097 * n + 3 ) / 4);
@@ -453,7 +453,7 @@ common.getDateByJulianDay = function (jd) {
 	return new Date (y, m - 1, d);
 }
 common.execSQL = function (sql) {
-	var j, result;
+	let j, result;
 
 	if ($zs) {
 		result = $zs.execute ({
@@ -465,7 +465,7 @@ common.execSQL = function (sql) {
 	};
 
 	try {
-		var temp = result.length;
+		let temp = result.length;
 	}
 	catch (err) {
 		result = {};
@@ -482,12 +482,12 @@ common.execSQL = function (sql) {
 	// row, col - result [row] [col]
 	// col - может быть числом или названием атрибута
 	result.get = function (row, col) {
-		var colN = this.fields [col];
+		let colN = this.fields [col];
 
 		if (colN == null)
 			throw "result.get: col unknown (row:" + row + ",col:" + col + ")";
 
-		var val = this [row] [colN];
+		let val = this [row] [colN];
 
 		if (val == undefined)
 			val = null;
@@ -498,7 +498,7 @@ common.execSQL = function (sql) {
 };
 // Объекты имеющие ссылки на объект options.id
 obj.getDependentObjects = function (options) {
-	var r = common.execSQL ({
+	let r = common.execSQL ({
 		select: [
 			{"a":"___fid"}, "id"
 		],
@@ -515,8 +515,8 @@ obj.getDependentObjects = function (options) {
 			{"b":"___fnumber"}, "=", options.id
 		]
 	});
-	var result = [];
-	for (var i = 0; i < r.length; i ++) {
+	let result = [];
+	for (let i = 0; i < r.length; i ++) {
 		if (result.indexOf (r.get (i, "id")) == -1) {
 			result.push (r.get (i, "id"));
 		}
@@ -549,25 +549,25 @@ common.window.options = null;
 // Заглушка
 common.card = function () {return {};};
 common.window.onViewLayout = function (options) {
-	var record = options.record;
-	var layout = options.layout;
+	let record = options.record;
+	let layout = options.layout;
 	if ($zs.views.ser.card.stub.get ('id') == record.stub.get ('id') && common.window.options) {
-		var cardFn = common.window.options.cardFn;
-		var r = cardFn (common.window.options);
+		let cardFn = common.window.options.cardFn;
+		let r = cardFn (common.window.options);
 		Ext.apply (layout, r);
 		common.window.options = null; // objectfield.choose.layout тут мешается
 	};
 };
 common.window.show = function (options) {
 	options = options || {};
-	var id = options.id;
+	let id = options.id;
 	if (options.olap && options.attr) {
 		id = this.relatives [options.olap].getCurrentValue (options.attr);
 	};
 	options.id = id;
-	var windowId = "Window-" + (++ Ext.Component.AUTO_ID);
-	var view;
-	var record = $zs.views.ser.card;
+	let windowId = "Window-" + (++ Ext.Component.AUTO_ID);
+	let view;
+	let record = $zs.views.ser.card;
 	if (common.extMajorVersion () == 4) {
 		view = Ext.create ("$o.Layout.Widget", {
 			record: record,
@@ -583,7 +583,7 @@ common.window.show = function (options) {
 		}, options.viewOptions));
 	};
 	view.on ('destroy', function () {
-		var i = common.window.list.indexOf (this);
+		let i = common.window.list.indexOf (this);
 		if (i > -1) {
 			common.window.list.splice (i, 1);
 		}
@@ -609,7 +609,7 @@ common.window.show = function (options) {
 		if (options.listeners && !options.listeners.scope) {
 			options.listeners.scope = this;
 		}
-		var win = new Ext.Window ({
+		let win = new Ext.Window ({
 			id: windowId,
 			title: options.title,
 			resizable: true,
@@ -632,7 +632,7 @@ common.window.show = function (options) {
 		});
 		view.win = win;
 /*		win.on ("close", function () {
-			var i = common.window.list.indexOf (this);
+			let i = common.window.list.indexOf (this);
 			if (i > -1) {
 				common.window.list.splice (i, 1);
 			}
@@ -644,7 +644,7 @@ common.window.show = function (options) {
 			}
 		}, this);*/
 		win.on ('show', function () {
-			var pos = win.getPosition ();
+			let pos = win.getPosition ();
 			if (pos [1] < 0) {
 				win.setPosition (pos [0], 0);
 			}
@@ -652,12 +652,12 @@ common.window.show = function (options) {
 		win.show ();
 		common.window.list.push (win);
 	} else {                                   
-		var pageId = "o" + id;
-		var app = $zp.application;
-		var closeTask = function () {
+		let pageId = "o" + id;
+		let app = $zp.application;
+		let closeTask = function () {
 			if (options.listeners && options.listeners.close) {
-				var scope = options.listeners.close.scope || options.listeners.scope || this;
-				var fn = options.listeners.close.fn || options.listeners.close;
+				let scope = options.listeners.close.scope || options.listeners.scope || this;
+				let fn = options.listeners.close.fn || options.listeners.close;
 				fn.call (scope);
 			}
 		};
@@ -708,7 +708,7 @@ common.window.show = function (options) {
 };
 // Закрывает открытые окна карточек
 common.window.closeAll = function () {
-	for (var i = 0; i < common.window.list.length; i ++) {
+	for (let i = 0; i < common.window.list.length; i ++) {
 		common.window.list [i].close ();
 	}
 }
@@ -718,7 +718,7 @@ common.data = {};
 common.getId = function (options) {
 	if (common.data [options.classCode] == null) {
 		common.data [options.classCode] = {};
-		var r = common.execSQL ({
+		let r = common.execSQL ({
 			select: [
 				{"a":"id"}, "id",
 				{"a":"code"}, "code"
@@ -727,11 +727,11 @@ common.getId = function (options) {
 				{"a":options.classCode}
 			]
 		});
-		for (var i = 0; i < r.length; i ++) {
+		for (let i = 0; i < r.length; i ++) {
 			common.data [options.classCode][r.get (i, "code")] = r.get (i, "id");
 		}
 	};
-	var result = common.data [options.classCode][options.code];
+	let result = common.data [options.classCode][options.code];
 	if (result == null) {
 		throw {
 			name: "common.getId exception",
@@ -743,7 +743,7 @@ common.getId = function (options) {
 // Типовой макет для редактирования справочника
 // options: {viewCode, classCode, olapId, cardId}
 common.sprLayout = function (options) {
-	var l = { 
+	let l = { 
 		split:  {
 			orientation: "vertical",
 			width: 250,
@@ -819,13 +819,13 @@ common.sprLayout = function (options) {
 	});
 */
 common.chart.show = function (options) {
-	var store = new Ext.data.JsonStore ({
+	let store = new Ext.data.JsonStore ({
 		fields: options.fields,
 		data: options.data
 	});
-	var width = options.width || 800;
-	var height = options.height || 600;
-	var win = new Ext.Window ({
+	let width = options.width || 800;
+	let height = options.height || 600;
+	let win = new Ext.Window ({
 		title: options.title,
 		resizable: true,
 		closable: true,
@@ -856,19 +856,19 @@ common.chart.show = function (options) {
 }
 Ext.apply(Ext.form.VTypes, {
     daterange : function(val, field) {
-        var date = field.parseDate(val);
+        let date = field.parseDate(val);
         if(!date){
             return false;
         }
         if (field.startDateField) {
-            var start = Ext.getCmp(field.startDateField);
+            let start = Ext.getCmp(field.startDateField);
             if (!start.maxValue || (date.getTime() != start.maxValue.getTime())) {
                 start.setMaxValue(date);
                 start.validate();
             }
         }
         else if (field.endDateField) {
-            var end = Ext.getCmp(field.endDateField);
+            let end = Ext.getCmp(field.endDateField);
             if (!end.minValue || (date.getTime() != end.minValue.getTime())) {
                 end.setMinValue(date);
                 end.validate();
@@ -883,7 +883,7 @@ Ext.apply(Ext.form.VTypes, {
 });
 // options: {title, success}
 dialog.getPeriod = function (options) {
-	var dr = new Ext.FormPanel({
+	let dr = new Ext.FormPanel({
 		labelWidth: 75,
 		frame: true,
 		style: "background-color: #fff",
@@ -914,8 +914,8 @@ dialog.getPeriod = function (options) {
 			startDateField: 'startdt' // id of the start date field
 		}]
 	});
-	var scope = options.scope || this;
-	var win = new Ext.Window ({
+	let scope = options.scope || this;
+	let win = new Ext.Window ({
 		title: options.title,
 		resizable: true,
 		closable: true,
@@ -932,8 +932,8 @@ dialog.getPeriod = function (options) {
 				code: 'ok',
 				formBind: true,
 				handler: function () {
-					var d1 = dr.items.items [0].getValue ();
-					var d2 = dr.items.items [1].getValue ();
+					let d1 = dr.items.items [0].getValue ();
+					let d2 = dr.items.items [1].getValue ();
 					win.close ();
 					options.success.call (scope, {startDate: d1, dateStart: d1, endDate: d2, dateEnd: d2});
 				}
@@ -951,14 +951,14 @@ dialog.getPeriod = function (options) {
 // Выбор объекта в любом представлении
 // options: {width, height, title, view || layout, attr, success, scope}
 dialog.getObject = function (options) {
-	var panel;
-	var winWidth = options.width || 600;
-	var winHeight = options.height || 400;		
+	let panel;
+	let winWidth = options.width || 600;
+	let winHeight = options.height || 400;		
 	if (!options.title) {
 		options.title = $zr.getString ("object.choosing");
 	}
-	var scope = options.scope || this;
-	var view;
+	let scope = options.scope || this;
+	let view;
 	if (options.view) {
 		view = new objectum.ui.layout.ViewLayout ({
 			xtype: 'zviewlayout',
@@ -967,7 +967,7 @@ dialog.getObject = function (options) {
 			bodyStyle: 'background-color: ' + $zu.getThemeBGColor () + ';'
 		});
 	} else {
-		var record = $zs.views.get ("ser.card", {async: false});
+		let record = $zs.views.get ("ser.card", {async: false});
 		record.stub.set ("layout", typeof (options.layout) == "string" ? options.layout : JSON.stringify (options.layout));
 		view = new objectum.ui.layout.ViewLayout ({
 			xtype: 'zviewlayout',
@@ -976,19 +976,19 @@ dialog.getObject = function (options) {
 			bodyStyle: 'background-color: ' + $zu.getThemeBGColor () + ';'
 		});
 	};
-	var choose = function () {
-		var values, t = options.attr || "id";
+	let choose = function () {
+		let values, t = options.attr || "id";
 		t = t.split (".");
 		if (t.length == 1) {
 			values = view.relatives ["olap"].getCurrentValues (t [0]);
 		} else {
 			values = view.relatives [t [0]].getCurrentValues (t [1]);
 		};
-		var value = values [0];
+		let value = values [0];
 		win.close ();
 		options.success.call (scope, {value: value, values: values});
 	};
-	var win = new Ext.Window ({
+	let win = new Ext.Window ({
 		title: options.title,
 		resizable: true,
 		closable: true,
@@ -1019,9 +1019,9 @@ dialog.getObject = function (options) {
 	}
 */
 dialog.selectObject = function (options) {
-	var success = options.success;
-	var scope = options.scope;
-	var layout = {
+	let success = options.success;
+	let scope = options.scope;
+	let layout = {
 		olap: {
 			id: "olap",
 			view: options.view,
@@ -1032,37 +1032,37 @@ dialog.selectObject = function (options) {
 			}
 		}
 	};
-	var record = $zs.views.get ("ser.card", {async: false});
+	let record = $zs.views.get ("ser.card", {async: false});
 	record.stub.set ("layout", JSON.stringify (layout));
-	var view = new objectum.ui.layout.ViewLayout ({
+	let view = new objectum.ui.layout.ViewLayout ({
 		xtype: 'zviewlayout',
 		border: false,
 		record: record,
 		bodyStyle: 'background-color: ' + $zu.getThemeBGColor () + ';'
 	});
-	var choose = function () {
-		var id = view.relatives ["olap"].getCurrentValue ("id");
+	let choose = function () {
+		let id = view.relatives ["olap"].getCurrentValue ("id");
 		win.close ();
 		success.call (scope || this, {value: id});
 	};
-	var btnChoose = new Ext.Button ({
+	let btnChoose = new Ext.Button ({
 		code: 'choose',
 		disabled: true,
 		handler: choose,
 		scope: this
 	});
-	var btnCancel = new Ext.Button ({
+	let btnCancel = new Ext.Button ({
 		code: 'cancel',
 		handler: function () {
 			win.close ();
 		}
 	});
 	view.on ('load', function () {
-		var olap = view.relatives ['olap'];
+		let olap = view.relatives ['olap'];
 		if (!olap) {
 			return;
 		};
-		var onSelectionChange = function () {
+		let onSelectionChange = function () {
 			if (olap.getCurrentValue ('id')) {
 				btnChoose.setDisabled (false);
 			} else {
@@ -1071,7 +1071,7 @@ dialog.selectObject = function (options) {
 		};		
 		olap.selModel.on ('selectionchange', onSelectionChange, this);
 	}, this);
-	var win = new Ext.Window ({
+	let win = new Ext.Window ({
 		code: $o.getString ("Choose object"),
 		resizable: true,
 		closable: true,
@@ -1088,7 +1088,7 @@ dialog.selectObject = function (options) {
 };
 // options: {title, success}
 dialog.getDate = function (options) {
-	var dp = new Ext.FormPanel({
+	let dp = new Ext.FormPanel({
 		labelWidth: 75,
 		//frame: true,
 		bodyStyle: 'background-color: ' + $zu.getThemeBGColor () + '; padding: 5px 5px 0;',
@@ -1108,8 +1108,8 @@ dialog.getDate = function (options) {
 			id: 'dt'
 		}]
 	});
-	var scope = options.scope || this;
-	var win = new Ext.Window ({
+	let scope = options.scope || this;
+	let win = new Ext.Window ({
 		title: options.title,
 		closable: true,
 		modal: true,
@@ -1125,7 +1125,7 @@ dialog.getDate = function (options) {
 				iconCls: "ok",
 				formBind: true,
 				handler: function () {
-					var d = dp.items.items [0].getValue ();
+					let d = dp.items.items [0].getValue ();
 					win.close ();
 					options.success.call (scope, {date: d});
 				}
@@ -1145,12 +1145,12 @@ dialog.getDate = function (options) {
 //
 // options: {title, success, scope, fieldLabel, value}
 dialog.getString = function (options) {
-	var title = options.title || $ptitle;
-	var success = options.success;
-	var failure = options.failure;
-	var scope = options.scope || this;
-	var value = options.value;
-	var okBtn = new Ext.Button ({
+	let title = options.title || $ptitle;
+	let success = options.success;
+	let failure = options.failure;
+	let scope = options.scope || this;
+	let value = options.value;
+	let okBtn = new Ext.Button ({
 		code: 'Ok',
 		formBind: true,
 		scope: this,
@@ -1159,7 +1159,7 @@ dialog.getString = function (options) {
 			win.close ();
 		}
 	});
-	var cancelBtn = new Ext.Button ({
+	let cancelBtn = new Ext.Button ({
 		code: 'Cancel',
 		scope: this,
 		handler: function () {
@@ -1169,7 +1169,7 @@ dialog.getString = function (options) {
 			win.close ();
 		}
 	});
-	var fieldName = new Ext.form.TextField ({
+	let fieldName = new Ext.form.TextField ({
 		selectOnFocus: true,
 		fieldLabel: options.fieldLabel || $o.getString ("Enter string"),
 		allowBlank: false,
@@ -1189,7 +1189,7 @@ dialog.getString = function (options) {
 			scope: this
 		}
 	});
-	var form = new Ext.FormPanel({
+	let form = new Ext.FormPanel({
 		frame: false,
 		border: false,
 		defaultType: 'textfield',
@@ -1206,7 +1206,7 @@ dialog.getString = function (options) {
 			cancelBtn
 		]
 	});
-    var win = new Ext.Window ({
+    let win = new Ext.Window ({
 		width: 450,
 		height: 150,
         layout: 'fit',
@@ -1225,11 +1225,11 @@ dialog.getString = function (options) {
 //
 // options: {title, success, scope, fieldLabel}
 dialog.getNumber = function (options) {
-	var title = options.title || $ptitle;
-	var success = options.success;
-	var failure = options.failure;
-	var scope = options.scope || this;
-	var okBtn = new Ext.Button ({
+	let title = options.title || $ptitle;
+	let success = options.success;
+	let failure = options.failure;
+	let scope = options.scope || this;
+	let okBtn = new Ext.Button ({
 		code: 'Ok',
 		formBind: true,
 		scope: this,
@@ -1238,7 +1238,7 @@ dialog.getNumber = function (options) {
 			win.close ();
 		}
 	});
-	var cancelBtn = new Ext.Button ({
+	let cancelBtn = new Ext.Button ({
 		code: 'Cancel',
 		scope: this,
 		handler: function () {
@@ -1248,7 +1248,7 @@ dialog.getNumber = function (options) {
 			win.close ();
 		}
 	});
-	var fieldName = new Ext.form.NumberField ({
+	let fieldName = new Ext.form.NumberField ({
 		selectOnFocus: true,
 		fieldLabel: options.fieldLabel || $o.getString ("Enter number"),
 		allowBlank: false,
@@ -1267,7 +1267,7 @@ dialog.getNumber = function (options) {
 			scope: this
 		}
 	});
-	var form = new Ext.FormPanel({
+	let form = new Ext.FormPanel({
 		frame: false,
 		border: false,
 		defaultType: 'textfield',
@@ -1284,7 +1284,7 @@ dialog.getNumber = function (options) {
 			cancelBtn
 		]
 	});
-    var win = new Ext.Window ({
+    let win = new Ext.Window ({
 		width: 450,
 		height: 150,
         layout: 'fit',
@@ -1386,8 +1386,8 @@ $report.xmlss = function (options) {
 	// Нормализация объектов
 	this.normalize = function (options) {
 		if (Ext.isArray (this.columns)) {
-			var o = {};
-			for (var i = 0; i < this.columns.length; i ++) {
+			let o = {};
+			for (let i = 0; i < this.columns.length; i ++) {
 				o [i + 1] = {width: this.columns [i]};
 			};
 			this.columns = o;
@@ -1395,33 +1395,33 @@ $report.xmlss = function (options) {
 		if (!this.rows || !this.rows.length) {
 			this.rows = [{cells: [{text: ""}]}];
 		};
-		for (var i = 0; i < this.rows.length; i ++) {
-			var row = this.rows [i];
+		for (let i = 0; i < this.rows.length; i ++) {
+			let row = this.rows [i];
 			row.height = row.height || 12.75;
 			row.cells = row.cells || [];
-			for (var j = 0; j < row.cells.length; j ++) {
+			for (let j = 0; j < row.cells.length; j ++) {
 				if (typeof (row.cells [j].text) == "number") {
 					row.cells [j].text = String (row.cells [j].text);
 				};
 			};
 			row.startIndex = row.startIndex || 0;
 		};
-		for (var k = 0; k < this.sheets.length; k ++) {
-			var sheet = this.sheets [k];
+		for (let k = 0; k < this.sheets.length; k ++) {
+			let sheet = this.sheets [k];
 			if (Ext.isArray (sheet.columns)) {
-				var o = {};
-				for (var i = 0; i < sheet.columns.length; i ++) {
+				let o = {};
+				for (let i = 0; i < sheet.columns.length; i ++) {
 					o [i + 1] = {width: sheet.columns [i]};
 				};
 				sheet.columns = o;
 			};
 			sheet.rows = sheet.rows || [];
-			for (var i = 0; i < sheet.rows.length; i ++) {
-				var row = sheet.rows [i];
+			for (let i = 0; i < sheet.rows.length; i ++) {
+				let row = sheet.rows [i];
 				row.height = row.height || 12.75;
 				row.cells = row.cells || [];
-				for (var j = 0; j < row.cells.length; j ++) {
-					var t = row.cells [j].text;
+				for (let j = 0; j < row.cells.length; j ++) {
+					let t = row.cells [j].text;
 					if (typeof (t) == "number") {
 						row.cells [j].text = String (row.cells [j].text);
 					};
@@ -1445,10 +1445,10 @@ $report.xmlss = function (options) {
 		};
 	};
 	this.preview = function (options) {
-		var me = this;
+		let me = this;
 		options = options || {};
 		me.title = options.title;
-		var win = new Ext.Window ({
+		let win = new Ext.Window ({
 			title: $o.getString ("Preview"),
 			resizable: true,
 			closable: true,
@@ -1483,7 +1483,7 @@ $report.xmlss = function (options) {
 	// Создание отчета
 	this.create = function (options) {
 		this.normalize (options);
-		var uri = 'report?sessionId=' + $sessionId + "&username=" + $zp.currentUser + "&format=xmlss&custom=1";
+		let uri = 'report?sessionId=' + $sessionId + "&username=" + $zp.currentUser + "&format=xmlss&custom=1";
 		document.getElementById ('loading').innerHTML = 
 			"<form name='form_report' method='post' target='_blank' action='" + uri + "'>" +
 			"<textarea style='display: none' name='params'>" + JSON.stringify (this.params) + "</textarea>" +
@@ -1497,7 +1497,7 @@ $report.xmlss = function (options) {
 	};
 	this.createXLSX = function (options) {
 		this.normalize (options);
-		var uri = 'report?sessionId=' + $sessionId + "&username=" + $zp.currentUser + "&format=xlsx";
+		let uri = 'report?sessionId=' + $sessionId + "&username=" + $zp.currentUser + "&format=xlsx";
 		document.getElementById ('loading').innerHTML = 
 			"<form name='form_report' method='post' target='_blank' action='" + uri + "'>" +
 			"<textarea style='display: none' name='params'>" + JSON.stringify (this.params) + "</textarea>" +
@@ -1511,7 +1511,7 @@ $report.xmlss = function (options) {
 	};
 	this.createCSV = function (options) {
 		this.normalize (options);
-		var uri = 'report?sessionId=' + $sessionId + "&username=" + $zp.currentUser + "&format=xlsx&convert_csv=1&win1251=1";
+		let uri = 'report?sessionId=' + $sessionId + "&username=" + $zp.currentUser + "&format=xlsx&convert_csv=1&win1251=1";
 		document.getElementById ('loading').innerHTML = 
 			"<form name='form_report' method='post' target='_blank' action='" + uri + "'>" +
 			"<textarea style='display: none' name='params'>" + JSON.stringify (this.params) + "</textarea>" +
@@ -1526,7 +1526,7 @@ $report.xmlss = function (options) {
 	// Создание PDF отчета
 	this.createPDF = function (options) {
 		this.normalize ();
-		var uri = 'pdf?sessionId=' + $sessionId;
+		let uri = 'pdf?sessionId=' + $sessionId;
 		document.getElementById ('loading').innerHTML = 
 			"<form name='form_report' method='post' target='_blank' action='" + uri + "'>" +
 			"<textarea style='display: none' name='params'>" + JSON.stringify (this.params) + "</textarea>" +
@@ -1542,11 +1542,11 @@ $report.xmlss = function (options) {
 	this.createHTML = function (options) {
 		this.normalize ();
 		options = options || {};
-		var rows = options.rows || this.rows;
+		let rows = options.rows || this.rows;
 		if (this.sheets.length) {
 			rows = this.sheets [0].rows;
 		};
-		var w;
+		let w;
 		if (options.generate) {
 			w = {
 				document: {
@@ -1605,13 +1605,13 @@ $report.xmlss = function (options) {
 			"</style>\n"
 		);
 		w.document.write ('<table cellpadding=0 cellspacing=0>');
-		for (var i = 0; i < rows.length; i ++) {
-			var row = rows [i];
-			var cells = row.cells;
-			var r = "<tr>";
-			for (var j = 0; j < cells.length; j ++) {
-				var cell = cells [j];
-				var v = cell.text;
+		for (let i = 0; i < rows.length; i ++) {
+			let row = rows [i];
+			let cells = row.cells;
+			let r = "<tr>";
+			for (let j = 0; j < cells.length; j ++) {
+				let cell = cells [j];
+				let v = cell.text;
 				if (v === undefined || v === null || v === "") {
 					v = "<img width=1 height=1>";
 				};
@@ -1622,7 +1622,7 @@ $report.xmlss = function (options) {
 				if (cell.style == "border_gray") {
 					v = "<font color='gray'>" + v + "</font>";
 				};
-				var bgcolor = "";
+				let bgcolor = "";
 				if (cell.style == "border_bg_gray") {
 					bgcolor = "bgcolor='#DDDDDD'";
 				};
@@ -1688,10 +1688,10 @@ $dbf.file = function (options) {
 	this.rows = options.rows || [];
 	// Создание отчета
 	this.create = function (options) {
-		var uri = 'report?sessionId=' + $sessionId + "&username=" + $zp.currentUser + "&format=dbf&custom=1&filename=" + this.options.filename;
-		for (var i = 0; i < this.rows.length; i ++) {
-			var row = this.rows [i];
-			for (var field in row) {
+		let uri = 'report?sessionId=' + $sessionId + "&username=" + $zp.currentUser + "&format=dbf&custom=1&filename=" + this.options.filename;
+		for (let i = 0; i < this.rows.length; i ++) {
+			let row = this.rows [i];
+			for (let field in row) {
 				row [field] = String (row [field]);
 			};
 		};
@@ -1713,7 +1713,7 @@ $csv.file = function (options) {
 	this.body = options.body || "";
 	// Создание отчета
 	this.create = function (options) {
-		var uri = 'report?sessionId=' + $sessionId + "&username=" + $o.currentUser + "&format=xmlss&custom=1&csv=1";
+		let uri = 'report?sessionId=' + $sessionId + "&username=" + $o.currentUser + "&format=xmlss&custom=1&csv=1";
 		document.getElementById ('loading').innerHTML = 
 			"<form name='form_report' method='post' action='" + uri + "'>" +
 			"<textarea style='display: none' name='body'>" + this.body + "</textarea>" +
@@ -1726,7 +1726,7 @@ String.prototype.fulltrim = function () {
 	return this.replace (/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace (/\s+/g,' ');
 };
 common.isEmail = function (email) {
-	var emailReg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+	let emailReg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 	return emailReg.test (email);
 };
 Ext.example = function () {
@@ -1741,13 +1741,13 @@ Ext.example = function () {
     };
     return {
         msg: function (title, msg, el) {
-			var msgCt = Ext.DomHelper.insertFirst (el || document.body, {id:'msg-div'}, true);
+			let msgCt = Ext.DomHelper.insertFirst (el || document.body, {id:'msg-div'}, true);
             //msgCt.alignTo (el || document, 't');
-            var m = Ext.DomHelper.append (msgCt, {html: createBox (title, msg)}, true);
+            let m = Ext.DomHelper.append (msgCt, {html: createBox (title, msg)}, true);
             m.slideIn ('t').pause (500).ghost ("t", {remove: true});
         },
         init: function () {
-            var lb = Ext.get ('lib-bar');
+            let lb = Ext.get ('lib-bar');
             if (lb) {
                 lb.show();
             };
@@ -1772,7 +1772,7 @@ common.round = function (d, n) {
 	if (!d) {
 		return d;
 	};
-	var nn;
+	let nn;
 	switch (n) {
 	case null:
 	case undefined:
@@ -1794,15 +1794,15 @@ common.round = function (d, n) {
 	default:
 		throw "common.round - invalid n: " + n;
 	};
-	var r = Math.round (d * nn) / nn;
+	let r = Math.round (d * nn) / nn;
 	return r;
 };
 common.isNumber = function (n) {
   return !isNaN (parseFloat (n)) && isFinite (n);
 };
 common.sqlArray = function (a) {
-	var r = [];
-	for (var i = 0; i < a.length; i ++) {
+	let r = [];
+	for (let i = 0; i < a.length; i ++) {
 		if (i) {
 			r.push (",");
 		};
@@ -1811,11 +1811,11 @@ common.sqlArray = function (a) {
 	return r;
 };
 common.extMajorVersion = function () {
-	var v = Ext.version || Ext.getVersion ().version;
+	let v = Ext.version || Ext.getVersion ().version;
 	return v.split (".")[0];
 };
 common.isEmail = function (email) {
-	var emailReg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+	let emailReg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 	return emailReg.test (email);
 };
 common.unicode = {
@@ -1824,7 +1824,7 @@ common.unicode = {
 			return s;
 		};
 		return s.replace (/^[-~]|\\/g, function (m) {
-			var code = m.charCodeAt (0);
+			let code = m.charCodeAt (0);
 			return '\\u' + ((code < 0x10) ? '000' : ((code < 0x100) ? '00' : ((code < 0x1000) ? '0' : ''))) + code.toString (16);
 		});
 	},
@@ -1838,17 +1838,17 @@ common.unicode = {
 	}
 };
 common.addRecord = function (options) {
-	var store = options.store;
-	var data = options.data;
-	var map = options.map;
+	let store = options.store;
+	let data = options.data;
+	let map = options.map;
 	if (!store || !data || !map) {
 		return data;
 	};
 	function getValue (data, path) {
-		var tokens = path.split (".");
-		var val = data [tokens [0]];
-		for (var i = 1; i < tokens.length; i ++) {
-			var o = $o.getObject (val);
+		let tokens = path.split (".");
+		let val = data [tokens [0]];
+		for (let i = 1; i < tokens.length; i ++) {
+			let o = $o.getObject (val);
 			if (!o) {
 				val = null;
 				break;
@@ -1857,13 +1857,13 @@ common.addRecord = function (options) {
 		};
 		return val;
 	};
-	for (var attr in map) {
+	for (let attr in map) {
 		data [attr] = getValue (data, map [attr]);
 	};
-	var cmp = options.cmp;
+	let cmp = options.cmp;
 	if (cmp.getXType ().indexOf ("tree") > -1) {
-		var sm = cmp.getSelectionModel ();
-		var node;
+		let sm = cmp.getSelectionModel ();
+		let node;
 		if (sm.hasSelection ()) {
             node = sm.getSelection ()[0];
             node.set ("leaf", false);
@@ -1879,16 +1879,16 @@ common.addRecord = function (options) {
 	return data;
 };
 common.updateRecord = function (options) {
-	var record = options.record;
-	var map = options.map;
+	let record = options.record;
+	let map = options.map;
 	if (!record || !map) {
 		return record;
 	};
 	function getValue (record, path) {
-		var tokens = path.split (".");
-		var val = record.get (tokens [0]);
-		for (var i = 1; i < tokens.length; i ++) {
-			var o = $o.getObject (val);
+		let tokens = path.split (".");
+		let val = record.get (tokens [0]);
+		for (let i = 1; i < tokens.length; i ++) {
+			let o = $o.getObject (val);
 			if (!o) {
 				val = undefined;
 				break;
@@ -1897,8 +1897,8 @@ common.updateRecord = function (options) {
 		};
 		return val;
 	};
-	for (var attr in map) {
-		var v = getValue (record, map [attr]);
+	for (let attr in map) {
+		let v = getValue (record, map [attr]);
 		if (v !== undefined) {
 			record.set (attr, v);
 		}
@@ -1908,20 +1908,20 @@ common.updateRecord = function (options) {
 };
 common.tpl.remove = function (options) {
 	options = options || {};
-	var me = this;
+	let me = this;
 	common.confirm ({message: $o.getString ("Are you sure?"), fn: function (btn) {
 		if (btn == "yes") {
-			var id = options.id || me.getValue ("a_id") || me.getValue ("id");
+			let id = options.id || me.getValue ("a_id") || me.getValue ("id");
 			if (id) {
 				$o.startTransaction ({description: "Remove " + id});
-				var o = $o.getObject (id);
+				let o = $o.getObject (id);
 				o.remove ();
 				o.commit ();
 				$o.commitTransaction ();
 				if (me.getSelectionModel) {
-					var record = me.getSelectionModel ().getSelection ()[0];
+					let record = me.getSelectionModel ().getSelection ()[0];
 					if (me.getXType ().indexOf ("tree") > -1) {
-	                    var parentNode = record.parentNode;
+	                    let parentNode = record.parentNode;
 						record.remove ();
 						if (parentNode != me.getStore ().getRootNode () && !parentNode.childNodes.length) {
 							parentNode.set ("leaf", true);
@@ -1935,37 +1935,37 @@ common.tpl.remove = function (options) {
 	}});
 };
 common.tpl.show = function (options) {
-	var me = this;
+	let me = this;
 	options = options || {};
 	options.id = options.id || this.getValue ("a_id") || this.getValue ("id");
-	var refresh = options.refresh;
-	var fn = options.card;
+	let refresh = options.refresh;
+	let fn = options.card;
 	if (fn) {
 		fn = typeof (fn) == "string" ? eval (fn) : fn;
 	};
-	var layout = options.layout;
+	let layout = options.layout;
 	options.title = options.title || "";
 	if (options.id) {
-		var o = $s.getObject (options.id);
+		let o = $s.getObject (options.id);
 		options.title = o.get ("name") || "ID: " + (options.id < 0 ? $o.getString ("Adding") : options.id);
 	};
-	var map = options.map || me.map || {};
-	var sql = eval ("(" + me.$view.get ("query") + ")");
+	let map = options.map || me.map || {};
+	let sql = eval ("(" + me.$view.get ("query") + ")");
 	// tree: {a: "id", b: "id.type", c: "id.type.vid"} <- select a.name, b.name from subject.org a left join spr.org.type b on (b.id = a.type) left join spr.org.vid c on (c.id = b.vid)
-	var getTree = function (from) {
-		var tree = {};
-		var a; for (a in from [0]) {break;};
+	let getTree = function (from) {
+		let tree = {};
+		let a; for (a in from [0]) {break;};
 		tree [a] = me.$view.attrs ["a_id"] ? "a_id" : "id";
 		function process (b) {
-			for (var i = 2; i < from.length; i += 4) {
-				var e; for (e in from [i]) {break;};
+			for (let i = 2; i < from.length; i += 4) {
+				let e; for (e in from [i]) {break;};
 				if (tree [e]) {
 					continue;
 				};
-				var c = from [i + 2];
-				for (var j = 0; j < c.length; j ++) {
+				let c = from [i + 2];
+				for (let j = 0; j < c.length; j ++) {
 					if (typeof (c [j]) == "object") {
-						var d; for (d in c [j]) {break;};
+						let d; for (d in c [j]) {break;};
 						if (d == b && 
 							c [j][d] != "id" // обратные ссылки не получится
 						) {
@@ -1979,12 +1979,12 @@ common.tpl.show = function (options) {
 		process (a);
 		return tree;
 	};
-	var tree = getTree (sql.from);
-	for (var i = 1; i < sql.select.length; i ++) {
+	let tree = getTree (sql.from);
+	for (let i = 1; i < sql.select.length; i ++) {
 		if (typeof (sql.select [i]) == "string") {
-			for (var j = 0; j < me.columns.length; j ++) {
+			for (let j = 0; j < me.columns.length; j ++) {
 				if (me.columns [j].dataIndex == sql.select [i]) {
-					var a; for (a in sql.select [i - 1]) {break;};
+					let a; for (a in sql.select [i - 1]) {break;};
 					map [sql.select [i]] = map [sql.select [i]] || (tree [a] + "." + sql.select [i - 1][a]);
 				};
 			};
@@ -1994,7 +1994,7 @@ common.tpl.show = function (options) {
 	if (options.readOnly) {
 		common.makeReadOnlyLayout (layout);
 	};
-	var items = {
+	let items = {
 		id: "o" + options.id,
 		objectId: options.id,
 		name: "viewContainer",
@@ -2004,9 +2004,9 @@ common.tpl.show = function (options) {
 		$layout: layout,
 		listeners: {
 			destroy: function () {
-				var o = $s.getObject (options.id);
+				let o = $s.getObject (options.id);
 				if (o.get ("id") != options.id) {
-					var record = common.addRecord ({
+					let record = common.addRecord ({
 						cmp: me,
 						store: me.getStore (), 
 						data: me.$view.attrs ["a_id"] ? {
@@ -2021,10 +2021,10 @@ common.tpl.show = function (options) {
 						me.getSelectionModel ().select (me.getStore ().getCount () - 1);
 					};
 				} else {
-					var record = me.getSelectionModel ().getSelection ()[0];
+					let record = me.getSelectionModel ().getSelection ()[0];
 					if (!record) {
-	                    var store = me.getStore ();
-	                    var sm = me.getSelectionModel ();
+	                    let store = me.getStore ();
+	                    let sm = me.getSelectionModel ();
 	                    record = store.getById (options.id);
 	                    if (record) {
 	                    	sm.select (record);
@@ -2044,7 +2044,7 @@ common.tpl.show = function (options) {
 	};
 	if (options.asWindow) {
 		items.title = undefined;
-		var win = Ext.create ("Ext.window.Window", {
+		let win = Ext.create ("Ext.window.Window", {
 			title: options.title,
 			resizable: true,
 			closable: true,
@@ -2060,25 +2060,25 @@ common.tpl.show = function (options) {
 	};
 };
 common.tpl.getViewObjectId = function () {
-	var id = 0;
-	var vc = this.up ("*[name=viewContainer]");
+	let id = 0;
+	let vc = this.up ("*[name=viewContainer]");
 	if (vc) {
 	    id = vc.objectId;
 	};
 	return id;
 };
 common.tpl.getOpener = function () {
-	var vc = this.up ("*[name=viewContainer]");
+	let vc = this.up ("*[name=viewContainer]");
 	if (vc) {
 	    return vc.opener;
 	};
 };
 common.tpl.create = function (options) {
-	var me = this;
-	var o = $s.createObject (options.classCode, "local");
+	let me = this;
+	let o = $s.createObject (options.classCode, "local");
 	if (options.attrs) {
-		for (var attr in options.attrs) {
-			var v = options.attrs [attr];
+		for (let attr in options.attrs) {
+			let v = options.attrs [attr];
             if (Object.prototype.toString.apply (v) === "[object Array]") {
             	v = me.relatives [v [0]].getValue (v [1]);
             };
@@ -2090,7 +2090,7 @@ common.tpl.create = function (options) {
 	};
 	options.id = o.get ("id");
 	if (options.fn) {
-		var fn = typeof (options.fn) == "string" ? eval (options.fn) : options.fn;
+		let fn = typeof (options.fn) == "string" ? eval (options.fn) : options.fn;
 		fn.call (me, o, options);
 	};
 	if (!options.layout) {
@@ -2103,15 +2103,15 @@ common.tpl.updateTags = function (r, args) {
 	if (!r) {
 		return r;
 	};
-	var tags = [];
-	var isObject = 0;
+	let tags = [];
+	let isObject = 0;
 	if (typeof (r) == "object") {
 		r = JSON.stringify (r);
 		isObject = 1;
 	};
-	for (var i = 1; i < r.length; i ++) {
+	for (let i = 1; i < r.length; i ++) {
 		if ((r [i] == "$" || r [i] == "#") && r [i - 1] == "[") {
-			var tag = "";
+			let tag = "";
 			for (; i < r.length; i ++) {
 				if (r [i] == "]") {
 					break;
@@ -2124,8 +2124,8 @@ common.tpl.updateTags = function (r, args) {
 			};
 		};
 	};
-	for (var i = 0; i < tags.length; i ++) {
-		var result;
+	for (let i = 0; i < tags.length; i ++) {
+		let result;
 		if (tags [i][0] == "$") {
 			result = common.getValue (args, tags [i]);
 		} else {
@@ -2139,8 +2139,8 @@ common.tpl.updateTags = function (r, args) {
 	return r;
 };
 dialog.getClass = function (options) {
-	var success = options.success;
-	var win = Ext.create ("Ext.Window", {
+	let success = options.success;
+	let win = Ext.create ("Ext.Window", {
 		title: $o.getString ("Choose", "class"),
 		width: 900,
 		height: 700,
@@ -2154,9 +2154,9 @@ dialog.getClass = function (options) {
 		},
 		listeners: {
 			afterrender: function () {
-				var olap = win.down ("*[zid=olap]");
-				var id;
-				var btnChoose = Ext.create ("Ext.Button", {
+				let olap = win.down ("*[zid=olap]");
+				let id;
+				let btnChoose = Ext.create ("Ext.Button", {
 					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
@@ -2179,7 +2179,7 @@ dialog.getClass = function (options) {
 				olap.on ("itemdblclick", function () {
 					btnChoose.handler ();
 				});
-				var tbar = olap.down ("toolbar[dock=top]");
+				let tbar = olap.down ("toolbar[dock=top]");
 				tbar.insert (0, [btnChoose]);
 				tbar.doLayout ();
 			}
@@ -2189,8 +2189,8 @@ dialog.getClass = function (options) {
 };
 // {hasQuery, success}
 dialog.getView = function (options) {
-	var success = options.success;
-	var win = Ext.create ("Ext.Window", {
+	let success = options.success;
+	let win = Ext.create ("Ext.Window", {
 		title: $o.getString ("Select") + " " + (options.hasQuery ? $o.getString ("query") : $o.getString ("view")),
 		width: 900,
 		height: 700,
@@ -2204,9 +2204,9 @@ dialog.getView = function (options) {
 		},
 		listeners: {
 			afterrender: function () {
-				var olap = win.down ("*[zid=olap]");
-				var id;
-				var btnChoose = Ext.create ("Ext.Button", {
+				let olap = win.down ("*[zid=olap]");
+				let id;
+				let btnChoose = Ext.create ("Ext.Button", {
 					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
@@ -2229,7 +2229,7 @@ dialog.getView = function (options) {
 				olap.on ("itemdblclick", function () {
 					btnChoose.handler ();
 				});
-				var tbar = olap.down ("toolbar[dock=top]");
+				let tbar = olap.down ("toolbar[dock=top]");
 				tbar.insert (0, [btnChoose]);
 				tbar.doLayout ();
 			}
@@ -2238,8 +2238,8 @@ dialog.getView = function (options) {
 	win.show ();
 };
 dialog.getAction = function (options) {
-	var success = options.success;
-	var win = Ext.create ("Ext.Window", {
+	let success = options.success;
+	let win = Ext.create ("Ext.Window", {
 		title: $o.getString ("Select", "action"),
 		width: 900,
 		height: 700,
@@ -2253,10 +2253,10 @@ dialog.getAction = function (options) {
 		},
 		listeners: {
 			afterrender: function () {
-				var olap = win.down ("*[zid=olapActions]");
+				let olap = win.down ("*[zid=olapActions]");
 				olap.up ("tabpanel").setActiveTab (2);
-				var id;
-				var btnChoose = Ext.create ("Ext.Button", {
+				let id;
+				let btnChoose = Ext.create ("Ext.Button", {
 					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
@@ -2279,7 +2279,7 @@ dialog.getAction = function (options) {
 				olap.on ("itemdblclick", function () {
 					btnChoose.handler ();
 				});
-				var tbar = olap.down ("toolbar[dock=top]");
+				let tbar = olap.down ("toolbar[dock=top]");
 				tbar.insert (0, [btnChoose]);
 				tbar.doLayout ();
 			}
@@ -2288,10 +2288,10 @@ dialog.getAction = function (options) {
 	win.show ();
 };
 common.report.show = function (options) {
-	var o = $o.getObject (options.id);
-	var success = options.success;
-	var value = o.get ("options") ? JSON.parse (o.get ("options")) : null;
-	var win = Ext.create ("Ext.Window", {
+	let o = $o.getObject (options.id);
+	let success = options.success;
+	let value = o.get ("options") ? JSON.parse (o.get ("options")) : null;
+	let win = Ext.create ("Ext.Window", {
 		title: $o.getString ("Report"),
 		iconCls: "gi_print",
 		width: 800,
@@ -2306,8 +2306,8 @@ common.report.show = function (options) {
 			text: $o.getString ("Save"),
 			iconCls: "save",
 			handler: function () {
-				var rd = win.down ("*[name=reportdesigner]");
-				var v = rd.getValue ();
+				let rd = win.down ("*[name=reportdesigner]");
+				let v = rd.getValue ();
 				if (!v.code) {
 					common.message ($o.getString ("Enter report code"));
 					return;
@@ -2326,8 +2326,8 @@ common.report.show = function (options) {
 			text: $o.getString ("Preview"),
 			iconCls: "gi_search",
 			handler: function () {
-				var value = JSON.parse (o.get ("options"));
-				var rd = Ext.create ("$o.ReportDesigner.Widget", {
+				let value = JSON.parse (o.get ("options"));
+				let rd = Ext.create ("$o.ReportDesigner.Widget", {
 					value: value
 				});
 				rd.build ({html: 1});
@@ -2342,8 +2342,8 @@ common.report.show = function (options) {
 	win.show ();
 };
 common.report.build = function (options) {
-	var code = options.code;
-	var r = $o.execute ({
+	let code = options.code;
+	let r = $o.execute ({
 		select: [
 			{"a": "id"}, "id"
 		],
@@ -2358,19 +2358,19 @@ common.report.build = function (options) {
 		common.message ($o.getString ("Report") + " '" + code + "' " + $o.getString ("not exists"));
 		return;
 	};
-	var o = $o.getObject (r.get (0, "id"));
-	var value = JSON.parse (o.get ("options"));
-	var rd = Ext.create ("$o.ReportDesigner.Widget", {
+	let o = $o.getObject (r.get (0, "id"));
+	let value = JSON.parse (o.get ("options"));
+	let rd = Ext.create ("$o.ReportDesigner.Widget", {
 		value: value
 	});
 	rd.build (options);
 };
 common.merge = function (json1, json2) {
-    var out = {};
-    for (var k1 in json1) {
+    let out = {};
+    for (let k1 in json1) {
         if (json1.hasOwnProperty (k1)) out[k1] = json1 [k1];
     };
-    for (var k2 in json2) {
+    for (let k2 in json2) {
         if (json2.hasOwnProperty (k2)) {
             if (!out.hasOwnProperty (k2)) out [k2] = json2 [k2];
             else if (
@@ -2388,7 +2388,7 @@ common.makeReadOnlyLayout = function (layout) {
 	} catch (e) {
 		return;
 	};
-	//var cache = {};
+	//let cache = {};
 	function go (l) {
 		/*
 		if (cache [l]) {
@@ -2396,10 +2396,10 @@ common.makeReadOnlyLayout = function (layout) {
 		};
 		cache [l] = true;
 		*/
-	    for (var key in l) {
+	    for (let key in l) {
 	        if (typeof (l [key]) == "object") {
 		        if (key == "actions" && Ext.isArray (l [key])) {
-		            for (var i = l [key].length - 1; i >= 0; i --) {
+		            for (let i = l [key].length - 1; i >= 0; i --) {
 		                if ([$o.getString ("Open")].indexOf (l [key][i].text) > -1 || ["open"].indexOf (l [key][i].caption) > -1) {
 		                    l [key][i].arguments = l [key][i].arguments || {};
 		                    l [key][i].arguments.readOnly = true;
@@ -2433,18 +2433,18 @@ common.makeReadOnlyLayout = function (layout) {
 	1000000 -> 1 000 000
 */
 common.setThousandSeparator = function (v) {
-	var me = this;
-	var s = String (v), r = [];
-	for (var i = 0; i < s.length % 3; i ++) {
+	let me = this;
+	let s = String (v), r = [];
+	for (let i = 0; i < s.length % 3; i ++) {
 		s = " " + s;
 	}
-	for (var i = 0; i < s.length; i += 3) {
+	for (let i = 0; i < s.length; i += 3) {
 		r.push (s.substr (i, 3));
 	}
 	return r.join (" ");
 }
 common.findObject = function (obj, keyObj) {
-    var p, key, val, tRet;
+    let p, key, val, tRet;
     for (p in keyObj) {
         if (keyObj.hasOwnProperty (p)) {
             key = p;
@@ -2468,10 +2468,10 @@ common.findObject = function (obj, keyObj) {
     return false;
 }
 common.findMenuItem = function (m, opts) {
-	var items = m.items;
-	for (var i = 0; i < items.getCount (); i ++) {
-		var item = items.getAt (i);
-		var equal = true;
+	let items = m.items;
+	for (let i = 0; i < items.getCount (); i ++) {
+		let item = items.getAt (i);
+		let equal = true;
 		_.each (opts, function (v, a) {
 			if (v != item [a]) {
 				equal = false;
@@ -2489,7 +2489,7 @@ common.findMenuItem = function (m, opts) {
 	}
 }
 common.updateMenuItemText = function (m, opts, text) {
-	var item = common.findMenuItem (m, opts);
+	let item = common.findMenuItem (m, opts);
 	if (item && item.setText) {
 		item.setText (text);
 	}
@@ -2504,7 +2504,7 @@ common.updateMenuItemText = function (m, opts, text) {
 */
 common.reportTpl = function (opts) {
 	if (opts.method == "post") {
-		var reportUri =
+		let reportUri =
 			"report?storage=" + $o.code + "&" +
 			"sessionId=" + $sessionId + "&" +
 			"username=" + $o.currentUser + "&" +
@@ -2515,12 +2515,12 @@ common.reportTpl = function (opts) {
 		if (opts.files) {
 			reportUri += "&files=" + opts.files;
 		}
-		var mapForm = document.createElement ("form");
+		let mapForm = document.createElement ("form");
 	    mapForm.target = "Map";
 	    mapForm.method = "POST";
 	    mapForm.action = reportUri;
 
-	    var mapInput = document.createElement ("input");
+	    let mapInput = document.createElement ("input");
 	    mapInput.type = "text";
 	    mapInput.name = "opts";
 	    mapInput.value = JSON.stringify (opts);
@@ -2531,8 +2531,8 @@ common.reportTpl = function (opts) {
 	    map = window.open ("", "Map");
 	    mapForm.submit ();
 	} else {
-		var reportUri = "report?";			
-		var key;
+		let reportUri = "report?";			
+		let key;
 		_.each (opts, function (v, a) {
 			reportUri += a + "=" + v + "&";
 		});
@@ -2542,7 +2542,7 @@ common.reportTpl = function (opts) {
 			"username=" + $o.currentUser + "&" +
 			"time_offset_min=" + (new Date ()).getTimezoneOffset ()
 		;
-		var w = window.open (reportUri);
+		let w = window.open (reportUri);
 		w.focus ();
 	}
 }

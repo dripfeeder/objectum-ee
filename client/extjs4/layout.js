@@ -15,7 +15,7 @@ Ext.define ("$o.Layout.Widget", {
 	},
 	initComponent: function () {
 		this.relatives = {};
-		var layout = this.$layout;
+		let layout = this.$layout;
 		if (!layout && this.record && this.record.stub) {
 			layout = this.record.stub.get ("layout");
 			if (!layout && this.record.get ("query")) {
@@ -52,20 +52,20 @@ Ext.define ("$o.Layout.Widget", {
 		this.callParent (arguments);
 	},
 	processTab: function (o) {
-		var item = {
+		let item = {
 			xtype: "tabpanel",
 			zid: o.id,
 			items: []
 		};
 		o.items = o.pages || o.items;
-		for (var i = 0; i < o.items.length; i ++) {
+		for (let i = 0; i < o.items.length; i ++) {
 			item.items.push (this.process (o.items [i]));
 		};
 		delete o.id;
 		return item;
 	},
 	processSplit: function (o) {
-		var item = {
+		let item = {
 			layout: "border",
 			border: false,
 			zid: o.id,
@@ -102,7 +102,7 @@ Ext.define ("$o.Layout.Widget", {
 		return item;
 	},
 	processOlap: function (o) {
-		var item = {
+		let item = {
 			xtype: "$o.grid",
 			zview: this,
 			relatives: this.relatives,
@@ -125,7 +125,7 @@ Ext.define ("$o.Layout.Widget", {
 		return item;
 	},
 	processChart: function (o) {
-		var item = {
+		let item = {
 			xtype: "$o.chart",
 			zview: this,
 			relatives: this.relatives,
@@ -137,7 +137,7 @@ Ext.define ("$o.Layout.Widget", {
 		return item;
 	},
 	processImage: function (o) {
-		var item = {
+		let item = {
 			xtype: "$o.image",
 			zview: this,
 			relatives: this.relatives,
@@ -151,7 +151,7 @@ Ext.define ("$o.Layout.Widget", {
 		return item;
 	},
 	processFrame: function (o) {
-		var item = {
+		let item = {
 			xtype: "$o.frame",
 			zview: this,
 			relatives: this.relatives,
@@ -163,7 +163,7 @@ Ext.define ("$o.Layout.Widget", {
 		return item;
 	},
 	processTreegrid: function (o) {
-		var item = {
+		let item = {
 			xtype: "$o.tree",
 			zview: this,
 			relatives: this.relatives,
@@ -186,7 +186,7 @@ Ext.define ("$o.Layout.Widget", {
 		return item;
 	},
 	processCard: function (o) {
-		var item = {
+		let item = {
 			xtype: "$o.card",
 			zview: this,
 			relatives: this.relatives,
@@ -197,7 +197,7 @@ Ext.define ("$o.Layout.Widget", {
 		return item;
 	},
 	processCardConf: function (o) {
-		var item = {
+		let item = {
 			xtype: "$o.cardConf",
 			zview: this,
 			relatives: this.relatives,
@@ -207,7 +207,7 @@ Ext.define ("$o.Layout.Widget", {
 		return item;
 	},
 	processPanel: function (o) {
-		var item = {
+		let item = {
 			xtype: "panel",
 			zview: this,
 			relatives: this.relatives,
@@ -217,9 +217,9 @@ Ext.define ("$o.Layout.Widget", {
 		return item;
 	},
 	process: function (l) {
-		var item = {};
-		for (var c in l) {
-			var o = l [c];
+		let item = {};
+		for (let c in l) {
+			let o = l [c];
 			switch (c) {
 			case "tab":
 				item = this.processTab (o);
@@ -264,8 +264,8 @@ Ext.define ("$o.Layout.Widget", {
 		return item;
 	},
 	getCurrentValue: function (wId, field) {
-		var v;
-		var w = this.relatives [wId];
+		let v;
+		let w = this.relatives [wId];
 		if (w) {
 			v = w.getCurrentValue (field);
 		};

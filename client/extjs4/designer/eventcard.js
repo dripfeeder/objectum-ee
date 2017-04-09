@@ -8,7 +8,7 @@ Ext.define ("$o.EventCard.Widget", {
 	},
 	bodyPadding: 1,
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || {};
 		me.tbar = [{
 			text: "Ок",
@@ -25,9 +25,9 @@ Ext.define ("$o.EventCard.Widget", {
 			},
 			name: "cancel"
 		}];
-		var action = $o.getAction (me.value.fn);
-		var data = [];
-		for (var i = 0; i < me.$events.length; i ++) {
+		let action = $o.getAction (me.value.fn);
+		let data = [];
+		for (let i = 0; i < me.$events.length; i ++) {
 			data.push ([me.$events [i], me.$events [i]]);
 		};
 		me.items = [{
@@ -85,10 +85,10 @@ Ext.define ("$o.EventCard.Widget", {
 			listeners: {
 				change: function () {
 					if (this.getValue ()) {
-						var a = $o.getAction (this.getValue ());
-						var cls = $o.getClass (a.get ("class"));
+						let a = $o.getAction (this.getValue ());
+						let cls = $o.getClass (a.get ("class"));
 						/*
-						var fn = cls.getFullCode () + "." + a.get ("code");
+						let fn = cls.getFullCode () + "." + a.get ("code");
 						try {
 							fn = eval (fn);
 						} catch (e) {
@@ -132,7 +132,7 @@ Ext.define ("$o.EventCard.Widget", {
 		this.callParent (arguments);
 	},
 	validator: function () {
-		var panel = this.up ("panel");
+		let panel = this.up ("panel");
 		if (panel.down ("*[name=event]").getValue () && (
 			panel.down ("*[name=action]").getValue () || panel.down ("*[name=fn]").getValue ()
 		)) {
@@ -143,17 +143,17 @@ Ext.define ("$o.EventCard.Widget", {
 		return true;
 	},
 	save: function () {
-		var me = this;
-		var fn;
-		var actionId = me.down ("*[name=action]").getValue ();
+		let me = this;
+		let fn;
+		let actionId = me.down ("*[name=action]").getValue ();
 		if (actionId) {
-			var action = $o.getAction (actionId);
-			var cls = $o.getClass (action.get ("class"));
+			let action = $o.getAction (actionId);
+			let cls = $o.getClass (action.get ("class"));
 			fn = cls.getFullCode () + "." + action.get ("code"); 
 		} else {
 			fn = me.down ("*[name=fn]").getValue ();
 		};
-		var v = me.value;
+		let v = me.value;
 		v.fn = fn;
 		v.event = me.down ("*[name=event]").getValue ();
 		me.fireEvent ("aftersave", v);

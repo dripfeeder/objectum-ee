@@ -7,7 +7,7 @@
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.$view = $o.getView (me.viewId);
 		if (me.updateAttrs ()) {
 			me.items = {
@@ -147,44 +147,44 @@
 		this.callParent (arguments);
 	},
 	getClassAndClassAttr: function (viewAttrCode, query) {
-		var me = this;
-		var classes = {}, alias;
+		let me = this;
+		let classes = {}, alias;
 		for (alias in query.from [0]) {break;};
 		classes [alias] = $o.getClass (query.from [0][alias]);
-		for (var i = 1; i < query.from.length; i += 4) {
+		for (let i = 1; i < query.from.length; i += 4) {
 			for (alias in query.from [i + 1]) {break;};
 			classes [alias] = $o.getClass (query.from [i + 1][alias]);
 		};
-		for (var i = 1; i < query.select.length; i += 2) {
+		for (let i = 1; i < query.select.length; i += 2) {
 			if (query.select [i] == viewAttrCode) {
 				for (alias in query.select [i - 1]) {break;};
-				var caCode = query.select [i - 1][alias];
+				let caCode = query.select [i - 1][alias];
 				return [classes [alias], classes [alias].attrs [caCode]];
 			};
 		};
 	},
 	updateAttrs: function () {
-		var me = this;
-		var query, attrs = [];
+		let me = this;
+		let query, attrs = [];
 		try {
 			query = JSON.parse (me.$view.get ("query"));
 			// query attrs -> view attrs
-			var npp = 1;
-			for (var attr in me.$view.attrs) {
+			let npp = 1;
+			for (let attr in me.$view.attrs) {
 				if (me.$view.attrs [attr].order && me.$view.attrs [attr].order >= npp) {
 					npp = me.$view.attrs [attr].order + 1;
 				};
 			};
-			for (var i = 1; i < query.select.length; i += 2) {
-				var attr = query.select [i];
+			for (let i = 1; i < query.select.length; i += 2) {
+				let attr = query.select [i];
 				attrs.push (attr);
 				if (!me.$view.attrs [attr]) {
-					var cca = me.getClassAndClassAttr (attr, query);
-					var name = cca [1] ? cca [1].get ("name") : attr;
+					let cca = me.getClassAndClassAttr (attr, query);
+					let name = cca [1] ? cca [1].get ("name") : attr;
 					if (attr == "a_id" || (attr [0] == "c" && attr.substr (attr.length - 3, 3) == "_id")) {
 						name = "id";
 					};
-					var va = $o.createViewAttr ({
+					let va = $o.createViewAttr ({
 			    		name: name,
 			    		code: attr,
 			    		view: me.viewId,
@@ -198,9 +198,9 @@
 				};
 			};
 			// remove view attrs
-			for (var attr in me.$view.attrs) {
+			for (let attr in me.$view.attrs) {
 				if (attrs.indexOf (attr) == -1) {
-					var va = me.$view.attrs [attr];
+					let va = me.$view.attrs [attr];
 					va.remove ();
 					va.sync ();
 				};
@@ -224,8 +224,8 @@
 		if (!column.$field) {
 			return;
 		};
-		var vaId = column.$field.id;
-		var va = $o.getViewAttr (vaId);
+		let vaId = column.$field.id;
+		let va = $o.getViewAttr (vaId);
 		va.set ("width", width);
 		va.sync ();
 		if (this.olapAttrs) {
@@ -233,13 +233,13 @@
 		};
 	},
 	onColumnMove: function (ct, column, fromIdx, toIdx) {
-		var me = this;
-		var cols = ct.getGridColumns ();
-		for (var i = 0; i < cols.length; i ++) {
+		let me = this;
+		let cols = ct.getGridColumns ();
+		for (let i = 0; i < cols.length; i ++) {
 			if (!cols [i].$field) {
 				continue;
 			};
-			var va = $o.getViewAttr (cols [i].$field.id);
+			let va = $o.getViewAttr (cols [i].$field.id);
 			if (va.get ("order") != i + 1) {
 				va.set ("order", i + 1);
 				va.sync ();
@@ -253,8 +253,8 @@
 		if (!column.$field) {
 			return;
 		};
-		var vaId = column.$field.id;
-		var va = $o.getViewAttr (vaId);
+		let vaId = column.$field.id;
+		let va = $o.getViewAttr (vaId);
 		va.set ("area", 0);
 		va.sync ();
 		if (this.olapAttrs) {
@@ -265,8 +265,8 @@
 		if (!column.$field) {
 			return;
 		};
-		var vaId = column.$field.id;
-		var va = $o.getViewAttr (vaId);
+		let vaId = column.$field.id;
+		let va = $o.getViewAttr (vaId);
 		va.set ("area", 1);
 		va.sync ();
 		if (this.olapAttrs) {

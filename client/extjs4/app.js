@@ -22,9 +22,9 @@ Ext.define ("$o.app", {
 	},
 	// Логин
 	login: function (options) {
-		var me = this;
-		var meOptions = options;
-		var success = options.success;
+		let me = this;
+		let meOptions = options;
+		let success = options.success;
 		if ($o.authorized) {
 			success.call (meOptions.scope || this, meOptions);
 			return;
@@ -48,14 +48,14 @@ Ext.define ("$o.app", {
 			}});
 			return;
 		};
-		var tryLogin = function () {
-			var login = Ext.getCmp ("$o.app.login.field").getValue ();
-			var password = Ext.getCmp ("$o.app.password.field").getValue ();
+		let tryLogin = function () {
+			let login = Ext.getCmp ("$o.app.login.field").getValue ();
+			let password = Ext.getCmp ("$o.app.password.field").getValue ();
 			if (!login || !password) {
 				return;
 			};
 			loginDialog.getEl ().mask ($o.getString ("Loading"));
-			var passwordHash = $o.util.sha1 (password);
+			let passwordHash = $o.util.sha1 (password);
 			if (password == "password in cookie") {
 				passwordHash = $o.util.getCookie ('password');
 				password = $o.util.getCookie ('passwordPlain');
@@ -70,7 +70,7 @@ Ext.define ("$o.app", {
 					$zu.removeCookie ('password');
 					$zu.removeCookie ('passwordPlain');
 				};
-				var success = meOptions.success;
+				let success = meOptions.success;
 				$o.init (Ext.apply (meOptions, {success: function () {
 					loginDialog.getEl ().unmask (true);
 					loginDialog.close ();
@@ -84,7 +84,7 @@ Ext.define ("$o.app", {
 				});
 			}});
 		};
-		var buttons = {
+		let buttons = {
 			xtype: "button",
 			text: $o.getString ("Enter"),
 			iconCls: "gi_ok",
@@ -108,12 +108,12 @@ Ext.define ("$o.app", {
 						marginRight: 5
 					},
 					handler: function () {
-						var url = window.location.protocol + "//" + window.location.hostname;
+						let url = window.location.protocol + "//" + window.location.hostname;
 						if (window.location.port) {
 							url += ":" + window.location.port;
 						}
 						url += "/projects/" + options.code + "/plugins/?fn=service.esia";
-						var form = Ext.create ("Ext.form.Panel", {
+						let form = Ext.create ("Ext.form.Panel", {
 							standardSubmit: true,
 							url: options.esia
 						});
@@ -128,7 +128,7 @@ Ext.define ("$o.app", {
 				]
 			}
 		}
-		var loginDialog = Ext.create ("Ext.Window", {
+		let loginDialog = Ext.create ("Ext.Window", {
 			title: me.name || $o.getString ("Authorization"),
 			iconCls: "gi_keys",
 			width: 300,
@@ -205,18 +205,18 @@ Ext.define ("$o.app", {
 		TreeStore
 	*/
 	initTreeStore: function (options) {
-		var model = Ext.ModelManager.getModel (options.model);
-		var fields = model.getFields ();
-		var map = options.map;
-		var getNode = function (options) {
-			for (var i = 0; i < fields.length; i ++) {
-				var f = fields [i];
+		let model = Ext.ModelManager.getModel (options.model);
+		let fields = model.getFields ();
+		let map = options.map;
+		let getNode = function (options) {
+			for (let i = 0; i < fields.length; i ++) {
+				let f = fields [i];
 				options.r [f.name] = options.c.get (f.name);
 			};
 			if (options.c.childs.length) {
 				options.r.children = [];
-				for (var i = 0; i < options.c.childs.length; i ++) {
-					var r = {};
+				for (let i = 0; i < options.c.childs.length; i ++) {
+					let r = {};
 					getNode ({c: map [options.c.childs [i]], r: r});
 					options.r.children.push (r);
 				};
@@ -224,13 +224,13 @@ Ext.define ("$o.app", {
 				options.r.leaf = true;
 			};
 		};
-		var data = [];
-		for (var i = 0; i < $o.store [options.data].getCount (); i ++) {
-			var c = $o.store [options.data].getAt (i);
+		let data = [];
+		for (let i = 0; i < $o.store [options.data].getCount (); i ++) {
+			let c = $o.store [options.data].getAt (i);
 			if (c.get ("parent")) {
 				continue;
 			};
-			var r = {};
+			let r = {};
 			getNode ({c: c, r: r});
 			data.push (r);
 		};
@@ -250,7 +250,7 @@ Ext.define ("$o.app", {
 		});
 	},
 	tabChangeListener: function (tp) {
-		var tab = tp.getActiveTab ();
+		let tab = tp.getActiveTab ();
 		if (!tab) {
 			return;
 		};
@@ -259,14 +259,14 @@ Ext.define ("$o.app", {
 			document.location.href = '#' + tab.id;
 		};
 		// title
-		var n = tab.title;
+		let n = tab.title;
 		if (tab.id) {
 			if (tab.id [0] == 'o') {
-				var o = $zs.getObject (tab.id.substr (1));
+				let o = $zs.getObject (tab.id.substr (1));
 				n = o.get ('name');
 			} else
 			if (tab.id [0] == 'v') {
-				var v = $zs.viewsMap [tab.id.substr (1)];
+				let v = $zs.viewsMap [tab.id.substr (1)];
 				try {
 					n = v.stub.get ('name');
 				} catch (e) {
@@ -280,8 +280,8 @@ Ext.define ("$o.app", {
 		Создает рабочий стол
 	*/
 	createDesktop: function (options) {
-		var me = this;
-		var cleanViewport = options.cleanViewport;
+		let me = this;
+		let cleanViewport = options.cleanViewport;
 		$o.app.tp = Ext.create ("Ext.tab.Panel", {
 		    region: "center",
 		    layout: "fit",
@@ -311,9 +311,9 @@ Ext.define ("$o.app", {
 			region: "south",
 			items: []
 		});
-		var items = [];
+		let items = [];
 		if ($o.currentUser == "admin") {
-			var itemsVisual = [{
+			let itemsVisual = [{
 				xtype: "label",
 				text: "Visual Objectum",
 				style: "font-weight: bold; color: #073255; margin-left: 5px; margin-right: 15px; text-shadow: -1px -1px 1px white, 1px -1px 1px white, -1px 1px 1px white, 1px 1px 1px white;"
@@ -420,7 +420,7 @@ Ext.define ("$o.app", {
 		// title or logo
 		if ($o.visualObjectum && $o.visualObjectum.menuConstructor) {
 			if ($o.visualObjectum.logo.left && $o.visualObjectum.logo.height) {
-				var w = window,
+				let w = window,
 				    d = document,
 				    e = d.documentElement,
 				    g = d.getElementsByTagName('body')[0],
@@ -480,13 +480,13 @@ Ext.define ("$o.app", {
 		Показывает представление (view, editView, class, items)
 	*/
 	show: function (options) {
-		var me = this;
-		var items = options.items;
-		var record = options.record;
-		var readOnly = options.readOnly;
-		var tabId;
+		let me = this;
+		let items = options.items;
+		let record = options.record;
+		let readOnly = options.readOnly;
+		let tabId;
 		if (record) {
-			var className = Ext.getClassName (record);
+			let className = Ext.getClassName (record);
 			if (className == "$o.View.Model") {
 				if (!record.get ("query") && !record.get ("layout")) {
 					return;
@@ -520,9 +520,9 @@ Ext.define ("$o.app", {
 		if (!items) {
 			return;
 		};
-		var center = $o.app.vp.down ("*[region='center']");
+		let center = $o.app.vp.down ("*[region='center']");
 		if (Ext.getClassName (center) == "Ext.tab.Panel") {
-			var tab = me.tp.down ("#" + tabId);
+			let tab = me.tp.down ("#" + tabId);
 			if (!tab) {
 				if (record) {
 					tab = me.tp.add ({
@@ -552,25 +552,25 @@ Ext.define ("$o.app", {
 		Перехватчик Ajax запросов
 	*/
 	beforerequest: function (conn, options, eOpts) {
-		var me = this;
-		var url = options.url;
-		var olapRequest = function () {
-			var start = options.params.page > 1 ? (options.params.page - 1) * options.params.limit : 0;
-			var limit = options.params.limit;
-			var tokens = url.substr (12, url.length - 12).split ("&");
-			var id = tokens [0].split ("=")[1];
-			var cmpId = tokens [1].split ("=")[1];
+		let me = this;
+		let url = options.url;
+		let olapRequest = function () {
+			let start = options.params.page > 1 ? (options.params.page - 1) * options.params.limit : 0;
+			let limit = options.params.limit;
+			let tokens = url.substr (12, url.length - 12).split ("&");
+			let id = tokens [0].split ("=")[1];
+			let cmpId = tokens [1].split ("=")[1];
 			options.url = "?sessionId=" + $sessionId;
 			options.method = "POST";
-			var order = null;
+			let order = null;
 			if (options.params.sort) {
-				var sort = eval ("(" + options.params.sort + ")");
+				let sort = eval ("(" + options.params.sort + ")");
 				order = [sort [0].property, sort [0].direction];
 			};
-			var filter = [];
-			var grid = Ext.getCmp (cmpId);
+			let filter = [];
+			let grid = Ext.getCmp (cmpId);
 			if (grid) {
-				var gridFilter = grid.getFilter ();
+				let gridFilter = grid.getFilter ();
 				if (gridFilter && gridFilter.length) {
 					filter = [gridFilter];
 				};
@@ -578,10 +578,10 @@ Ext.define ("$o.app", {
 				grid = {};
 			};
 			if (options.params.filter) {
-				var fs = eval ("(" + options.params.filter + ")");
-				var va = $o.viewsMap [id].attrs;
-				for (var i = 0; i < fs.length; i ++) {
-					var f = fs [i];
+				let fs = eval ("(" + options.params.filter + ")");
+				let va = $o.viewsMap [id].attrs;
+				for (let i = 0; i < fs.length; i ++) {
+					let f = fs [i];
 					if (typeof (f.value) == "object" && f.value.isNotNull) {
 						if (filter.length) {
 							filter.push ("and");
@@ -598,15 +598,15 @@ Ext.define ("$o.app", {
 						filter.push ("is null");
 						continue;
 					};
-					var dataType;
+					let dataType;
 					if (!va [f.field].get ("classAttr")) {
 						dataType = "number";
 					} else {
 						dataType = $o.classAttrsMap [va [f.field].get ("classAttr")].getDataType ();
 					}
 					if (dataType == "string") {
-						var has = 0;
-						for (var j = 1; j < filter.length; j ++) {
+						let has = 0;
+						for (let j = 1; j < filter.length; j ++) {
 							if (filter [j] == "like" && filter [j - 1] == f.field && filter [j + 1] == (f.value + "%")) {
 								has = 1;
 								break;
@@ -618,8 +618,8 @@ Ext.define ("$o.app", {
 					};
 					if (dataType == "bool") {
 						f.value = f.value ? 1 : 0;
-						var has = 0;
-						for (var j = 1; j < filter.length; j ++) {
+						let has = 0;
+						for (let j = 1; j < filter.length; j ++) {
 							if (filter [j] == "=" && filter [j - 1] == f.field && filter [j + 1] == f.value) {
 								has = 1;
 								break;
@@ -641,7 +641,7 @@ Ext.define ("$o.app", {
 					} else
 					if (dataType == "date" && f.comparison == "eq") {
 						if (_.isArray (filter [0])) {
-							var n = filter [0].indexOf (f.field);
+							let n = filter [0].indexOf (f.field);
 							if (n > -1) {
 								if (filter [0].length == 4) {
 									filter.splice (0, 2);
@@ -677,7 +677,7 @@ Ext.define ("$o.app", {
 							};
 						} else {
 							if (dataType == "string") {
-								var v = f.value;
+								let v = f.value;
 								if (typeof (v) == "object") {
 									if (v.value.indexOf (",") > -1) {
 										if (v.notLike) {
@@ -725,38 +725,38 @@ Ext.define ("$o.app", {
 			options.cmpId = cmpId;
 			options.start = start;
 		};
-		var treegridRequest = function () {
-			var node = options.params.node == "root" ? null : options.params.node;
-			var tokens = url.substr (16, url.length - 16).split ("&");
-			var id = tokens [0].split ("=")[1];
-			var view = $o.viewsMap [id];
-			var cmpId = tokens [1].split ("=")[1];
-			var treegrid = Ext.getCmp (cmpId);
-			var fieldParent = tokens [2].split ("=")[1];
-			var fieldId = tokens [3].split ("=")[1];
+		let treegridRequest = function () {
+			let node = options.params.node == "root" ? null : options.params.node;
+			let tokens = url.substr (16, url.length - 16).split ("&");
+			let id = tokens [0].split ("=")[1];
+			let view = $o.viewsMap [id];
+			let cmpId = tokens [1].split ("=")[1];
+			let treegrid = Ext.getCmp (cmpId);
+			let fieldParent = tokens [2].split ("=")[1];
+			let fieldId = tokens [3].split ("=")[1];
 			options.url = "?sessionId=" + $sessionId;
 			options.method = "POST";
-			var query = eval ("(" + view.get ("query") + ")");
-			var alias, table; for (alias in query.from [0]) {table = query.from [0][alias]; break;};
-			var fieldParentPair = {}, attrParent;
-			for (var i = 1; i < query.select.length; i += 2) {
+			let query = eval ("(" + view.get ("query") + ")");
+			let alias, table; for (alias in query.from [0]) {table = query.from [0][alias]; break;};
+			let fieldParentPair = {}, attrParent;
+			for (let i = 1; i < query.select.length; i += 2) {
 				if (query.select [i] == fieldParent) {
 					fieldParentPair = $o.util.clone (query.select [i - 1]);
-					for (var key in fieldParentPair) {attrParent = fieldParentPair [key];}
+					for (let key in fieldParentPair) {attrParent = fieldParentPair [key];}
 				};
 			};
-			var fieldIdPair = {}, attrId;
-			for (var i = 1; i < query.select.length; i += 2) {
+			let fieldIdPair = {}, attrId;
+			for (let i = 1; i < query.select.length; i += 2) {
 				if (query.select [i] == fieldId) {
 					fieldIdPair = $o.util.clone (query.select [i - 1]);
-					for (var key in fieldIdPair) {attrId = fieldIdPair [key];}
+					for (let key in fieldIdPair) {attrId = fieldIdPair [key];}
 				};
 			};
-			var filter = [fieldParentPair, "is null"];
+			let filter = [fieldParentPair, "is null"];
 			if (node) {
 				filter = [fieldParentPair, "=", node];
 			};
-			var where = query.where || [];
+			let where = query.where || [];
 			if (where.length) {
 				where.push ("and");
 			};
@@ -765,21 +765,21 @@ Ext.define ("$o.app", {
 				{"___childs": attrId}, "___childId",
 				fieldParentPair, "___parentId"
 			]);
-			var field2 = {}; field2 [alias] = attrId;
+			let field2 = {}; field2 [alias] = attrId;
 			query.from = query.from.concat (["left-join", {"___childs": table}, "on", [{"___childs": attrParent}, "=", field2]]);
 			if (treegrid.filter && treegrid.filter.childsFn) {
-				var cf = treegrid.filter.childsFn ();
+				let cf = treegrid.filter.childsFn ();
 				if (cf && cf.length) {
 					query.from [query.from.length - 1] = query.from [query.from.length - 1].concat ("and", cf);
 				};
 			};
-			var convertFilter = function (query, filter) {
-				var fields = {};
-				for (var i = 0; i < query.select.length; i += 2) {
+			let convertFilter = function (query, filter) {
+				let fields = {};
+				for (let i = 0; i < query.select.length; i += 2) {
 					fields [query.select [i + 1]] = query.select [i];
 				};
-				var r = [];
-				for (var i = 0; i < filter.length; i ++) {
+				let r = [];
+				for (let i = 0; i < filter.length; i ++) {
 					if (Ext.isArray (filter [i])) {
 						r.push (convertFilter (query, filter [i]));
 					} else {
@@ -794,18 +794,18 @@ Ext.define ("$o.app", {
 			};
 			if (treegrid.filter) {
 				if (!node || (node && treegrid.filter.all)) {
-					var treeFilter = treegrid.getFilter ();
-					var filter = convertFilter (query, treeFilter);
+					let treeFilter = treegrid.getFilter ();
+					let filter = convertFilter (query, treeFilter);
 					if (filter && filter.length) {
 						where = where.concat ("and", filter);
 					};
 				};
 			};
 			if (!node && treegrid.$opened.length) {
-				var openedFilter = [fieldParentPair, "in", treegrid.$opened.join (".,.").split (".")];
+				let openedFilter = [fieldParentPair, "in", treegrid.$opened.join (".,.").split (".")];
 				if (treegrid.filter && treegrid.filter.all) {
-					var treeFilter = treegrid.getFilter ();
-					var filter = convertFilter (query, treeFilter);
+					let treeFilter = treegrid.getFilter ();
+					let filter = convertFilter (query, treeFilter);
 					if (filter && filter.length) {
 						openedFilter = openedFilter.concat ("and", filter);
 					};
@@ -833,15 +833,15 @@ Ext.define ("$o.app", {
 		Перехватчик Ajax запросов (ответ)
 	*/
 	requestcomplete: function (conn, response, options, eOpts) {
-		var r;
+		let r;
 		try {
 			r = eval ("(" + response.responseText + ")");
 		} catch (e) {
 		};
 		if (r && r.header && r.header.error) {
-			var msg = r.header.error;
+			let msg = r.header.error;
 			//common.message ("<font color=red>" + $o.locale.translate (msg) + "</font><br>" + JSON.stringify (options));
-			var win = Ext.create ("Ext.window.Window", {
+			let win = Ext.create ("Ext.window.Window", {
 				title: $ptitle,
 				resizable: false,
 				closable: true,
@@ -881,18 +881,18 @@ Ext.define ("$o.app", {
 			});
 			throw r.header.error + " options: " + JSON.stringify (options);
 		};
-		var olapResponse = function () {
-			var model = Ext.ModelManager.getModel ("$o.View." + options.viewId + ".Model");
+		let olapResponse = function () {
+			let model = Ext.ModelManager.getModel ("$o.View." + options.viewId + ".Model");
 			// fields
-			var mFields = model.getFields ();
-			var rt = eval ("(" + response.responseText + ")");
-			var vFields = [];
-			var fieldsMap = {};
-			var grid = Ext.getCmp (options.cmpId);
-			for (var i in rt.data.column) {
-				var attr = rt.data.column [i][0].attr;
+			let mFields = model.getFields ();
+			let rt = eval ("(" + response.responseText + ")");
+			let vFields = [];
+			let fieldsMap = {};
+			let grid = Ext.getCmp (options.cmpId);
+			for (let i in rt.data.column) {
+				let attr = rt.data.column [i][0].attr;
 				vFields.push (attr);
-				for (var j = 0; j < mFields.length; j ++) {
+				for (let j = 0; j < mFields.length; j ++) {
 					if (mFields [j].name == attr) {
 						fieldsMap [i] = mFields [j].name;
 						break;
@@ -904,51 +904,51 @@ Ext.define ("$o.app", {
 				};
 			};
 			// data
-			var data = [];
-			for (var i = 0; i < rt.data.tree.currentLength; i ++) {
-				var row = rt.data.tree [options.start + i].data;
-				var rec = {};
-				for (var j = 0; j < vFields.length; j ++) {
+			let data = [];
+			for (let i = 0; i < rt.data.tree.currentLength; i ++) {
+				let row = rt.data.tree [options.start + i].data;
+				let rec = {};
+				for (let j = 0; j < vFields.length; j ++) {
 					rec [fieldsMap [j]] = row [j].text;
 				};
 				data.push (rec);
 			};
 			grid.countOverflow = rt.data.tree.overflow;
-			var r = {
+			let r = {
 				success: true,
 				total: rt.data.tree.length,
 				data: data
 			};
 			response.responseText = JSON.stringify (r);
 		};
-		var treegridResponse = function () {
-			var node = options.node || null;
-			var model = Ext.ModelManager.getModel ("$o.View." + options.viewId + ".Model");
-			var view = $o.viewsMap [options.viewId];
-			var treegrid = Ext.getCmp (options.cmpId);
-			var mFields = view.orderedFields;
-			var rt = eval ("(" + response.responseText + ")");
-			var fieldsMap = {};
-			var query = options.query;
-			for (var i = 0; i < query.select.length; i += 2) {
-				var attr; for (var alias in query.select [i]) {attr = query.select [i + 1]; break;};
-				for (var j = 0; j < mFields.length; j ++) {
+		let treegridResponse = function () {
+			let node = options.node || null;
+			let model = Ext.ModelManager.getModel ("$o.View." + options.viewId + ".Model");
+			let view = $o.viewsMap [options.viewId];
+			let treegrid = Ext.getCmp (options.cmpId);
+			let mFields = view.orderedFields;
+			let rt = eval ("(" + response.responseText + ")");
+			let fieldsMap = {};
+			let query = options.query;
+			for (let i = 0; i < query.select.length; i += 2) {
+				let attr; for (let alias in query.select [i]) {attr = query.select [i + 1]; break;};
+				for (let j = 0; j < mFields.length; j ++) {
 					if (mFields [j].name == attr) {
 						fieldsMap [i / 2] = mFields [j].name;
 						break;
 					};
 				};
 			};
-			var /*prevId, */levels = {}, hasId = [];
-			for (var i = 0; i < rt.data.length; i ++) {
-				var row = rt.data [i];
-				var rec = {};
-				var j;
+			let /*prevId, */levels = {}, hasId = [];
+			for (let i = 0; i < rt.data.length; i ++) {
+				let row = rt.data [i];
+				let rec = {};
+				let j;
 				for (j = 0; j < mFields.length; j ++) {
 					rec [fieldsMap [j]] = row [j];
 				};
-				var childId = row [j];
-				var parentId = row [j + 1];
+				let childId = row [j];
+				let parentId = row [j + 1];
 //				if (prevId != rec [options.fieldId]) {
 				if (hasId.indexOf (rec [options.fieldId]) == -1) {
 					if (!childId) {
@@ -964,11 +964,11 @@ Ext.define ("$o.app", {
 				};
 			};
 			if (!node && levels [null] && levels [null].length) {
-				var addChildren = function (rec) {
-					var nodes = levels [rec [options.fieldId]];
+				let addChildren = function (rec) {
+					let nodes = levels [rec [options.fieldId]];
 					if (nodes) {
-						var childs = [];
-						for (var i = 0; i < nodes.length; i ++) {
+						let childs = [];
+						for (let i = 0; i < nodes.length; i ++) {
 							childs.push (nodes [i]);
 							addChildren (nodes [i]);
 						};
@@ -976,12 +976,12 @@ Ext.define ("$o.app", {
 						rec.expanded = true;
 					};
 				};
-				for (var i = 0; i < levels [null].length; i ++) {
+				for (let i = 0; i < levels [null].length; i ++) {
 					addChildren (levels [null][i]);
 				};
 			};
-			var data = levels [node];
-			var r = {
+			let data = levels [node];
+			let r = {
 			    text: ".",
 			    children: data
 			};
@@ -1001,7 +1001,7 @@ Ext.define ("$o.app", {
 		if ($o.idleTimer > $o.maxIdleSec) {
 			return;
 		};
-		var err = response.responseText == "<html><head><title>Unauthenticated</title></head><body><h1>401 Unauthenticated</h1></body></html>" ? $o.getString ("Session not authorized. Please, reload browser page") : response.responseText;
+		let err = response.responseText == "<html><head><title>Unauthenticated</title></head><body><h1>401 Unauthenticated</h1></body></html>" ? $o.getString ("Session not authorized. Please, reload browser page") : response.responseText;
 		if (!err) {
 			err = $o.getString ("Could not connect to server") + "<br>status: " + response.status + " " + response.statusText;
 		};
@@ -1011,18 +1011,18 @@ Ext.define ("$o.app", {
 		Старт приложения
 	*/
 	start: function (options) {
-		var me = this;
-		var meOptions = options;
+		let me = this;
+		let meOptions = options;
 		me.code = options.code;
 		me.name = options.name;
 		me.version = options.version;
 		me.locale = options.locale;
-		var success = options.success;
-		var scope = options.scope;
+		let success = options.success;
+		let scope = options.scope;
 		$ptitle = options.name;
 		$pversion = options.version;
-		var useHash = options.useHash;
-		var go = function () {
+		let useHash = options.useHash;
+		let go = function () {
 			if (meOptions.locale != "en") {
 	    		$o.locale.load ("/client/extjs4/locale/" + meOptions.locale + ".json");
 	    	};
@@ -1046,7 +1046,7 @@ Ext.define ("$o.app", {
 	    		$o.initAdapter ();
 	    		if ($o.visualObjectum) {
 		    		if ($o.currentUser == "admin") {
-						var projectNeedBuild = common.getConf ("projectNeedBuild");
+						let projectNeedBuild = common.getConf ("projectNeedBuild");
 						if (projectNeedBuild.used && $o.app.vp.down ("*[name=project]")) {
 							me.projectNeedBuildTooltip = Ext.create ("Ext.tip.ToolTip", {
 							    title: $o.getString ("Need assembly"),
@@ -1060,16 +1060,16 @@ Ext.define ("$o.app", {
 							});
 						};
 					};
-					var href = document.location.href;
+					let href = document.location.href;
 					if (href.indexOf ("#") > -1 && !useHash) {
-						var tokens = href.split ("#");
+						let tokens = href.split ("#");
 						document.location.href = tokens [0] + "#";
 					};
 		    		if ($o.visualObjectum.menuConstructor) {
 						system.init ();
 						system.vo.buildMenu ();
 			    		if ($o.visualObjectum.initAction) {
-			    			var fn_ = eval ("(" + $o.visualObjectum.initAction + ")");
+			    			let fn_ = eval ("(" + $o.visualObjectum.initAction + ")");
 			    			fn_ ();
 			    		};
 					};
@@ -1088,13 +1088,13 @@ Ext.define ("$o.app", {
 	},
 	loginDialog: function (options) {
 		$o.app.vp.destroy ();
-		for (var id in $o.viewsMap) {
-			var c = Ext.getCmp ("v" + id);
+		for (let id in $o.viewsMap) {
+			let c = Ext.getCmp ("v" + id);
 			if (c) {
 				c.destroy ();
 			};
 		};
-		var me = this;
+		let me = this;
 		options = options || {};
 		$o.app.start ({
 			code: me.code || options.code, 
@@ -1122,8 +1122,8 @@ Ext.define ("$o.app", {
 		});
 	},
 	loadScript: function (src, cb) {
-	    var script = document.createElement ("script");
-		var appendTo = document.getElementsByTagName ("head")[0];
+	    let script = document.createElement ("script");
+		let appendTo = document.getElementsByTagName ("head")[0];
 	    if (script.readyState && !script.onload) {
 	        // IE, Opera
 	        script.onreadystatechange = function () {

@@ -8,8 +8,8 @@ Ext.define ("$o.LayoutCard.Widget", {
 	alias: ["widget.$o.layoutcard", "widget.$layoutcard"],
 	cmpCode: "card",
 	initComponent: function () {
-		var me = this;
-		var id = me.layoutDesigner ? ("cmp-" + me.layoutDesigner.counter ++) : "card";
+		let me = this;
+		let id = me.layoutDesigner ? ("cmp-" + me.layoutDesigner.counter ++) : "card";
 		me.value = me.value || {
 			card: {
 				id: id,
@@ -20,7 +20,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 		if (!Ext.isArray (me.value.card.object)) {
 			me.value.card.object = [me.value.card.object];
 		};
-		var items = [{
+		let items = [{
 			layout: "column",
 			border: 0,
 			width: "100%",
@@ -105,7 +105,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 						text: $o.getString ("Add"),
 						iconCls: "gi_circle_plus",
 						handler: function () {
-							var win = Ext.create ("Ext.Window", {
+							let win = Ext.create ("Ext.Window", {
 								title: $o.getString ("Tag", ":", "Adding"),
 								width: 600,
 								height: 400,
@@ -120,9 +120,9 @@ Ext.define ("$o.LayoutCard.Widget", {
 									text: $o.getString ("Add"),
 									iconCls: "gi_circle_plus",
 									handler: function () {
-										var store = me.down ("*[name=tags]").getStore ();
-										var clsId = win.down ("*[name=cls]").getValue ();
-										var tag = win.down ("*[name=tag]").getValue ();
+										let store = me.down ("*[name=tags]").getStore ();
+										let clsId = win.down ("*[name=cls]").getValue ();
+										let tag = win.down ("*[name=tag]").getValue ();
 										store.insert (store.getCount (), {
 											cls: clsId,
 											clsName: clsId ? $o.getClass (clsId).toString () : null,
@@ -146,7 +146,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 									confRef: "class",
 									choose: {
 										type: "custom", fn: function () {
-											var field = this;
+											let field = this;
 											dialog.getClass ({success: function (options) {
 												field.setValue (options.id);
 											}});
@@ -182,12 +182,12 @@ Ext.define ("$o.LayoutCard.Widget", {
 						text: $o.getString ("Remove"),
 						iconCls: "gi_circle_minus",
 						handler: function () {
-							var grid = me.down ("*[name=tags]");
+							let grid = me.down ("*[name=tags]");
 							if (grid.getSelectionModel ().hasSelection ()) {
-								var rec = grid.getSelectionModel ().getSelection ()[0];
-								for (var i = 0; i < me.value.card.object.length; i ++) {
+								let rec = grid.getSelectionModel ().getSelection ()[0];
+								for (let i = 0; i < me.value.card.object.length; i ++) {
 									if (rec.get ("cls")) {
-										var cls = $o.getClass (rec.get ("cls"));
+										let cls = $o.getClass (rec.get ("cls"));
 										if (cls.getFullCode () == me.value.card.object [i].cls) {
 											me.value.card.object.splice (i, 1);
 											break;
@@ -213,7 +213,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 						listeners: {
 							selectionchange: function (sm, records) {
 								if (records.length) {
-									var clsId = records [0].get ("cls");
+									let clsId = records [0].get ("cls");
 									me.down ("*[name=cardDesigner]").setClassId (clsId, records [0].get ("tag"));
 									me.down ("*[name=cardDesigner]").down ("*[name=tree]").getSelectionModel ().deselectAll ();
 								};
@@ -227,8 +227,8 @@ Ext.define ("$o.LayoutCard.Widget", {
 								if (!Ext.isArray (me.value.card.object)) {
 									me.value.card.object = [me.value.card.object];
 								};
-								for (var i = 0; i < me.value.card.object.length; i ++) {
-									var cls = $o.getClass (me.value.card.object [i].cls);
+								for (let i = 0; i < me.value.card.object.length; i ++) {
+									let cls = $o.getClass (me.value.card.object [i].cls);
 									me.value.card.object [i].cls = cls.get ("id");
 									me.value.card.object [i].clsName = cls.toString ();
 								};
@@ -291,7 +291,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 		me.on ("beforesave", function (options) {
 			if (!options.convertion) {
 				me.value.card.items = me.down ("*[name=cardDesigner]").getValue ();
-				for (var i = 0; i < me.value.card.object.length; i ++) {
+				for (let i = 0; i < me.value.card.object.length; i ++) {
 					delete me.value.card.object [i].clsName;
 					me.value.card.object [i].cls = $o.getClass (me.value.card.object [i].cls).getFullCode ();
 				};
@@ -301,7 +301,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 		this.callParent (arguments);
 	},
 	validator: function () {
-		var me = this.up ("panel");
+		let me = this.up ("panel");
 		if (me.down ("*[name=cls]").getValue () && (me.down ("*[name=tag]").getValue () || me.down ("*[name=cmpAttr]").getValue ())) {
 			me.up ("window").down ("button[name=ok]").enable ();
 		} else {
@@ -310,7 +310,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 		return true;
 	},
 	getViewCmpAttrs: function (layout) {
-		var me = this;
+		let me = this;
 		try {
 			if (typeof (layout) == "string") {
 				layout = eval ("(" + layout + ")");
@@ -320,20 +320,20 @@ Ext.define ("$o.LayoutCard.Widget", {
 		if (!layout) {
 			return [];
 		};
-		var data = [];
+		let data = [];
 		me.cmpAttrId = {};
-		var get = function (layout) {
+		let get = function (layout) {
 			if (typeof (layout) != "object") {
 				return;
 			};
-			for (var a in layout) {
+			for (let a in layout) {
 				if (layout [a]) {
 					if (layout [a].id && layout [a].view) {
 						v = $o.getView (layout [a].view);
-						for (var attr in v.attrs) {
-							var va = v.attrs [attr];
+						for (let attr in v.attrs) {
+							let va = v.attrs [attr];
 							if (va.get ("classAttr")) {
-								var ca = $o.getClassAttr (va.get ("classAttr"));
+								let ca = $o.getClassAttr (va.get ("classAttr"));
 								if (!(ca.get ("type") == 2 || ca.get ("type") == 12 || ca.get ("type") >= 1000)) {
 									continue;
 								};
@@ -350,7 +350,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 		return data;
 	},
 	setValue: function (value) {
-		var me = this;
+		let me = this;
 		me.value = value;
 		me.value.card.object = me.value.card.object || [];
 		if (!Ext.isArray (me.value.card.object)) {
@@ -360,7 +360,7 @@ Ext.define ("$o.LayoutCard.Widget", {
 		me.build ();
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		return me.value;
 	}
 });

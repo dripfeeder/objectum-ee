@@ -3,7 +3,7 @@
 	alias: ["widget.$o.layoutsplit"],
 	cmpCode: "split",
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || {
 			split: {
 				id: "cmp-" + (me.layoutDesigner.counter ++),
@@ -14,8 +14,8 @@
 				]
 			}
 		};
-		var w = me.value.split.width || me.value.split.height;
-		var ed;
+		let w = me.value.split.width || me.value.split.height;
+		let ed;
 		if (typeof (w) == "string") {
 			ed = "%";
 			w = w.substr (0, w.length - 1);

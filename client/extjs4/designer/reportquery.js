@@ -4,7 +4,7 @@
 	layout: "fit",
 	border: false,
 	initComponent: function () {
-		var me = this;
+		let me = this;
 	    me.store = Ext.create ("Ext.data.Store", {
 	        data: me.getData (),
 	        fields: [{
@@ -25,10 +25,10 @@
 			deferRowRender: false,
 			listeners: {
 				afterrender: function () {
-					var sm = this.getSelectionModel ();
+					let sm = this.getSelectionModel ();
 					sm.on ("selectionchange", function () {
 						if (sm.hasSelection ()) {
-							var record = sm.getSelection ()[0];
+							let record = sm.getSelection ()[0];
 							me.down ("*[name=filter]").enable ();
 							me.down ("*[name=filter]").setViewId (me.data [record.get ("alias")].view);
 							me.down ("*[name=filter]").setValue (me.data [record.get ("alias")].filter);
@@ -84,10 +84,10 @@
 		me.callParent (arguments);
 	},
 	getData: function () {
-		var me = this;
-		var data = [];
+		let me = this;
+		let data = [];
 		me.data = {};
-		for (var i = 0; i < me.value.length; i ++) {
+		for (let i = 0; i < me.value.length; i ++) {
 			data.push ({
 				alias: me.value [i].alias,
 				view: $o.getView (me.value [i].view).toString ()
@@ -101,17 +101,17 @@
 		return data;
 	},
 	create: function () {
-		var me = this;
+		let me = this;
 		dialog.getView ({hasQuery: 1, success: function (options) {
-			var maxN = 0;
-			for (var i = 0; i < me.store.getCount (); i ++) {
-				var alias = me.store.getAt (i).get ("alias");
+			let maxN = 0;
+			for (let i = 0; i < me.store.getCount (); i ++) {
+				let alias = me.store.getAt (i).get ("alias");
 				if (Number (alias.substr (1)) > maxN) {
 					maxN = Number (alias.substr (1));
 				};
 			};
-			var alias = "q" + (maxN + 1);
-			var rec = {
+			let alias = "q" + (maxN + 1);
+			let rec = {
 				alias: alias,
 				view: $o.getView (options.id).toString ()
 			};
@@ -124,28 +124,28 @@
 		}});
 	},
 	remove: function () {
-		var me = this;
-		var sm = me.grid.getSelectionModel ();
+		let me = this;
+		let sm = me.grid.getSelectionModel ();
 		if (sm.hasSelection ()) {
-			var record = sm.getSelection ()[0];
+			let record = sm.getSelection ()[0];
 			me.store.remove (record);
 			me.down ("*[name=filter]").disable ();
 			me.fireEvent ("change", me.getValue ());
 		};
 	},
 	getValue: function () {
-		var me = this;
-		var value = [];
-		for (var i = 0; i < me.store.getCount (); i ++) {
-			var alias = me.store.getAt (i).get ("alias");
+		let me = this;
+		let value = [];
+		for (let i = 0; i < me.store.getCount (); i ++) {
+			let alias = me.store.getAt (i).get ("alias");
 			value.push (me.data [alias]);
 		};
 		return value;
 	},
 	updateFilter: function (value) {
-		var me = this;
-		var sm = me.grid.getSelectionModel ();
-		var record = sm.getSelection ()[0];
+		let me = this;
+		let sm = me.grid.getSelectionModel ();
+		let record = sm.getSelection ()[0];
 		me.data [record.get ("alias")].filter = value;
 		me.fireEvent ("change", me.getValue ());
 	}

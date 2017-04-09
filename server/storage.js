@@ -1,8 +1,8 @@
 /*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
-var Storage = function (options) {
-	var storage = this;
+global.Storage = function (options) {
+	let storage = this;
 	// postgresql main client object
 	storage.client = null;
 	// Connections to postgresql. One connection - one transaction.
@@ -13,12 +13,12 @@ var Storage = function (options) {
 		if (storage.clientPool [options.session.id]) {
 			return storage.clientPool [options.session.id];
 		} else {
-			var client = db.create (storage);
+			let client = db.create (storage);
 			return client;
 		};
 	};
 	storage.freeClient = function (options) {
-		var client = storage.clientPool [options.session.id];
+		let client = storage.clientPool [options.session.id];
 		if (client) {
 			client.disconnect ();
 			delete storage.clientPool [options.session.id];
@@ -29,21 +29,21 @@ var Storage = function (options) {
 	// exec sql
 	storage.queryCount = 0;
 	storage.query = function (options) {
-		var meOptions = options;
+		let meOptions = options;
 		options.options = options.options || {};
-		var session = options.session;
+		let session = options.session;
 		storage.queryCount ++;
-		var client = options.client || storage.getClient (options);
+		let client = options.client || storage.getClient (options);
 		(function hideParams () {
 			if (options.params) {
-				for (var i = 0; i < options.params.length; i ++) {
+				for (let i = 0; i < options.params.length; i ++) {
 					options.sql = options.sql.replace ("$" + (i + 1), "#" + (i + 1));
 				};
 			};
 		}) ();
 		(function prepare () {
-			var s = "", c, sql = "";
-			for (var i = 0; i < options.sql.length; i ++) {
+			let s = "", c, sql = "";
+			for (let i = 0; i < options.sql.length; i ++) {
 				c = options.sql [i];
 				if (c == "$") {
 					if (s) {
@@ -72,7 +72,7 @@ var Storage = function (options) {
 		}) ();
 		(function returnParams () {
 			if (options.params) {
-				for (var i = 0; i < options.params.length; i ++) {
+				for (let i = 0; i < options.params.length; i ++) {
 					options.sql = options.sql.replace ("#" + (i + 1), "$" + (i + 1));
 				};
 			};
@@ -99,8 +99,8 @@ var Storage = function (options) {
 	};
 	storage.maxRevision = 2147483647;
 	storage.getCurrentFilter = function (options) {
-		var filter;
-		var alias = "";
+		let filter;
+		let alias = "";
 		if (options && options.alias) {
 			alias = options.alias + ".";
 		};
@@ -108,17 +108,17 @@ var Storage = function (options) {
 		return filter;
 	};
 	storage.createRevision = function (options) {
-		var success = options.success;
-		var description = options.description;
-		var session = options.session;
-		var remoteAddr = options.remoteAddr || session.ip;
-		var client = storage.clientPool [session.id];
+		let success = options.success;
+		let description = options.description;
+		let session = options.session;
+		let remoteAddr = options.remoteAddr || session.ip;
+		let client = storage.clientPool [session.id];
 		client.getNextId ({session: session, table: "trevision", success: function (options) {
-			var id = options.id;
+			let id = options.id;
 			storage.lastRevision = id;
 			remoteAddr = remoteAddr ? "'" + remoteAddr + "'" : "null";
 			session.userId = session.userId || "null";
-			var s = 
+			let s = 
 				"insert into trevision (fid, fdate, fdescription, fsubject_id, fremote_addr)\n" + 
 				"values (" + id + ", " + client.currentTimestamp () + ", '" + description + "', " + session.userId + ", " + remoteAddr + ")";
 			storage.query ({session: session, sql: s, success: function (options) {
@@ -142,9 +142,9 @@ var Storage = function (options) {
 	storage.startTransaction = function (options, cb) {
 		options = options || {};
 		options.session = options.session || {};
-		var success = options.success;
-		var failure = options.failure;
-		var session = options.session;
+		let success = options.success;
+		let failure = options.failure;
+		let session = options.session;
 		log.debug ({cls: "Storage", fn: "startTransaction", params: options.description});
 		async.series ([
 			function (cb) {
@@ -157,7 +157,7 @@ var Storage = function (options) {
 				};
 			}
 		], function (err, results) {
-			var client = db.create (storage);
+			let client = db.create (storage);
 			client.connect ({success: function () {
 				client.startTransaction ({success: function () {
 					storage.clientPool [session.id] = client;
@@ -232,15 +232,15 @@ var Storage = function (options) {
 		log.debug ({cls: "Storage", fn: "commitTransaction"});
 		options = options || {};
 		options.session = options.session || {};
-		var session = options.session;
-		var failure = options.failure;
+		let session = options.session;
+		let failure = options.failure;
 		if (storage.revision [session.id]) {
-			var client = storage.clientPool [session.id];
+			let client = storage.clientPool [session.id];
 			if (client) {
 				client.commitTransaction ({success: function () {
 					delete storage.clientPool [session.id];
 					client.disconnect ();
-					var revision = storage.revision [session.id];
+					let revision = storage.revision [session.id];
 					if (storage.revisions [revision]) {
 						storage.revisions [revision].dirty = false;
 						storage.redisPub.publish (config.redis.db + "-" + storage.code + "-revisions", JSON.stringify (storage.revisions [revision]));
@@ -283,12 +283,12 @@ var Storage = function (options) {
 		log.debug ({cls: "Storage", fn: "rollbackTransaction"});
 		options = options || {};
 		options.session = options.session || {};
-		var session = options.session;
+		let session = options.session;
 		if (storage.revision [session.id]) {
-			var client = storage.clientPool [session.id];
+			let client = storage.clientPool [session.id];
 			if (!client) {
 				// removeTimeoutSessions exception
-				var revision = storage.revision [session.id];
+				let revision = storage.revision [session.id];
 				delete storage.revisions [revision];
 				delete storage.revision [session.id];
 				if (cb) {
@@ -302,7 +302,7 @@ var Storage = function (options) {
 			client.rollbackTransaction ({success: function () {
 				delete storage.clientPool [session.id];
 				client.disconnect ();
-				var revision = storage.revision [session.id];
+				let revision = storage.revision [session.id];
 				delete storage.revisions [revision];
 				delete storage.revision [session.id];
 				if (cb) {
@@ -340,22 +340,22 @@ var Storage = function (options) {
 	storage.initClasses = function (options) {
 		log.debug ({cls: "Storage", fn: "initClasses"});
 		options = options || {};
-		var success = options.success;
+		let success = options.success;
 		options.session = options.session || {};
-		var session = options.session;
+		let session = options.session;
 		storage.query ({session: session, sql: "select * from tclass where " + storage.getCurrentFilter (), success: function (options) {
-			var rows = options.result.rows;
+			let rows = options.result.rows;
 			// get fields
-			var fields = [];
-			for (var field in rows [0]) {
+			let fields = [];
+			for (let field in rows [0]) {
 				fields.push (field);
 			}
 			// get storage.classes
 			storage.classes = [];
 			storage.classesMap = {};
-			for (var i = 0; i < rows.length; i ++) {
-				var o = new storage.tobject ({code: "tclass"});
-				for (var j = 0; j < fields.length; j ++) {
+			for (let i = 0; i < rows.length; i ++) {
+				let o = new storage.tobject ({code: "tclass"});
+				for (let j = 0; j < fields.length; j ++) {
 					o.data [fields [j]] = rows [i][fields [j]];
 				}
 				o.toc = o.get ("fcode").toLowerCase () + "_" + o.get ("fid");
@@ -367,17 +367,17 @@ var Storage = function (options) {
 			// get storage.classesTree
 			storage.classesTree = {};
 			storage.classesCode = {};
-			var getTree = function (options) {
-				for (var i = 0; i < storage.classes.length; i ++) {
-					var o = storage.classes [i];
+			let getTree = function (options) {
+				for (let i = 0; i < storage.classes.length; i ++) {
+					let o = storage.classes [i];
 					if (o.get ("fparent_id") == options.parent) {
 						if (options.parent) {
 							storage.classesMap [options.parent].childs.push (o.get ("fid"));
 						}
 						options.node [o.get ("fcode")] = {id: o.get ("fid")};
-						var code = options.code ? options.code + "." + o.get ("fcode") : o.get ("fcode");
+						let code = options.code ? options.code + "." + o.get ("fcode") : o.get ("fcode");
 						storage.classesCode [code] = o;
-						var tokens = code.split (".");
+						let tokens = code.split (".");
 						if (tokens.length == 3) {
 							storage.classesCode [tokens [0] + "." + tokens [2]] = storage.classesCode [tokens [0] + "." + tokens [2]] || o;
 						}
@@ -398,22 +398,22 @@ var Storage = function (options) {
 		if (!o) {
 			return o;
 		};
-		var n = o.get ("fcode");
+		let n = o.get ("fcode");
 		if (o.get ("fparent_id")) {
 			n = storage.getClassFullCode (storage.classesMap [o.get ("fparent_id")]) + "." + n;
 		};
 		return n;
 	};
 	storage.updateClassCache = function (options) {
-		var fields = options.fields;
-		var values = options.values;
-		var o = storage.classesMap [values [0]] || (new storage.tobject ({code: "tclass"}));
+		let fields = options.fields;
+		let values = options.values;
+		let o = storage.classesMap [values [0]] || (new storage.tobject ({code: "tclass"}));
 		if (values [1]) {
 			storage.classesMap [values [1]].childs.splice (
 				storage.classesMap [values [1]].childs.indexOf (values [0], 1)
 			);
 		};
-		for (var i = 0; i < fields.length; i ++) {
+		for (let i = 0; i < fields.length; i ++) {
 			o.data [fields [i]] = values [i];
 		};
 		o.toc = o.get ("fcode").toLowerCase () + "_" + o.get ("fid");
@@ -427,9 +427,9 @@ var Storage = function (options) {
 			if (storage.classesMap [o.get ("fparent_id")].childs.indexOf (o.get ("fid")) == -1) {
 				storage.classesMap [o.get ("fparent_id")].childs.push (o.get ("fid"));
 			};
-			var code = storage.getClassFullCode (o);
+			let code = storage.getClassFullCode (o);
 			storage.classesCode [code] = o;
-			var tokens = code.split (".");
+			let tokens = code.split (".");
 			if (tokens.length == 3) {
 				storage.classesCode [tokens [0] + "." + tokens [2]] = storage.classesCode [tokens [0] + "." + tokens [2]] || o;
 			};
@@ -441,20 +441,20 @@ var Storage = function (options) {
 		};
 	};
 	storage.updateClassAttrCache = function (options) {
-		var fields = options.fields;
-		var values = options.values;
-		var o = storage.classAttrsMap [values [0]] || (new storage.tobject ({code: "tclass_attr"}));
+		let fields = options.fields;
+		let values = options.values;
+		let o = storage.classAttrsMap [values [0]] || (new storage.tobject ({code: "tclass_attr"}));
 		if (storage.classesMap [values [1]]) {
-			var removeClassAttr = function (oClass) {
+			let removeClassAttr = function (oClass) {
 				oClass.attrs = oClass.attrs || {};
 				delete oClass.attrs [values [3]];
-				for (var i = 0; i < oClass.childs.length; i ++) {
+				for (let i = 0; i < oClass.childs.length; i ++) {
 					removeClassAttr (storage.classesMap [oClass.childs [i]]);
 				}
 			};
 			removeClassAttr (storage.classesMap [values [1]]);
 		};
-		for (var i = 0; i < fields.length; i ++) {
+		for (let i = 0; i < fields.length; i ++) {
 			o.data [fields [i]] = values [i];
 		}
 		o.toc = o.get ("fcode").toLowerCase () + "_" + o.get ("fid");
@@ -463,10 +463,10 @@ var Storage = function (options) {
 			storage.classAttrsMap [o.get ("fid")] = o;
 		};
 		if (storage.classesMap [o.get ("fclass_id")]) {
-			var addClassAttr = function (oClass) {
+			let addClassAttr = function (oClass) {
 				oClass.attrs = oClass.attrs || {};
 				oClass.attrs [o.get ("fcode")] = o;
-				for (var i = 0; i < oClass.childs.length; i ++) {
+				for (let i = 0; i < oClass.childs.length; i ++) {
 					addClassAttr (storage.classesMap [oClass.childs [i]]);
 				}
 			};
@@ -477,17 +477,17 @@ var Storage = function (options) {
 		if (!o) {
 			return o;
 		};
-		var n = o.get ("fcode");
+		let n = o.get ("fcode");
 		if (o.get ("fparent_id")) {
 			n = storage.getViewFullCode (storage.viewsMap [o.get ("fparent_id")]) + "." + n;
 		};
 		return n;
 	};
 	storage.updateViewCache = function (options) {
-		var fields = options.fields;
-		var values = options.values;
-		var o = storage.viewsMap [values [0]] || (new storage.tobject ({code: "tview"}));
-		for (var i = 0; i < fields.length; i ++) {
+		let fields = options.fields;
+		let values = options.values;
+		let o = storage.viewsMap [values [0]] || (new storage.tobject ({code: "tview"}));
+		for (let i = 0; i < fields.length; i ++) {
 			o.data [fields [i]] = values [i];
 		}
 		if (!storage.viewsMap [o.get ("fid")]) {
@@ -496,9 +496,9 @@ var Storage = function (options) {
 			storage.viewsMap [o.get ("fid")] = o;
 		};
 		if (o.get ("fparent_id")) {
-			var code = storage.getViewFullCode (o);
+			let code = storage.getViewFullCode (o);
 			storage.viewsCode [code] = o;
-			var tokens = code.split (".");
+			let tokens = code.split (".");
 			if (tokens.length == 3) {
 				storage.viewsCode [tokens [0] + "." + tokens [2]] = storage.viewsCode [tokens [0] + "." + tokens [2]] || o;
 			};
@@ -510,17 +510,17 @@ var Storage = function (options) {
 		};
 	};
 	storage.updateViewAttrCache = function (options) {
-		var fields = options.fields;
-		var values = options.values;
-		var o = storage.viewAttrsMap [values [0]] || (new storage.tobject ({code: "tview_attr"}));
-		for (var i = 0; i < fields.length; i ++) {
+		let fields = options.fields;
+		let values = options.values;
+		let o = storage.viewAttrsMap [values [0]] || (new storage.tobject ({code: "tview_attr"}));
+		for (let i = 0; i < fields.length; i ++) {
 			o.data [fields [i]] = values [i];
 		};
 		if (!storage.viewAttrsMap [o.get ("fid")]) {
 			storage.viewAttrs.push (o);
 			storage.viewAttrsMap [o.get ("fid")] = o;
 		};
-		var oView = storage.viewsMap [o.get ("fview_id")];
+		let oView = storage.viewsMap [o.get ("fview_id")];
 		if (oView) {
 			oView.attrs = oView.attrs || {};
 			oView.attrs [o.get ("fcode")] = o;
@@ -534,32 +534,32 @@ var Storage = function (options) {
 	storage.initClassAttrs = function (options) {
 		log.debug ({cls: "storage", fn: "initClassAttrs"});
 		options = options || {};
-		var success = options.success;
+		let success = options.success;
 		options.session = options.session || {};
-		var session = options.session;
+		let session = options.session;
 		storage.query ({session: session, sql: "select * from tclass_attr where " + storage.getCurrentFilter (), success: function (options) {
-			var rows = options.result.rows;
+			let rows = options.result.rows;
 			// get fields
-			var fields = [];
-			for (var field in rows [0]) {
+			let fields = [];
+			for (let field in rows [0]) {
 				fields.push (field);
 			}
 			// get storage.classAttrs
 			storage.classAttrs = [];
 			storage.classAttrsMap = {};
-			for (var i = 0; i < rows.length; i ++) {
-				var o = new storage.tobject ({code: "tclass_attr"});
-				for (var j = 0; j < fields.length; j ++) {
+			for (let i = 0; i < rows.length; i ++) {
+				let o = new storage.tobject ({code: "tclass_attr"});
+				for (let j = 0; j < fields.length; j ++) {
 					o.data [fields [j]] = rows [i][fields [j]];
 				}
 				o.toc = o.get ("fcode").toLowerCase () + "_" + o.get ("fid");
 				storage.classAttrs.push (o);
 				storage.classAttrsMap [o.get ("fid")] = o;
 				if (storage.classesMap [o.get ("fclass_id")]) {
-					var addClassAttr = function (oClass) {
+					let addClassAttr = function (oClass) {
 						oClass.attrs = oClass.attrs || {};
 						oClass.attrs [o.get ("fcode")] = o;
-						for (var i = 0; i < oClass.childs.length; i ++) {
+						for (let i = 0; i < oClass.childs.length; i ++) {
 							addClassAttr (storage.classesMap [oClass.childs [i]]);
 						}
 					};
@@ -582,20 +582,20 @@ var Storage = function (options) {
 	storage.initViews = function (options) {
 		log.debug ({cls: "storage", fn: "initViews"});
 		options = options || {};
-		var success = options.success;
+		let success = options.success;
 		options.session = options.session || {};
-		var session = options.session;
+		let session = options.session;
 		storage.query ({session: session, sql: "select * from tview where " + storage.getCurrentFilter (), success: function (options) {
-			var rows = options.result.rows;
-			var fields = [];
-			for (var field in rows [0]) {
+			let rows = options.result.rows;
+			let fields = [];
+			for (let field in rows [0]) {
 				fields.push (field);
 			}
 			storage.views = [];
 			storage.viewsMap = {};
-			for (var i = 0; i < rows.length; i ++) {
-				var o = new storage.tobject ({code: "tview"});
-				for (var j = 0; j < fields.length; j ++) {
+			for (let i = 0; i < rows.length; i ++) {
+				let o = new storage.tobject ({code: "tview"});
+				for (let j = 0; j < fields.length; j ++) {
 					o.data [fields [j]] = rows [i][fields [j]];
 				}
 				storage.views.push (o);
@@ -603,15 +603,15 @@ var Storage = function (options) {
 			}
 			storage.viewsTree = {};
 			storage.viewsCode = {};
-			var getTree = function (options) {
-				for (var i = 0; i < storage.views.length; i ++) {
-					var o = storage.views [i];
+			let getTree = function (options) {
+				for (let i = 0; i < storage.views.length; i ++) {
+					let o = storage.views [i];
 					if (o.get ("fparent_id") == options.parent) {
 						options.node [o.get ("fcode")] = {id: o.get ("fid")};
-						var code = options.code ? options.code + "." + o.get ("fcode") : o.get ("fcode");
+						let code = options.code ? options.code + "." + o.get ("fcode") : o.get ("fcode");
 						storage.viewsCode [code] = o;
 						if (code) {
-							var tokens = code.split (".");
+							let tokens = code.split (".");
 							if (tokens.length == 3) {
 								storage.viewsCode [tokens [0] + "." + tokens [2]] = storage.viewsCode [tokens [0] + "." + tokens [2]] || o;
 							}
@@ -636,20 +636,20 @@ var Storage = function (options) {
 	storage.initViewAttrs = function (options) {
 		log.debug ({cls: "storage", fn: "initViewAttrs"});
 		options = options || {};
-		var success = options.success;
+		let success = options.success;
 		options.session = options.session || {};
-		var session = options.session;
+		let session = options.session;
 		storage.query ({session: session, sql: "select * from tview_attr where " + storage.getCurrentFilter (), success: function (options) {
-			var rows = options.result.rows;
-			var fields = [];
-			for (var field in rows [0]) {
+			let rows = options.result.rows;
+			let fields = [];
+			for (let field in rows [0]) {
 				fields.push (field);
 			}
 			storage.viewAttrs = [];
 			storage.viewAttrsMap = {};
-			for (var i = 0; i < rows.length; i ++) {
-				var o = new storage.tobject ({code: "tview_attr"});
-				for (var j = 0; j < fields.length; j ++) {
+			for (let i = 0; i < rows.length; i ++) {
+				let o = new storage.tobject ({code: "tview_attr"});
+				for (let j = 0; j < fields.length; j ++) {
 					o.data [fields [j]] = rows [i][fields [j]];
 				}
 				if (o.get ("fcode") == null) {
@@ -672,13 +672,13 @@ var Storage = function (options) {
 	// todo: не понимает коротких путей
 	storage.findNode = function (options) {
 		log.debug ({cls: "storage", fn: "findNode"});
-		var node = options.node;
-		var path = options.path;
-		var foundNode;
+		let node = options.node;
+		let path = options.path;
+		let foundNode;
 		if (typeof (path) == "string") {
 			path = path.split (".");
 		};		
-		var key = path [0];
+		let key = path [0];
 		if (node.hasOwnProperty (key)) {
 			if (path.length > 1) {
 				path.splice (0, 1);
@@ -706,7 +706,7 @@ var Storage = function (options) {
 			if (typeof (options) == "string") {
 				options = {code: options};
 			};
-			var code = options.classCode || options.code;
+			let code = options.classCode || options.code;
 			if (storage.classesCode [code]) {
 				return storage.classesCode [code];
 			} else {
@@ -729,7 +729,7 @@ var Storage = function (options) {
 				throw new Error ("storage.getClassAttr - Unknown classAttrId: " + options);
 			}
 		} else {
-			var oClass;
+			let oClass;
 			if (options.classCode) {
 				oClass = storage.classesCode [options.classCode];
 			} else {
@@ -747,7 +747,7 @@ var Storage = function (options) {
 						}
 					}
 				};
-				var o = getAttr (oClass)
+				let o = getAttr (oClass)
 				return o;
 			} else {
 				throw new Error ("storage.getClassAttr - Unknown classCode: " + options.classCode + " (classId: " + options.classId || options.classCode + ")");
@@ -758,13 +758,13 @@ var Storage = function (options) {
 	storage.getObject = function (options, cb) {
 		log.debug ({cls: "Storage", fn: "getObject", id: options.id});
 		options = options || {};
-		var success = options.success;
-		var failure = options.failure;
-		var objectId = options.id;
+		let success = options.success;
+		let failure = options.failure;
+		let objectId = options.id;
 		options.session = options.session || {};
-		var session = options.session;
+		let session = options.session;
 		storage.redisClient.hset ("sessions", session.id + "-clock", config.clock);
-		var revision = session.revision;
+		let revision = session.revision;
 		if (!objectId || Number (objectId) == NaN) {
 			if (cb) {
 				cb (null, null);
@@ -774,15 +774,15 @@ var Storage = function (options) {
 			};
 			return;
 		};
-		var object;
+		let object;
 		async.series ([
 			function (cb) {
 				storage.redisClient.hmget (storage.code + "-objects" + (revision || ""), [objectId + "-data"], function (err, result) {
-					var o = new storage.tobject ({code: "tobject"});
+					let o = new storage.tobject ({code: "tobject"});
 					if (result && result [0]) {
 						o.data = eval ("(" + result [0] + ")");
 						o.originalData = {};
-						for (var attr in o.data) {
+						for (let attr in o.data) {
 							o.originalData [attr] = o.data [attr];
 						}
 						object = o;
@@ -790,7 +790,7 @@ var Storage = function (options) {
 					} else {
 						if (revision) {
 							// time machine
-							var cls, row;
+							let cls, row;
 							async.series ([
 								function (cb) {
 									storage.query ({session: session, sql: 
@@ -801,24 +801,24 @@ var Storage = function (options) {
 									}});
 								},
 								function (cb) {
-									var fields = [];
+									let fields = [];
 									function addFields (attrs) {
-										for (var attr in attrs) {
+										for (let attr in attrs) {
 											fields.push (attrs [attr].toc);
 										};
 									};
 									addFields (cls.attrs);
-									var joins = "";
+									let joins = "";
 									function addJoins (parent) {
 										if (parent) {
-											var clsParent = storage.getClass (parent);
+											let clsParent = storage.getClass (parent);
 											joins += "left join tm_" + clsParent.toc + " on (tm_" + clsParent.toc + ".fobject_id=tm_" + cls.toc + ".fobject_id and tm_" + clsParent.toc + ".frevision_id=tm_" + cls.toc + ".frevision_id)\n";
 											addFields (clsParent.attrs);
 											addJoins (clsParent.get ("fparent_id"));
 										};
 									};
 									addJoins (cls.get ("fparent_id"));
-									var s = 
+									let s = 
 										"select " + fields.join (", ") + " from tm_" + cls.toc + "\n" +
 										joins +
 										"where tm_" + cls.toc + ".fobject_id=" + objectId + " and tm_" + cls.toc + ".frevision_id=" + revision
@@ -831,12 +831,12 @@ var Storage = function (options) {
 								function (cb) {
 									o.data.id = objectId;
 									o.data.fclass_id = cls.get ("fid");
-									for (var attr in cls.attrs) {
-										var ca = cls.attrs [attr];
+									for (let attr in cls.attrs) {
+										let ca = cls.attrs [attr];
 										o.data [attr] = row [ca.toc];
 										o.originalData [attr] = row [ca.toc];
 									};
-									var hdata = {};
+									let hdata = {};
 									hdata [objectId + "-data"] = o.dataToJSONString (true);
 									storage.redisClient.hmset (storage.code + "-objects" + revision, hdata);
 									object = o;
@@ -846,7 +846,7 @@ var Storage = function (options) {
 								cb ();
 							});
 						} else {
-							var select = "select a.fclass_attr_id, a.fstring, a.ftime, fnumber, b.fclass_id";
+							let select = "select a.fclass_attr_id, a.fstring, a.ftime, fnumber, b.fclass_id";
 							storage.query ({session: session, sql: 
 								select + "\n" +
 								"from tobject b\n" +
@@ -857,19 +857,19 @@ var Storage = function (options) {
 									object = null;
 									cb ();
 								} else {
-									var rows = options.result.rows;
+									let rows = options.result.rows;
 									o.data.id = objectId;
 									o.data.fclass_id = rows [0].fclass_id;
-									for (var i = 0; i < rows.length; i ++) {
+									for (let i = 0; i < rows.length; i ++) {
 										if (!rows [i].fclass_attr_id) {
 											continue;
 										};
-										var classAttr = storage.classAttrsMap [rows [i].fclass_attr_id];
+										let classAttr = storage.classAttrsMap [rows [i].fclass_attr_id];
 										if (!classAttr) {
 											// Deleted class attr
 											continue;
 										}
-										var value;
+										let value;
 										if (classAttr.get ("ftype_id") == 1 || classAttr.get ("ftype_id") == 5) {
 											value = rows [i].fstring;
 										} else
@@ -882,7 +882,7 @@ var Storage = function (options) {
 										o.originalData [classAttr.get ("fcode")] = value;
 									}
 									if (!storage.revision [session.id]) {
-										var hdata = {};
+										let hdata = {};
 										hdata [objectId + "-data"] = o.dataToJSONString (true);
 										storage.redisClient.hmset (storage.code + "-objects", hdata);
 									};
@@ -916,13 +916,13 @@ var Storage = function (options) {
 		};
 		log.debug ({cls: "Storage", fn: "createObject", params: options.classId || options.code});
 		options = options || {};
-		var mainOptions = options;
-		var success = options.success;
-		var failure = options.failure;
-		var classId = options.classId || storage.getClass (options.code).get ("fid");
-		var userOptions = options.options || {};
+		let mainOptions = options;
+		let success = options.success;
+		let failure = options.failure;
+		let classId = options.classId || storage.getClass (options.code).get ("fid");
+		let userOptions = options.options || {};
 		options.session = options.session || {};
-		var session = options.session;
+		let session = options.session;
 		async.series ([
 			function (cb) {
 				cb ();
@@ -939,15 +939,15 @@ var Storage = function (options) {
 			};
 			storage.clsChange ({classId: classId});
 			storage.client.getNextId ({session: session, table: "tobject", success: function (options) {
-				var sql = [];
-				var objectId = mainOptions.objectId || options.id;
+				let sql = [];
+				let objectId = mainOptions.objectId || options.id;
 				sql.push (
 					"insert into tobject (fid, fclass_id, fstart_id, fend_id)\n" +
 					"values (" + objectId + "," + classId + "," + storage.revision [session.id] + "," + storage.maxRevision + ")"
 				);
-				var insertTOC = function (options) {
-					var classObject = storage.classesMap [options.classId];
-					var tocName = classObject.get ("fcode") + "_" + options.classId;
+				let insertTOC = function (options) {
+					let classObject = storage.classesMap [options.classId];
+					let tocName = classObject.get ("fcode") + "_" + options.classId;
 					sql.push ("insert into " + tocName + " (fobject_id) values (" + objectId + ")");
 					if (classObject.get ("fparent_id")) {
 						insertTOC ({classId: classObject.get ("fparent_id")});
@@ -970,11 +970,11 @@ var Storage = function (options) {
 						};
 					} else {
 						if (cb || success) {
-							var o = new storage.tobject ({code: "tobject"});
+							let o = new storage.tobject ({code: "tobject"});
 							o.data.id = objectId;
 							o.data.fclass_id = classId;
 							userOptions.object = o;
-							var hdata = {};
+							let hdata = {};
 							hdata [objectId + "-data"] = o.dataToJSONString ();
 							storage.redisClient.hmset (storage.code + "-objects", hdata);
 							if (storage.revisions [storage.revision [session.id]]) {
@@ -1001,7 +1001,7 @@ var Storage = function (options) {
 	},
 	// Object class
 	storage.tobject = function (options) {
-		var me = this;
+		let me = this;
 		me.code = options.code;
 		me.data = {};
 		me.originalData = {};
@@ -1018,7 +1018,7 @@ var Storage = function (options) {
 	storage.getClassAttrs = function (options) {
 		log.debug ({cls: "storage", fn: "getClassAttrs"});
 		options.result = options.result || {};
-		for (var i = 0; i < storage.classAttrs.length; i ++) {
+		for (let i = 0; i < storage.classAttrs.length; i ++) {
 			if (storage.classAttrs [i].get ("fclass_id") == options.classId) {
 				options.result [storage.classAttrs [i].get ("fcode")] = storage.classAttrs [i];
 			}
@@ -1030,47 +1030,47 @@ var Storage = function (options) {
 		return options.result;
 	};
 	storage.getDependentObjects = function (options) {
-		var session = options.session;
-		var object = options.object;
-		var success = options.success;
-		var failure = options.failure;
+		let session = options.session;
+		let object = options.object;
+		let success = options.success;
+		let failure = options.failure;
 		// classes
-		var getParentClasses = function (classId) {
-			var r = [classId];
-			var o = storage.classesMap [classId];
+		let getParentClasses = function (classId) {
+			let r = [classId];
+			let o = storage.classesMap [classId];
 			if (o.get ("fparent_id")) {
 				r = r.concat (getParentClasses (o.get ("fparent_id")));
 			}
 			return r;
 		};
-		var getChildClasses = function (classId) {
-			var r = [classId];
-			var o = storage.classesMap [classId];
-			for (var i = 0; i < o.childs.length; i ++) {
+		let getChildClasses = function (classId) {
+			let r = [classId];
+			let o = storage.classesMap [classId];
+			for (let i = 0; i < o.childs.length; i ++) {
 				r = r.concat (getChildClasses (storage.classesMap [o.childs [i]].get ("fid")));
 			}
 			return r;
 		};
-		var classes = getParentClasses (object.data.fclass_id).concat (getChildClasses (object.data.fclass_id));
+		let classes = getParentClasses (object.data.fclass_id).concat (getChildClasses (object.data.fclass_id));
 		classes.push (12); // Object
 		// classAttrs
-		var classAttrs = [];
-		for (var i = 0; i < storage.classAttrs.length; i ++) {
-			var ca = storage.classAttrs [i];
+		let classAttrs = [];
+		for (let i = 0; i < storage.classAttrs.length; i ++) {
+			let ca = storage.classAttrs [i];
 			if (classes.indexOf (ca.get ("ftype_id")) > -1) {
 				classAttrs.push (ca.get ("fid"));
 			}
 		}
 		if (classAttrs.length) {
-			var cascade = []; // objects for cascade removing
-			var setnull = []; // objects for set null
+			let cascade = []; // objects for cascade removing
+			let setnull = []; // objects for set null
 			storage.query ({session: session, sql: 
 				"select fobject_id, fclass_attr_id from tobject_attr\n" +
 				"where fclass_attr_id in (" + classAttrs.join (",") + ") and fnumber=" + object.data.id + " and " + storage.getCurrentFilter () + "\n"
 			, success: function (options) {
-				var rows = options.result.rows;
-				for (var i = 0; i < rows.length; i ++) {
-					var removeRule = storage.classAttrsMap [rows [i].fclass_attr_id].get ("fremove_rule");
+				let rows = options.result.rows;
+				for (let i = 0; i < rows.length; i ++) {
+					let removeRule = storage.classAttrsMap [rows [i].fclass_attr_id].get ("fremove_rule");
 					if (removeRule == "cascade") {
 						cascade.push (rows [i].fobject_id);
 					} else {
@@ -1089,18 +1089,18 @@ var Storage = function (options) {
 	};
 	// {session, object, success}
 	storage.removeObject = function (options) {
-		var session = options.session;
+		let session = options.session;
 		storage.redisClient.hset ("sessions", session.id + "-clock", config.clock);
-		var removeSingleObject = function (options) {
-			var object = options.object;
-			var objectId = object.data.id;
-			var success = options.success;
-			var failure = options.failure;
-			var sql = [];
+		let removeSingleObject = function (options) {
+			let object = options.object;
+			let objectId = object.data.id;
+			let success = options.success;
+			let failure = options.failure;
+			let sql = [];
 			sql.push ("update tobject set fend_id=" + storage.revision [session.id] + " where fend_id=" + storage.maxRevision + " and fid=" + objectId);
-			var deleteTOC = function (options) {
-				var classObject = storage.classesMap [options.classId];
-				var tocName = classObject.get ("fcode") + "_" + options.classId;
+			let deleteTOC = function (options) {
+				let classObject = storage.classesMap [options.classId];
+				let tocName = classObject.get ("fcode") + "_" + options.classId;
 				sql.push ("delete from " + tocName + " where fobject_id=" + objectId);
 				if (classObject.get ("fparent_id")) {
 					deleteTOC ({classId: classObject.get ("fparent_id")});
@@ -1119,17 +1119,17 @@ var Storage = function (options) {
 						return failure (new VError (err, "Storage.removeSingleObject"));
 					};
 				};
-				var oClass = storage.classesMap [object.data.fclass_id];
-				var attrs = [];
-				for (var a in object.originalData) {
+				let oClass = storage.classesMap [object.data.fclass_id];
+				let attrs = [];
+				for (let a in object.originalData) {
 					if (object.originalData [a]) {
 						attrs.push (a);
 					}
 				}
 				async.map (attrs, function (attr, cb) {
-					var ca = oClass.attrs [attr];
+					let ca = oClass.attrs [attr];
 					if (ca && ca.get ("funique")) {
-						var key = storage.code + "-unique-" + ca.get ("fid");
+						let key = storage.code + "-unique-" + ca.get ("fid");
 						storage.redisClient.srem (key, object.originalData [attr], function (err, result) {
 							cb ();
 						});
@@ -1145,19 +1145,19 @@ var Storage = function (options) {
 				});
 			});
 		};
-		var success = options.success;
-		var failure = options.failure;
-		var mainOptions = options;
+		let success = options.success;
+		let failure = options.failure;
+		let mainOptions = options;
 		if (!options.object) {
 			if (success) {
 				success ({cascadeNum: 0, setnullNum: 0});
 			}
 			return;
 		}
-		var cascade;
-		var cascadeNum;
-		var setnull;
-		var setnullNum;
+		let cascade;
+		let cascadeNum;
+		let setnull;
+		let setnullNum;
 		async.series ([
 			function (cb) {
 				cb ();
@@ -1173,7 +1173,7 @@ var Storage = function (options) {
 						function setNullAttrs (cb) {
 							async.map (setnull, function (snObject, cb) {
 								storage.getObject ({session: session, id: snObject.id, success: function (options) {
-									var o = options.object;
+									let o = options.object;
 									if (o) {
 										o.set (snObject.attrCode, null);
 										o.commit ({session: session, success: function () {
@@ -1240,12 +1240,12 @@ var Storage = function (options) {
 		log.debug ({cls: "Object", fn: "commit"});
 		options = options || {};
 		options.session = options.session || {};
-		var session = options.session;
+		let session = options.session;
 		storage.redisClient.hset ("sessions", session.id + "-clock", config.clock);
-		var success = options.success;
-		var failure = options.failure;
-		var objectId = this.data.id;
-		var object = this;
+		let success = options.success;
+		let failure = options.failure;
+		let objectId = this.data.id;
+		let object = this;
 		async.series ([
 			function (cb) {
 				if (object.removed) {
@@ -1287,8 +1287,8 @@ var Storage = function (options) {
 					};
 				}});
 			} else {
-				var attrs = [];
-				for (var attr in object.data) {
+				let attrs = [];
+				for (let attr in object.data) {
 					if (["id", "fclass_id"].indexOf (attr) > -1) {
 						continue;
 					}
@@ -1312,11 +1312,11 @@ var Storage = function (options) {
 				} else {
 					async.series ([
 						function (cb) {
-							var oClass = storage.classesMap [object.data.fclass_id];
+							let oClass = storage.classesMap [object.data.fclass_id];
 							async.map (attrs, function (attr, cb) {
-								var ca = oClass.attrs [attr];
+								let ca = oClass.attrs [attr];
 								if (ca && ca.get ("funique")) {
-									var key = storage.code + "-unique-" + ca.get ("fid");
+									let key = storage.code + "-unique-" + ca.get ("fid");
 									async.series ([
 										function addNew (cb) {
 											if (object.data [attr]) {
@@ -1352,15 +1352,15 @@ var Storage = function (options) {
 						},
 						function (cb) {
 							storage.clsChange ({session: session, classId: object.get ("fclass_id")});
-							var classAttrs = storage.getClassAttrs ({classId: object.get ("fclass_id")});
-							var toc = {};
-							var sql = [], sqlU = [], sqlI = [];
-							for (var i = 0; i < attrs.length; i ++) {
-								var value = object.data [attrs [i]];
+							let classAttrs = storage.getClassAttrs ({classId: object.get ("fclass_id")});
+							let toc = {};
+							let sql = [], sqlU = [], sqlI = [];
+							for (let i = 0; i < attrs.length; i ++) {
+								let value = object.data [attrs [i]];
 								if (value === true || value === false) {
 									value = Number (value);
 								}
-								var ca = classAttrs [attrs [i]];
+								let ca = classAttrs [attrs [i]];
 								if (!ca) {
 									continue;
 								}
@@ -1368,7 +1368,7 @@ var Storage = function (options) {
 									sql: "update tobject_attr set fend_id=" + storage.revision [session.id] + "\n" +
 										"where fobject_id=" + objectId + " and fclass_attr_id=" + ca.get ("fid") + " and fend_id=" + storage.maxRevision
 								});
-								var valueField = "fnumber";
+								let valueField = "fnumber";
 								if (ca.get ("ftype_id") == 1 || ca.get ("ftype_id") == 5) {
 									valueField = "fstring";
 								} else
@@ -1386,34 +1386,34 @@ var Storage = function (options) {
 										"values (" + objectId + "," + ca.get ("fid") + ", $1, " + storage.revision [session.id] + "," + storage.maxRevision + ")",
 									params: [value]
 								});
-								var classId = ca.get ("fclass_id");
+								let classId = ca.get ("fclass_id");
 								toc [classId] = toc [classId] || {name: storage.classesMap [classId].get ("fcode") + "_" + ca.get ("fclass_id")};
 								toc [classId].attrs = toc [classId].attrs || {};
 								toc [classId].attrs [ca.get ("fcode") + "_" + ca.get ("fid")] = value;
 							};
 							sql = sqlU.concat (sqlI);
-							var processObjectAttr = function (cb) {
+							let processObjectAttr = function (cb) {
 								async.mapSeries (sql, function (s, cb) {
 									storage.query ({session: session, sql: s.sql, params: s.params, success: function () {
 										cb ();
 									}, failure: cb});
 								}, cb);
 							};
-							var tocArray = [];
-							for (var classId in toc) {
+							let tocArray = [];
+							for (let classId in toc) {
 								tocArray.push (toc [classId]);
 							};
-							var processTOC = function (cb) {
+							let processTOC = function (cb) {
 								async.mapSeries (tocArray, function (t, cb) {
 									storage.query ({
 										session: session,
 										sql: "select fobject_id from " + t.name + " where fobject_id=" + objectId, 
 										success: function (options) {
 											if (options.result.rows.length == 0) {
-												var fields = ["fobject_id"];
-												var params = [objectId];
-												var $params = "$1";
-												for (var attr in t.attrs) {
+												let fields = ["fobject_id"];
+												let params = [objectId];
+												let $params = "$1";
+												for (let attr in t.attrs) {
 													fields.push (attr);
 													params.push (t.attrs [attr]);
 													$params += ", $" + params.length;
@@ -1430,10 +1430,10 @@ var Storage = function (options) {
 													}
 												});
 											} else {
-												var fields = [];
-												var params = [];
-												for (var attr in t.attrs) {
-													var value = t.attrs [attr];
+												let fields = [];
+												let params = [];
+												for (let attr in t.attrs) {
+													let value = t.attrs [attr];
 													if (value === "") {
 														value = null;
 													}
@@ -1460,7 +1460,7 @@ var Storage = function (options) {
 									cb (err);
 								});
 							};
-							var functions = [processObjectAttr, processTOC];
+							let functions = [processObjectAttr, processTOC];
 				   			//if (storage.connection.dbEngine && storage.connection.dbEngine.enabled) {
 							//	functions = [processObjectAttr];
 				   			//};
@@ -1503,8 +1503,8 @@ var Storage = function (options) {
 		this.removed = true;
 	};
 	storage.tobject.prototype.dataToJSONString = function (utc) {
-		var r;
-		for (var attr in this.data) {
+		let r;
+		for (let attr in this.data) {
 			if (!r) {
 				r = "{";
 			} else {
@@ -1522,11 +1522,11 @@ var Storage = function (options) {
 		log.debug ({cls: "storage", fn: "getId"});
 		options = options || {};
 		options.session = options.session || {};
-		var session = options.session;
-		var success = options.success;
-		var failure = options.failure;
-		var classCode = options.classCode;
-		var valueCode = options.valueCode || options.code;
+		let session = options.session;
+		let success = options.success;
+		let failure = options.failure;
+		let classCode = options.classCode;
+		let valueCode = options.valueCode || options.code;
 		if (!valueCode) {
 			success ({id: null});
 			return;
@@ -1537,7 +1537,7 @@ var Storage = function (options) {
 				success ({id: storage.dataId [classCode][valueCode]});
 			} else {
 				log.trace ({cls: "storage", fn: "getId", classCode: classCode, valueCode: valueCode}, "unknown");
-				var e = {error: "unknown value. classCode: " + classCode + ", valueCode: " + valueCode, module: "storage", fn: "getId"};
+				let e = {error: "unknown value. classCode: " + classCode + ", valueCode: " + valueCode, module: "storage", fn: "getId"};
 				if (failure) {
 					failure (e);
 				} else {
@@ -1556,7 +1556,7 @@ var Storage = function (options) {
 				]
 			}, success: function (r) {
 				storage.dataId [classCode] = {};
-				for (var i = 0; i < r.length; i ++) {
+				for (let i = 0; i < r.length; i ++) {
 					storage.dataId [classCode][r.get (i, "code")] = r.get (i, "id");
 				};
 				returnResult ();
@@ -1567,31 +1567,31 @@ var Storage = function (options) {
 	};	
 	// {sql: {select, from (inner-join, left-join), where, order}, success}
 	storage.execute = function (options, cb) {
-		var mainOptions = options;
-		var success = options.success;
-		var failure = options.failure;
-		var session = options.session;
+		let mainOptions = options;
+		let success = options.success;
+		let failure = options.failure;
+		let session = options.session;
 		options.storage = storage;
 		storage.addOrderId (options.sql);
-		var query = new Query (options);
+		let query = new Query (options);
 		query.generate ();
-		var fields = query.fields;
-		var sql = query.selectSQL + query.fromSQL + query.whereSQL + query.orderSQL;
+		let fields = query.fields;
+		let sql = query.selectSQL + query.fromSQL + query.whereSQL + query.orderSQL;
 		// todo: limit for mssql
 		if (storage.client.database != "mssql") {
 			sql += "\nlimit " + (options.sql.limit || config.query.maxRowNum) + " offset " + (options.sql.offset || "0") + "\n";
 		};
 		storage.query ({session: session, sql: sql, success: function (options) {
 			if (mainOptions.resultText) {
-				var r = "[";
+				let r = "[";
 				if (options.result) {
-					var rows = options.result.rows;
-					for (var i = 0; i < rows.length; i ++) {
+					let rows = options.result.rows;
+					for (let i = 0; i < rows.length; i ++) {
 						if (i) {
 							r += ",";
 						}
 						r += "[";
-						for (var j = 0; j < fields.length; j ++) {
+						for (let j = 0; j < fields.length; j ++) {
 							if (j) {
 								r += ",";
 							}
@@ -1608,15 +1608,15 @@ var Storage = function (options) {
 				}
 			} else
 			if (mainOptions.asArray || mainOptions.sql.asArray) {
-				var attrs = [];
+				let attrs = [];
 				_.each (mainOptions.sql.select, function (s) {
 					if (typeof (s) == "string") {
 						attrs.push (s);
 					}
 				});
-				var recs = [];
+				let recs = [];
 				_.each (options.result.rows, function (row) {
-					var rec = {};
+					let rec = {};
 					_.each (fields, function (f, i) {
 						rec [attrs [i]] = row [f];
 					});
@@ -1657,7 +1657,7 @@ var Storage = function (options) {
 	};
 	storage.prepareSQLForCount = function (sql, total) {
 		function getAlias (o) {
-			var a;
+			let a;
 			for (a in o) {
 				if (a != "distinct") {
 					break;
@@ -1669,10 +1669,10 @@ var Storage = function (options) {
 			if (!_.isArray (arr)) {
 				return false;
 			}
-			for (var i = 0; i < arr.length; i ++) {
-				var o = arr [i];
+			for (let i = 0; i < arr.length; i ++) {
+				let o = arr [i];
 				if (_.isArray (o)) {
-					var r = isAliasInArray (o, a);
+					let r = isAliasInArray (o, a);
 					if (r) {
 						return r;
 					}
@@ -1684,7 +1684,7 @@ var Storage = function (options) {
 			return false;
 		};
 		function isAliasInLeftJoins (joins, alias) {
-			var has = false;
+			let has = false;
 			_.each (joins, function (v, a) {
 				if (v && v [0] != "inner-join" && a != alias && isAliasInArray (v, alias)) {
 					has = true;
@@ -1693,7 +1693,7 @@ var Storage = function (options) {
 			return has;
 		};
 		function getJoins (sql, total) {
-			var alias, joins = {};
+			let alias, joins = {};
 			_.each (sql.from, function (o, i) {
 				if (o == "left-join" || o == "inner-join") {
 					alias = getAlias (sql.from [i + 1]);
@@ -1704,7 +1704,7 @@ var Storage = function (options) {
 				}
 			});
 			_.each (joins, function (arr, alias) {
-				var remove = false;
+				let remove = false;
 				if (arr [0] != "inner-join") {
 					if (!isAliasInArray (sql.where, alias) &&
 						!isAliasInArray (sql.order, alias) &&
@@ -1714,8 +1714,8 @@ var Storage = function (options) {
 						remove = true;
 					}
 					if (total) {
-						var has = false;
-						for (var i = 0; i < sql.select.length; i += 2) {
+						let has = false;
+						for (let i = 0; i < sql.select.length; i += 2) {
 							if (getAlias (sql.select [i]) == alias && total [sql.select [i + 1]]) {
 								has = true;
 								break;
@@ -1732,13 +1732,13 @@ var Storage = function (options) {
 			});
 			return joins;
 		}
-		var joins = getJoins (sql, total);
-		var r = {};
+		let joins = getJoins (sql, total);
+		let r = {};
 		_.each (sql, function (v, k) {
 			if (k == "select") {
 				r.select = [];
-				for (var i = 0; i < v.length; i += 2) {
-					var a = getAlias (v [i]);
+				for (let i = 0; i < v.length; i += 2) {
+					let a = getAlias (v [i]);
 					if (joins [a] || a == getAlias (sql.from [0])) {
 						r.select.push (v [i]);
 						r.select.push (v [i + 1]);
@@ -1761,13 +1761,13 @@ var Storage = function (options) {
 		return r;
 	};
 	storage.addOrderId = function (sql) {
-		var alias; for (alias in sql.from [0]) {break;};
-		var order = sql.orderAfter || sql.order;
+		let alias; for (alias in sql.from [0]) {break;};
+		let order = sql.orderAfter || sql.order;
 		order = order || [];
-		var has = 0;
-		for (var i = 0; i < order.length; i ++) {
+		let has = 0;
+		for (let i = 0; i < order.length; i ++) {
 			if (typeof (order [i]) == "object") {
-				for (var a in order [i]) {
+				for (let a in order [i]) {
 					if (order [i][a] == "id") {
 						has = 1;
 					};
@@ -1779,7 +1779,7 @@ var Storage = function (options) {
 				if (order.length) {
 					order.push (",");
 				};
-				var f = {}; f [alias] = "id";
+				let f = {}; f [alias] = "id";
 				order.push (f);
 			};
 		};
@@ -1790,26 +1790,26 @@ var Storage = function (options) {
 		}
 	},
 	storage.getContent = function (options) {
-		var viewId = options.viewId;
-		var column = options.column;
-		var row = options.row;
-		var columnCount = options.columnCount;
-		var rowCount = options.rowCount;
-		var parentId = options.parentId;
-		var filter = options.filter;
-		var order = options.order;
-		var total = options.total;
-		var dateAttrs = options.dateAttrs || [];
-		var timeOffsetMin = options.timeOffsetMin;
-		var success = options.success;
-		var failure = options.failure;
-		var request = options.request;
+		let viewId = options.viewId;
+		let column = options.column;
+		let row = options.row;
+		let columnCount = options.columnCount;
+		let rowCount = options.rowCount;
+		let parentId = options.parentId;
+		let filter = options.filter;
+		let order = options.order;
+		let total = options.total;
+		let dateAttrs = options.dateAttrs || [];
+		let timeOffsetMin = options.timeOffsetMin;
+		let success = options.success;
+		let failure = options.failure;
+		let request = options.request;
 		options.session = options.session || request.session || {};
-		var session = options.session;
-		var view = storage.viewsMap [viewId];
-		var viewQuery = JSON.parse (view.get ("fquery"));
+		let session = options.session;
+		let view = storage.viewsMap [viewId];
+		let viewQuery = JSON.parse (view.get ("fquery"));
 		if (!viewQuery || filter == "unselected") {
-			var r = 
+			let r = 
 				"{\n" +
 				"\tview: " + viewId + ",\n" +
 				"\tcolumnCount: 0,\n" +
@@ -1842,7 +1842,7 @@ var Storage = function (options) {
 			}
 		};
 		storage.addOrderId (viewQuery);
-		var query, rows, totalRow, sql, classes = [];
+		let query, rows, totalRow, sql, classes = [];
 		async.series ([
 			function (cb) {
 				if (config.caching && config.caching.getContent) {
@@ -1861,15 +1861,15 @@ var Storage = function (options) {
 				query = new Query ({storage: storage, session: session, sql: viewQuery});
 				query.generate ();
 				sql = query.selectSQL + query.fromSQL + query.whereSQL + query.orderSQL;
-				for (var a in query.attrs) {
-					var getClasses = function (classId) {
+				for (let a in query.attrs) {
+					let getClasses = function (classId) {
 						classes.push (classId);
-						var childs = storage.classesMap [classId].childs;
-						for (var i = 0; i < childs.length; i ++) {
+						let childs = storage.classesMap [classId].childs;
+						for (let i = 0; i < childs.length; i ++) {
 							getClasses (childs [i]);
 						}
 					};
-					var classCode = query.attrs [a].cls;
+					let classCode = query.attrs [a].cls;
 					if (["system.class", "system.class_attr", "system.view", "system.view_attr"].indexOf (classCode) > -1) {
 						continue;
 					};
@@ -1878,7 +1878,7 @@ var Storage = function (options) {
 				cb ();
 			},
 			function (cb) {
-				var sqlLimit = sql + "\nlimit " + rowCount + " offset " + row + "\n";
+				let sqlLimit = sql + "\nlimit " + rowCount + " offset " + row + "\n";
 				if (storage.client.database == "mssql") {
 					sqlLimit =
 						"select mssql2.* from (\n" +
@@ -1895,17 +1895,17 @@ var Storage = function (options) {
 				}, failure: cb});
 			},
 			function (cb) {
-				var sqlCount = sql;
+				let sqlCount = sql;
 				if (config.query.optimizeCountQuery) {
-					var viewQueryCount = storage.prepareSQLForCount (viewQuery, total);
-					var queryCount = new Query ({storage: storage, session: session, sql: viewQueryCount});
+					let viewQueryCount = storage.prepareSQLForCount (viewQuery, total);
+					let queryCount = new Query ({storage: storage, session: session, sql: viewQueryCount});
 					queryCount.generate ();
 					sqlCount = queryCount.selectSQL + queryCount.fromSQL + queryCount.whereSQL + queryCount.orderSQL;
 				}
-				var s = "select\n\tcount (*) as rows_num";
-				for (var t in total) {
-					var has = 0;
-					for (var i = 1; i < viewQuery.select.length; i += 2) {
+				let s = "select\n\tcount (*) as rows_num";
+				for (let t in total) {
+					let has = 0;
+					for (let i = 1; i < viewQuery.select.length; i += 2) {
 						if (viewQuery.select [i] == t) {
 							has = 1;
 							break;
@@ -1914,7 +1914,7 @@ var Storage = function (options) {
 					if (!has) {
 						continue;
 					};
-					var field = t.toLowerCase () + "_";
+					let field = t.toLowerCase () + "_";
 					if (total [t] == "cnt") {
 						total [t] = "count";
 					}
@@ -1934,15 +1934,15 @@ var Storage = function (options) {
 			if (err) {
 				return failure (new VError (err, "Storage.getContent"));
 			};
-			var attrs = view.attrs, attrsNum = 0;
-			var orderAttrs = [];
-			for (var attrCode in attrs) {
+			let attrs = view.attrs, attrsNum = 0;
+			let orderAttrs = [];
+			for (let attrCode in attrs) {
 				attrs [attrCode].set ("field", attrs [attrCode].get ("fcode").toLowerCase () + "_");
 				orderAttrs.push (attrs [attrCode]);
 				attrsNum ++;
 			}
 			orderAttrs.sort (function (a, b) {
-				var c = a.get ("forder"), d = b.get ("forder");
+				let c = a.get ("forder"), d = b.get ("forder");
 				if (d == null || c < d) {
 					return -1;
 				}
@@ -1953,13 +1953,13 @@ var Storage = function (options) {
 					return 0;
 				}
 			});
-			var r = "{header: {error: ''}, data: {view: " + viewId + ", columnCount: " + attrsNum + ", headerDepth: 1, column: {\n";
-			for (var i = 0; i < orderAttrs.length; i ++) {
-				var attr = orderAttrs [i];
+			let r = "{header: {error: ''}, data: {view: " + viewId + ", columnCount: " + attrsNum + ", headerDepth: 1, column: {\n";
+			for (let i = 0; i < orderAttrs.length; i ++) {
+				let attr = orderAttrs [i];
 				if (i) {
 					r += "\t,\n";
 				}
-				var field = attr.get ("fcode").toLowerCase () + "_";
+				let field = attr.get ("fcode").toLowerCase () + "_";
 				r += 
 					"\t" + i + ": {\n" +
 					"\t\twidth: " + attr.get ("fcolumn_width") + ",\n" +
@@ -1982,7 +1982,7 @@ var Storage = function (options) {
 			} else {
 				r += "\n";
 			};
-			for (var i = 0; i < rows.length; i ++) {
+			for (let i = 0; i < rows.length; i ++) {
 				if (i) {
 					r += ",\n";
 				}
@@ -1992,14 +1992,14 @@ var Storage = function (options) {
 					"\tlength: 0,\n" +
 					"\tdata: {\n"
 				;
-				for (var j = 0; j < orderAttrs.length; j ++) {
+				for (let j = 0; j < orderAttrs.length; j ++) {
 					if (j) {
 						r += "\t\t,\n";
 					};
-					var value = rows [i][orderAttrs [j].get ("field")];
+					let value = rows [i][orderAttrs [j].get ("field")];
 					if (dateAttrs.indexOf (orderAttrs [j].get ("fcode")) > -1 && value && typeof (value) == "object" && value.getMonth) {
 						if (timeOffsetMin && (value.getUTCHours () || value.getUTCMinutes () || value.getUTCSeconds ())) {
-							var timeOffset = timeOffsetMin * 60 * 1000
+							let timeOffset = timeOffsetMin * 60 * 1000
 							value = new Date (value.getTime () - timeOffset);
 							value = "new Date (" + value.getUTCFullYear () + "," + value.getUTCMonth () + "," + value.getUTCDate () + ")";
 						} else {
@@ -2016,7 +2016,7 @@ var Storage = function (options) {
 			if (config.caching && config.caching.getContent) {
 				if (classes.length && !storage.revision [session.id]) {
 					storage.redisClient.hsetnx (storage.code + "-content", request.storageParam, r);
-					for (var i = 0; i < classes.length; i ++) {
+					for (let i = 0; i < classes.length; i ++) {
 						storage.redisClient.hsetnx (storage.code + "-" + classes [i] + "-clschange", request.storageParam, "1");
 					}
 				};
@@ -2025,15 +2025,15 @@ var Storage = function (options) {
 		});
 	};
 	storage.selectRow = function (options) {
-		var viewId = options.viewId;
-		var viewFilter = options.viewFilter;
-		var selectFilter = options.selectFilter;
-		var success = options.success;
-		var failure = options.failure;
-		var request = options.request;
-		var session = options.session || {userId: null};
-		var view = storage.viewsMap [viewId];
-		var viewQuery = JSON.parse (view.get ("fquery"));
+		let viewId = options.viewId;
+		let viewFilter = options.viewFilter;
+		let selectFilter = options.selectFilter;
+		let success = options.success;
+		let failure = options.failure;
+		let request = options.request;
+		let session = options.session || {userId: null};
+		let view = storage.viewsMap [viewId];
+		let viewQuery = JSON.parse (view.get ("fquery"));
 		if (viewFilter && viewFilter.length) {
 			viewQuery.where = viewQuery.where || [];
 			if (viewQuery.where.length) {
@@ -2042,7 +2042,7 @@ var Storage = function (options) {
 			viewQuery.where.push (viewFilter);
 		}
 		if (storage.client.database != "mssql") {
-			var rn = ["row_number ()", "over"];
+			let rn = ["row_number ()", "over"];
 			if (viewQuery.order) {
 				rn.push (["order by"].concat (viewQuery.order));
 			} else {
@@ -2051,13 +2051,13 @@ var Storage = function (options) {
 			viewQuery.select.push (rn);
 			viewQuery.select.push ("rn");
 		};
-		var query, rows, sql, classes = [];
+		let query, rows, sql, classes = [];
 		async.series ([
 			function (cb) {
 				query = new Query ({storage: storage, session: session, sql: viewQuery});
 				query.generate ();
 				sql = query.selectSQL + query.fromSQL + query.whereSQL + query.orderSQL;
-				for (var a in query.attrs) {
+				for (let a in query.attrs) {
 					classes.push (storage.classesCode [query.attrs [a].cls].get ("fid"));
 				}
 				cb ();
@@ -2086,7 +2086,7 @@ var Storage = function (options) {
 			if (err) {
 				return failure (new VError (err, "Storage.selectRow"));
 			};
-			var r = "0";
+			let r = "0";
 			if (rows.length) {
 				r = rows [0].rn_ - 1;
 			}
@@ -2095,18 +2095,18 @@ var Storage = function (options) {
 	};
 	// {classId}
 	storage.clsChange = function (options) {
-		var classId = options.classId;
+		let classId = options.classId;
 		log.debug ({cls: "storage", fn: "clsChange", params: classId});
-		var session = options.session;
+		let session = options.session;
 		storage.redisClient.hkeys (storage.code + "-" + classId + "-clschange", function (err, result) {
-			for (var i = 0; i < result.length; i ++) {
+			for (let i = 0; i < result.length; i ++) {
 				storage.redisClient.hdel (storage.code + "-content", result [i]);
 			}
 			storage.redisClient.del (storage.code + "-" + classId + "-clschange");
 		});
 	};
 	storage.setVar = function (options) {
-		var success = options.success;
+		let success = options.success;
 		storage.redisClient.hset (storage.code + "-vars", options.field, options.value, function (err, result) {
 			if (success) {
 				success ();
@@ -2114,7 +2114,7 @@ var Storage = function (options) {
 		});
 	};
 	storage.getVar = function (options) {
-		var success = options.success;
+		let success = options.success;
 		storage.redisClient.hget (storage.code + "-vars", options.field, function (err, result) {
 			if (success) {
 				success ({value: result});
@@ -2122,7 +2122,7 @@ var Storage = function (options) {
 		});
 	};
 	storage.removeVar = function (options) {
-		var success = options.success;
+		let success = options.success;
 		storage.redisClient.hdel (storage.code + "-vars", options.field, function (err, result) {
 			if (success) {
 				success ();
@@ -2132,7 +2132,7 @@ var Storage = function (options) {
 	storage.authRecords = {}; // login, pass
 	storage.subjectRoles = {}; // subjectId = {role: roleId, menu: menuId}
 	storage.authInfoUpdater = function (options) {
-		var rows;
+		let rows;
 		async.series ([
 			function getAuthMethods (cb) {
 				storage.execute ({sql: {
@@ -2153,7 +2153,7 @@ var Storage = function (options) {
 				}});
 			},
 			function getRoles (cb) {
-				var cls = storage.getClass ("ose.role");
+				let cls = storage.getClass ("ose.role");
 				if (cls.attrs ["menu"]) {
 					storage.execute ({sql: {
 						"select": [
@@ -2166,8 +2166,8 @@ var Storage = function (options) {
 							"left-join", {"b": "ose.role"}, "on", [{"a": "role"}, "=", {"b": "id"}]
 						]
 					}, success: function (options) {
-						var r = options.result.rows;
-						for (var i = 0; i < r.length; i ++) {
+						let r = options.result.rows;
+						for (let i = 0; i < r.length; i ++) {
 							storage.subjectRoles [r [i].subject_] = {
 								role: r [i].role_,
 								menu: r [i].menu_
@@ -2182,30 +2182,30 @@ var Storage = function (options) {
 				};
 			},
 			function auth (cb) {
-				var processedLoginPasswordPairs = {};
+				let processedLoginPasswordPairs = {};
 				async.map (rows, function (row, cb) {
 					if (!row.use_) {
 						cb ();
 						return;
 					};
-					var loginAttrId = row.login_;
-					var passwordAttrId = row.password_;
+					let loginAttrId = row.login_;
+					let passwordAttrId = row.password_;
 					if (!processedLoginPasswordPairs [loginAttrId] == passwordAttrId) {
 						cb ();
 						return;
 					};
 					processedLoginPasswordPairs [loginAttrId] = passwordAttrId;
-					var loginAttr = storage.classAttrsMap [loginAttrId];
-					var passwordAttr = storage.classAttrsMap [passwordAttrId];
-					var clsAuth = storage.classesMap [loginAttr.get ("fclass_id")];
-					var toc = clsAuth.toc;
+					let loginAttr = storage.classAttrsMap [loginAttrId];
+					let passwordAttr = storage.classAttrsMap [passwordAttrId];
+					let clsAuth = storage.classesMap [loginAttr.get ("fclass_id")];
+					let toc = clsAuth.toc;
 					storage.query ({sql: 
 						"select fobject_id, " + loginAttr.toc + ", " + passwordAttr.toc + "\n" +
 						"from " + toc + "\n" +
 						"where " + loginAttr.toc + " is not null and " + passwordAttr.toc + " is not null\n"
 					, success: function (options) {
-						var r = options.result.rows;
-						for (var i = 0; i < r.length; i ++) {
+						let r = options.result.rows;
+						for (let i = 0; i < r.length; i ++) {
 							storage.authRecords [r [i][loginAttr.toc]] = {
 								password: r [i][passwordAttr.toc],
 								objectId: r [i].fobject_id,
@@ -2265,16 +2265,16 @@ var Storage = function (options) {
 	};
 	storage.fireEvent = function (event, options) {
 		options = options || {};
-		var success = options.success;
+		let success = options.success;
 		if (storage.suspendedEvents [event]) {
 			if (success) {
 				success ();
 			};
 			return;
 		};
-		var subscribers = storage.subscribers [event] || [];
+		let subscribers = storage.subscribers [event] || [];
 		delete options.success;
-		var cancel = 0;
+		let cancel = 0;
 		if (success) {
 			async.eachSeries (subscribers, function (subscriber, cb) {
 				options.success = function (options) {
@@ -2290,7 +2290,7 @@ var Storage = function (options) {
 				};
 			});
 		} else {
-			for (var i = 0; i < subscribers.length; i ++) {
+			for (let i = 0; i < subscribers.length; i ++) {
 				subscribers [i] (options);
 			};
 			return options;
@@ -2332,50 +2332,50 @@ var Storage = function (options) {
 		storage.redisSub.on ("message", function (channel, message) {
 			log.debug ({cls: "storage"}, "redisSub.message on channel: " + channel);
 			if (channel == config.redis.db + "-" + storage.code + "-revisions") {
-				var r = JSON.parse (message);
+				let r = JSON.parse (message);
 				if (!storage.revisions [r.id]) {
 					storage.revisions [r.id] = r;
 					log.debug ({cls: "storage"}, "new revision: " + r.id);
 					// todo: clear redis cache
 				};
-				for (var i = 0; i < r.classes.created.length; i ++) {
+				for (let i = 0; i < r.classes.created.length; i ++) {
 					storage.updateClassCache (r.classes.created [i]);
 				};
-				for (var i = 0; i < r.classes.changed.length; i ++) {
+				for (let i = 0; i < r.classes.changed.length; i ++) {
 					storage.updateClassCache (r.classes.changed [i]);
 				};
 				// r.classes.removed ?
-				for (var i = 0; i < r.classAttrs.created.length; i ++) {
+				for (let i = 0; i < r.classAttrs.created.length; i ++) {
 					storage.updateClassAttrCache (r.classAttrs.created [i]);
 				};
-				for (var i = 0; i < r.classAttrs.changed.length; i ++) {
+				for (let i = 0; i < r.classAttrs.changed.length; i ++) {
 					storage.updateClassAttrCache (r.classAttrs.changed [i]);
 				};
 				// r.classAttrs.removed ?
-				for (var i = 0; i < r.views.created.length; i ++) {
+				for (let i = 0; i < r.views.created.length; i ++) {
 					storage.updateViewCache (r.views.created [i]);
 				};
-				for (var i = 0; i < r.views.changed.length; i ++) {
+				for (let i = 0; i < r.views.changed.length; i ++) {
 					storage.updateViewCache (r.views.changed [i]);
 				};
 				// r.views.removed ?
-				for (var i = 0; i < r.viewAttrs.created.length; i ++) {
+				for (let i = 0; i < r.viewAttrs.created.length; i ++) {
 					storage.updateViewAttrCache (r.viewAttrs.created [i]);
 				};
-				for (var i = 0; i < r.viewAttrs.changed.length; i ++) {
+				for (let i = 0; i < r.viewAttrs.changed.length; i ++) {
 					storage.updateViewAttrCache (r.viewAttrs.changed [i]);
 				};
 				// r.viewAttrs.removed ?
 			};
 		});
 		storage.redisSub.subscribe (config.redis.db + "-" + storage.code + "-revisions");
-		var meOptions = options;
-		var client = db.create (storage);
+		let meOptions = options;
+		let client = db.create (storage);
 		client.connect ({systemDB: options.systemDB, success: function () {
 			client.inStorage = 1;
 			storage.client = client;
 			if (options.systemDB) {
-				var success = options.success;
+				let success = options.success;
 				if (success) {
 					success ();
 				}
@@ -2419,7 +2419,7 @@ var Storage = function (options) {
 					}});
 				}
 			], function (err, results) {
-				var success = options.success;
+				let success = options.success;
 				storage.query ({sql: "select max (fid) as maxId from trevision", success: function (options) {
 					storage.lastRevision = options.result.rows [0].maxid;
 					if (success) {

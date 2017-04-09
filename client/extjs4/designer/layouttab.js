@@ -3,8 +3,8 @@
 	alias: ["widget.$o.layouttab"],
 	cmpCode: "tab",
 	initComponent: function () {
-		var me = this;
-		var cmp = me.layoutDesigner.createEmpty ();
+		let me = this;
+		let cmp = me.layoutDesigner.createEmpty ();
 		cmp.panel.title = $o.getString ("Tab");
 		me.value = me.value || {
 			tab: {

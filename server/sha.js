@@ -9,15 +9,15 @@
  * Configurable variables. You may need to tweak these to be compatible with the
  * server-side, but the defaults work in most cases.
  */
-var hexcase = 1;	// hex output format. 0 - lowercase; 1 - uppercase
-var b64pad = "";	// base-64 pad character. "=" for strict RFC compliance
-var chrsz = 8;		// bits per input character. 8 - ASCII; 16 - Unicode
+let hexcase = 1;	// hex output format. 0 - lowercase; 1 - uppercase
+let b64pad = "";	// base-64 pad character. "=" for strict RFC compliance
+let chrsz = 8;		// bits per input character. 8 - ASCII; 16 - Unicode
 
 /*
  * These are the functions you'll usually want to call They take string
  * arguments and return either hex or base-64 encoded strings
  */
-var sha = {};
+global.sha = {};
 sha.hex_sha1 = function (s) {
 	return binb2hex (core_sha1 (str2binb (s), s.length * chrsz));
 }
@@ -57,26 +57,26 @@ function core_sha1 (x, len) {
 	x [len >> 5] |= 0x80 << (24 - len % 32);
 	x [((len + 64 >> 9) << 4) + 15] = len;
 
-	var w = Array (80);
-	var a = 1732584193;
-	var b = -271733879;
-	var c = -1732584194;
-	var d = 271733878;
-	var e = -1009589776;
+	let w = Array (80);
+	let a = 1732584193;
+	let b = -271733879;
+	let c = -1732584194;
+	let d = 271733878;
+	let e = -1009589776;
 
-	for (var i = 0; i < x.length; i += 16) {
-		var olda = a;
-		var oldb = b;
-		var oldc = c;
-		var oldd = d;
-		var olde = e;
+	for (let i = 0; i < x.length; i += 16) {
+		let olda = a;
+		let oldb = b;
+		let oldc = c;
+		let oldd = d;
+		let olde = e;
 
-		for (var j = 0; j < 80; j++) {
+		for (let j = 0; j < 80; j++) {
 			if (j < 16)
 				w [j] = x [i + j];
 			else
 				w [j] = rol (w [j - 3] ^ w [j - 8] ^ w [j - 14] ^ w [j - 16], 1);
-			var t = safe_add (safe_add (rol (a, 5), sha1_ft (j, b, c, d)), safe_add (safe_add (e, w [j]), sha1_kt (j)));
+			let t = safe_add (safe_add (rol (a, 5), sha1_ft (j, b, c, d)), safe_add (safe_add (e, w [j]), sha1_kt (j)));
 			e = d;
 			d = c;
 			c = rol (b, 30);
@@ -119,17 +119,17 @@ function sha1_kt (t) {
  * Calculate the HMAC-SHA1 of a key and some data
  */
 function core_hmac_sha1 (key, data) {
-	var bkey = str2binb (key);
+	let bkey = str2binb (key);
 	if (bkey.length > 16)
 		bkey = core_sha1 (bkey, key.length * chrsz);
 
-	var ipad = Array (16), opad = Array (16);
-	for (var i = 0; i < 16; i++) {
+	let ipad = Array (16), opad = Array (16);
+	for (let i = 0; i < 16; i++) {
 		ipad [i] = bkey [i] ^ 0x36363636;
 		opad [i] = bkey [i] ^ 0x5C5C5C5C;
 	}
 
-	var hash = core_sha1 (ipad.concat (str2binb (data)), 512 + data.length * chrsz);
+	let hash = core_sha1 (ipad.concat (str2binb (data)), 512 + data.length * chrsz);
 	return core_sha1 (opad.concat (hash), 512 + 160);
 }
 
@@ -138,8 +138,8 @@ function core_hmac_sha1 (key, data) {
  * work around bugs in some JS interpreters.
  */
 function safe_add (x, y) {
-	var lsw = (x & 0xFFFF) + (y & 0xFFFF);
-	var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+	let lsw = (x & 0xFFFF) + (y & 0xFFFF);
+	let msw = (x >> 16) + (y >> 16) + (lsw >> 16);
 	return (msw << 16) | (lsw & 0xFFFF);
 }
 
@@ -155,9 +155,9 @@ function rol (num, cnt) {
  * function, characters >255 have their hi-byte silently ignored.
  */
 function str2binb (str) {
-	var bin = Array ();
-	var mask = (1 << chrsz) - 1;
-	for (var i = 0; i < str.length * chrsz; i += chrsz)
+	let bin = Array ();
+	let mask = (1 << chrsz) - 1;
+	for (let i = 0; i < str.length * chrsz; i += chrsz)
 		bin [i >> 5] |= (str.charCodeAt (i / chrsz) & mask) << (32 - chrsz - i % 32);
 	return bin;
 }
@@ -166,9 +166,9 @@ function str2binb (str) {
  * Convert an array of big-endian words to a string
  */
 function binb2str (bin) {
-	var str = "";
-	var mask = (1 << chrsz) - 1;
-	for (var i = 0; i < bin.length * 32; i += chrsz)
+	let str = "";
+	let mask = (1 << chrsz) - 1;
+	for (let i = 0; i < bin.length * 32; i += chrsz)
 		str += String.fromCharCode ((bin [i >> 5] >>> (32 - chrsz - i % 32)) & mask);
 	return str;
 }
@@ -177,9 +177,9 @@ function binb2str (bin) {
  * Convert an array of big-endian words to a hex string.
  */
 function binb2hex (binarray) {
-	var hex_tab = hexcase ? "0123456789ABCDEF" : "0123456789abcdef";
-	var str = "";
-	for (var i = 0; i < binarray.length * 4; i++) {
+	let hex_tab = hexcase ? "0123456789ABCDEF" : "0123456789abcdef";
+	let str = "";
+	for (let i = 0; i < binarray.length * 4; i++) {
 		str += hex_tab.charAt ((binarray [i >> 2] >> ((3 - i % 4) * 8 + 4)) & 0xF)
 				+ hex_tab.charAt ((binarray [i >> 2] >> ((3 - i % 4) * 8)) & 0xF);
 	}
@@ -190,13 +190,13 @@ function binb2hex (binarray) {
  * Convert an array of big-endian words to a base-64 string
  */
 function binb2b64 (binarray) {
-	var tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	var str = "";
-	for (var i = 0; i < binarray.length * 4; i += 3) {
-		var triplet = (((binarray [i >> 2] >> 8 * (3 - i % 4)) & 0xFF) << 16)
+	let tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	let str = "";
+	for (let i = 0; i < binarray.length * 4; i += 3) {
+		let triplet = (((binarray [i >> 2] >> 8 * (3 - i % 4)) & 0xFF) << 16)
 				| (((binarray [i + 1 >> 2] >> 8 * (3 - (i + 1) % 4)) & 0xFF) << 8)
 				| ((binarray [i + 2 >> 2] >> 8 * (3 - (i + 2) % 4)) & 0xFF);
-		for (var j = 0; j < 4; j++) {
+		for (let j = 0; j < 4; j++) {
 			if (i * 8 + j * 6 > binarray.length * 32)
 				str += b64pad;
 			else

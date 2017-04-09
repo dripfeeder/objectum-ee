@@ -1,9 +1,8 @@
 //
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.
 //
-//	Class for PostgreSQL database
 db.MSSQL = function (options) {
-	var me = this;
+	let me = this;
 	me.storage = options;
 	me.database = "mssql";
 	me.host = options.connection.host;
@@ -33,7 +32,7 @@ db.MSSQL = function (options) {
 	};
 };
 db.MSSQL.prototype.connect = function (options) {
-	var me = this;
+	let me = this;
 	sql.open (options.systemDB ? me.adminConnection : me.connection, function (err, client) {
 		if (!err) {
 			me.client = client;
@@ -57,15 +56,15 @@ db.MSSQL.prototype.disconnect = function (options) {
 	this.client.close ();
 };
 db.MSSQL.prototype.query = function (options) {
-	var me = this;
+	let me = this;
 	options.options = options.options || {};
-	var meOptions = options;
+	let meOptions = options;
 	function go (options) {	
-		var query, values = [];
+		let query, values = [];
 		if (options.params) {
-			for (var i = 0; i < options.params.length; i ++) {
+			for (let i = 0; i < options.params.length; i ++) {
 //				options.sql = options.sql.replace ("$" + (i + 1), common.ToSQLString (options.params [i]));
-				var value = options.params [i];
+				let value = options.params [i];
 				if (value === "") {
 					value = null;
 				};
@@ -78,10 +77,10 @@ db.MSSQL.prototype.query = function (options) {
 			};
 		};
 		me.n = me.n || 1;
-		var n = me.n;
+		let n = me.n;
 		me.queue = me.queue || {};
 		me.queue [n] = options.sql;
-		var cb = function (err, results) {
+		let cb = function (err, results) {
 			delete me.queue [n];
 			if (err) {
 				if (options.failure) {
@@ -91,10 +90,10 @@ db.MSSQL.prototype.query = function (options) {
 				if (options.success) {
 					/*
 					if (results && results.length) {
-						for (var i = 0; i < results.length; i ++) {
-							var row = results [i];
-							for (var field in row) {
-								var lower = field.toLowerCase ();
+						for (let i = 0; i < results.length; i ++) {
+							let row = results [i];
+							for (let field in row) {
+								let lower = field.toLowerCase ();
 								if (lower != field) {
 									row [field.toLowerCase ()] = row [field];
 									delete row [field];
@@ -127,8 +126,8 @@ db.MSSQL.prototype.query = function (options) {
 	};
 };
 db.MSSQL.prototype.startTransaction = function (options) {
-	var me = this;
-	var meOptions = options;
+	let me = this;
+	let meOptions = options;
 	this.query ({sql: "begin transaction", success: function () {
 		meOptions.success ();
 	}, failure: function (options) {
@@ -136,8 +135,8 @@ db.MSSQL.prototype.startTransaction = function (options) {
 	}});
 };
 db.MSSQL.prototype.commitTransaction = function (options) {
-	var me = this;
-	var meOptions = options;
+	let me = this;
+	let meOptions = options;
 	this.query ({sql: "commit transaction", success: function () {
 		meOptions.success ();
 	}, failure: function (options) {
@@ -145,8 +144,8 @@ db.MSSQL.prototype.commitTransaction = function (options) {
 	}});
 };
 db.MSSQL.prototype.rollbackTransaction = function (options) {
-	var me = this;
-	var meOptions = options;
+	let me = this;
+	let meOptions = options;
 	this.query ({sql: "rollback transaction", success: function () {
 		meOptions.success ();
 	}, failure: function (options) {
@@ -155,11 +154,11 @@ db.MSSQL.prototype.rollbackTransaction = function (options) {
 };
 // Next id in table
 db.MSSQL.prototype.getNextId = function (options) {
-	var me = this;
-	var success = options.success;
-	var session = options.session;
-	var storage = me.storage;
-	var table = options.table;
+	let me = this;
+	let success = options.success;
+	let session = options.session;
+	let storage = me.storage;
+	let table = options.table;
 	storage.redisClient.hincrby ("mssql_sequences", storage.code + "_" + table, 1, function (err, result) {
 		success ({id: result});
 	});
@@ -169,8 +168,8 @@ db.MSSQL.prototype.currentTimestamp = function () {
 };
 // DB struct update
 db.MSSQL.prototype.update = function (options) {
-	var me = this;
-	var storage = me.storage;
+	let me = this;
+	let storage = me.storage;
 	async.series ([
 		function (cb) {
 			storage.query ({sql: "drop index tobject_attr_ufid", success: function (options) {
@@ -201,14 +200,14 @@ db.MSSQL.prototype.update = function (options) {
 		},
 		function (cb) {
 			/*
-			var tables = ["trevision", "tclass", "tclass_attr", "tview", "tview_attr", "tobject", "tobject_attr", "taction", "taction_attr"];
+			let tables = ["trevision", "tclass", "tclass_attr", "tview", "tview_attr", "tobject", "tobject_attr", "taction", "taction_attr"];
 			// create sequences
 			async.map (tables, function (table, cb) {
 				storage.query ({sql: "select * from sequence_" + table, success: function (options) {
 					cb ();
 				}, failure: function () {
 					storage.query ({sql: "select max (fid) as maxid from " + table, success: function (options) {
-						var initVal = 1000;
+						let initVal = 1000;
 						if (options.result.rows [0].maxid) {
 							initVal = options.result.rows [0].maxid;
 						};
@@ -248,12 +247,12 @@ db.MSSQL.prototype.update = function (options) {
 	});
 };
 db.MSSQL.prototype.updateSequences = function (options) {
-	var me = this;
-	var storage = me.storage;
-	var tables = ["trevision", "tclass", "tclass_attr", "tview", "tview_attr", "tobject", "tobject_attr", "taction", "taction_attr"];
+	let me = this;
+	let storage = me.storage;
+	let tables = ["trevision", "tclass", "tclass_attr", "tview", "tview_attr", "tobject", "tobject_attr", "taction", "taction_attr"];
 	async.map (tables, function (table, cb) {
 		storage.query ({sql: "select max (fid) as maxid from " + table, success: function (options) {
-			var tableValue = 1000;
+			let tableValue = 1000;
 			if (options.result.rows [0].maxid) {
 				tableValue = options.result.rows [0].maxid;
 			};
@@ -271,11 +270,11 @@ db.MSSQL.prototype.updateSequences = function (options) {
 	});
 };
 db.MSSQL.prototype.create = function (options) {
-	var me = this;
-	var storage = me.storage;
-	var connection = options.connection;
-	var cfg = options.cfg;
-	var success = options.success;
+	let me = this;
+	let storage = me.storage;
+	let connection = options.connection;
+	let cfg = options.cfg;
+	let success = options.success;
 	async.series ([
 		function (cb) {
 			storage.query ({sql: 
@@ -333,8 +332,8 @@ db.MSSQL.prototype.create = function (options) {
 			}});
 		},
 		function (cb) {
-//			var sql = fs.readFileSync (config.rootDir + "/db/indexes.sql").toString ();
-			var sql = dbIndexesSQL;
+//			let sql = fs.readFileSync (config.rootDir + "/db/indexes.sql").toString ();
+			let sql = dbIndexesSQL;
 			sql = sql.replace (
 				"create index tobject_fstring on $schema_prefix$tobject_attr (fstring)", 
 				"create index tobject_fstring on $schema_prefix$tobject_attr (fid) include (fstring)"
@@ -361,8 +360,8 @@ db.MSSQL.prototype.create = function (options) {
 			}});
 		},
 		function (cb) {
-//			var sql = fs.readFileSync (config.rootDir + "/db/data.sql").toString ().split (";");
-			var sql = dbDataSQL;
+//			let sql = fs.readFileSync (config.rootDir + "/db/data.sql").toString ().split (";");
+			let sql = dbDataSQL;
 			async.map (sql, function (s, cb) {
 				storage.query ({sql: s, success: function (options) {
 					cb ();
@@ -378,11 +377,11 @@ db.MSSQL.prototype.create = function (options) {
 	});
 };
 db.MSSQL.prototype.remove = function (options) {
-	var me = this;
-	var storage = me.storage;
-	var connection = options.connection;
-	var cfg = options.cfg;
-	var success = options.success;
+	let me = this;
+	let storage = me.storage;
+	let connection = options.connection;
+	let cfg = options.cfg;
+	let success = options.success;
 	storage.query ({sql: "drop database " + connection.dbUser, success: function (options) {
 		storage.query ({sql: "drop login " + connection.dbUser, success: function (options) {
 			success ();
@@ -394,12 +393,12 @@ db.MSSQL.prototype.remove = function (options) {
 	}});
 };
 db.MSSQL.prototype.createField = function (options) {
-	var storage = this.storage;
-	var toc = options.toc;
-	var tocField = options.tocField;
-	var type = options.type;
-	var caId = options.caId;
-	var success = options.success;
+	let storage = this.storage;
+	let toc = options.toc;
+	let tocField = options.tocField;
+	let type = options.type;
+	let caId = options.caId;
+	let success = options.success;
 	storage.query ({sql: "alter table " + toc + " add " + tocField + " " + type, success: function () {
 		if (type != "$ttext$") {
 			storage.query ({session: options.session, sql: "create index " + toc + "_" + caId + " on " + toc + " (" + tocField + ")", success: function () {
@@ -413,17 +412,17 @@ db.MSSQL.prototype.createField = function (options) {
 	}});
 };
 db.MSSQL.prototype.createIndex = function (options) {
-	var storage = this.storage;
-	var success = options.success;
+	let storage = this.storage;
+	let success = options.success;
 	storage.query ({session: options.session, sql: "create index " + options.table + "_" + options.field + " on " + options.table + " (" + options.field + ")", success: function () {
 		success ();
 	}});
 };
 db.MSSQL.prototype.isTableExists = function (options) {
-	var storage = this.storage;
-	var success = options.success;
+	let storage = this.storage;
+	let success = options.success;
 	storage.query ({session: options.session, sql: "select count (*) as num from INFORMATION_SCHEMA.TABLES where upper (TABLE_NAME) = upper ('" + options.table + "')", success: function (options) {
-		var r = options.result.rows;
+		let r = options.result.rows;
 		success (r [0].num);
 	}});
 };

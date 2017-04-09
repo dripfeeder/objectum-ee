@@ -6,12 +6,12 @@ Ext.define ("$o.CardConf.Widget", {
 	extend: "$o.Card.Widget",
 	alias: ["widget.$o.cardConf", "widget.$cardConf"],
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.callParent (arguments);
 	},
 	updateItem: function (item, parentItem) {
-		var me = this;
-		var n = {
+		let me = this;
+		let n = {
 			fieldLabel: item.fieldLabel || item.attr,
 			xtype: "textfield",
 			anchor: "-20",
@@ -26,15 +26,15 @@ Ext.define ("$o.CardConf.Widget", {
 		};
 		if (typeof (item.id) == "number") {
 			n.confId = item.id;
-			var o = $o.getConfObject (item.conf, item.id);
+			let o = $o.getConfObject (item.conf, item.id);
 			if (o) {
 				n.value = n.originalValue = o.get (item.attr);
 				item.$attr = item.attr;
 			};
 		} else 
 		if (typeof (item.id) == "string") {
-			var idAttr = item.attr.split (".")[0];
-			var attr = item.attr.split (".")[1];
+			let idAttr = item.attr.split (".")[0];
+			let attr = item.attr.split (".")[1];
 			me.$source = me.relatives [item.id];
 			me.relatives [item.id].targets [me.zid] = me;
 			n.$relative = me.relatives [item.id];
@@ -51,34 +51,34 @@ Ext.define ("$o.CardConf.Widget", {
 		Ext.applyIf (item, n);
 	},
 	createFields: function () {
-		var me = this;
-		var processItem = function (item, parentItem) {
+		let me = this;
+		let processItem = function (item, parentItem) {
 			if (item.conf && item.id && item.attr) {
 				me.updateItem (item, parentItem);
 			};
 			if (item.items) {
-				for (var i = 0; i < item.items.length; i ++) {
+				for (let i = 0; i < item.items.length; i ++) {
 					processItem (item.items.getAt ? item.items.getAt (i) : item.items [i], item);
 				};
 			};
 		};
-		for (var i = 0; i < me.$items.length; i ++) {
+		for (let i = 0; i < me.$items.length; i ++) {
 			processItem (me.$items [i], null);
 		};
 		me.add (me.$items);
 		me.doLayout ();
 	},
 	updateFields: function () {
-		var me = this;
-		var items = me.getItems ();
-		for (var i = 0; i < items.length; i ++) {
-			var item = items [i];
+		let me = this;
+		let items = me.getItems ();
+		for (let i = 0; i < items.length; i ++) {
+			let item = items [i];
 			if (!item.$attr) {
 				continue;
 			};
-			var confId = item.confId = item.$relative ? item.$relative.getCurrentValue (item.$idAttr) : item.confId;
+			let confId = item.confId = item.$relative ? item.$relative.getCurrentValue (item.$idAttr) : item.confId;
 			if (confId) {
-				var o = $o.getConfObject (item.conf, confId);
+				let o = $o.getConfObject (item.conf, confId);
 				if (!item.setValue) {
 					console.log (item);
 				};
@@ -89,23 +89,23 @@ Ext.define ("$o.CardConf.Widget", {
 	},
 	save: function (options) {
 		options = options || {};
-		var me = this;
-		var saveFn = function () {
-			var items = me.getItems ();
-			var objects = {};
-			var changed = false;
-			for (var i = 0; i < items.length; i ++) {
-				var item = items [i];
-				var confId = item.confId;
+		let me = this;
+		let saveFn = function () {
+			let items = me.getItems ();
+			let objects = {};
+			let changed = false;
+			for (let i = 0; i < items.length; i ++) {
+				let item = items [i];
+				let confId = item.confId;
 				if (!confId) {
 					continue;
 				};
-				var o = $o.getConfObject (item.conf, confId);
+				let o = $o.getConfObject (item.conf, confId);
 				if (!o) {
 					continue;
 				};
 				objects [confId] = o;
-				var v = item.getValue ();
+				let v = item.getValue ();
 				if (o.get (item.$attr) != v) {
 					o.set (item.$attr, v);
 					changed = true;
@@ -115,8 +115,8 @@ Ext.define ("$o.CardConf.Widget", {
 				me.fireEvent ("beforeSave");
 				$o.startTransaction ({description: "CardConf saving"});
 				try {
-					for (var confId in objects) {
-						var o = objects [confId];
+					for (let confId in objects) {
+						let o = objects [confId];
 						o.sync ();
 					};
 					me.fireEvent ("afterSave");
@@ -139,12 +139,12 @@ Ext.define ("$o.CardConf.Widget", {
 				options.success.call (options.scope || me);
 			};
 		};
-		var items = me.getItems ();
-		var msg = "";
-		for (var i = 0; i < items.length; i ++) {
-			var item = items [i];
+		let items = me.getItems ();
+		let msg = "";
+		for (let i = 0; i < items.length; i ++) {
+			let item = items [i];
 			if (item.getActiveError && item.getActiveError ()) {
-				var name = item.fieldLabel;
+				let name = item.fieldLabel;
 				if (!name && item.ownerCt && item.ownerCt.fieldLabel)  {
 					name = item.ownerCt.fieldLabel;
 				};

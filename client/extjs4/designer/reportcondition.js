@@ -7,7 +7,7 @@
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.filter = me.filter || [];
 		me.value = {};
 		me.tbar = [{
@@ -25,9 +25,9 @@
 				me.up ("window").close ();
 			}
 		}];
-		var dataAttrs = [];
-		for (var attr in me.$view.attrs) {
-			var a = me.$view.attrs [attr];
+		let dataAttrs = [];
+		for (let attr in me.$view.attrs) {
+			let a = me.$view.attrs [attr];
 			dataAttrs.push ([attr, a.toString ()]);
 		};
 		me.items = [{
@@ -98,7 +98,7 @@
 			displayField: "text",
 			listeners: {
 				select: function () {
-					var v = this.getValue ();
+					let v = this.getValue ();
 					if (v == "is null" || v == "is not null") {
 						me.down ("*[name='value']").disable ();
 					} else {
@@ -123,11 +123,11 @@
 		this.callParent (arguments);
 	},
 	validator: function (value) {
-		var me = this.up ("panel");
-		var andOrField = me.down ("*[name='and_or']");
-		var attrField = me.down ("*[name='attr']");
-		var operField = me.down ("*[name='oper']");
-		var valueField = me.down ("*[name='value']");
+		let me = this.up ("panel");
+		let andOrField = me.down ("*[name='and_or']");
+		let attrField = me.down ("*[name='attr']");
+		let operField = me.down ("*[name='oper']");
+		let valueField = me.down ("*[name='value']");
 		if (andOrField && !andOrField.getValue ()) {
 			me.down ("button[name='save']").disable ();
 			return true;
@@ -139,10 +139,10 @@
 			if (operField.getValue () == "is null" || operField.getValue () == "is not null") {
 				me.value = [attrField.getValue (), operField.getValue ()];
 			} else {
-				var val = valueField.getValue ();
+				let val = valueField.getValue ();
 				me.value = [attrField.getValue (), operField.getValue (), val];
 			};
-//			var bracketsField = me.down ("*[name='brackets']");
+//			let bracketsField = me.down ("*[name='brackets']");
 //			if (bracketsField && bracketsField.getValue ()) {
 //				me.value = [andOrField.getValue (), [me.value]];
 //			} else {
@@ -157,11 +157,11 @@
 		return true;
 	},
 	save: function () {
-		var me = this;
+		let me = this;
 		me.fireEvent ("aftersave", me.value);
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		return me.value;
 	}
 });

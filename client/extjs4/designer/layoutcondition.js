@@ -7,7 +7,7 @@
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.filter = me.filter || [];
 		me.value = {};
 		me.tbar = [{
@@ -25,9 +25,9 @@
 				me.up ("window").close ();
 			}
 		}];
-		var dataAttrs = [];
-		for (var attr in me.$view.attrs) {
-			var a = me.$view.attrs [attr];
+		let dataAttrs = [];
+		for (let attr in me.$view.attrs) {
+			let a = me.$view.attrs [attr];
 			dataAttrs.push ([attr, a.toString ()]);
 		};
 		me.items = [{
@@ -98,7 +98,7 @@
 			displayField: "text",
 			listeners: {
 				select: function () {
-					var v = this.getValue ();
+					let v = this.getValue ();
 					if (v == "is null" || v == "is not null") {
 						me.down ("*[name='value']").disable ();
 						me.down ("*[name='attrValue']").disable ();
@@ -145,12 +145,12 @@
 		this.callParent (arguments);
 	},
 	validator: function (value) {
-		var me = this.up ("panel");
-		var andOrField = me.down ("*[name='and_or']");
-		var attrField = me.down ("*[name='attr']");
-		var operField = me.down ("*[name='oper']");
-		var valueField = me.down ("*[name='value']");
-		var attrValueField = me.down ("*[name='attrValue']");
+		let me = this.up ("panel");
+		let andOrField = me.down ("*[name='and_or']");
+		let attrField = me.down ("*[name='attr']");
+		let operField = me.down ("*[name='oper']");
+		let valueField = me.down ("*[name='value']");
+		let attrValueField = me.down ("*[name='attrValue']");
 		if (andOrField && !andOrField.getValue ()) {
 			me.down ("button[name='save']").disable ();
 			return true;
@@ -162,14 +162,14 @@
 			if (operField.getValue () == "is null" || operField.getValue () == "is not null") {
 				me.value = [attrField.getValue (), operField.getValue ()];
 			} else {
-				var val = valueField.getValue ();
+				let val = valueField.getValue ();
 				if (attrValueField.getValue ()) {
-					var v = attrValueField.getValue ();
+					let v = attrValueField.getValue ();
 					val = {id: v.split (":")[0], attr: v.split (":")[1]};
 				};
 				me.value = [attrField.getValue (), operField.getValue (), val];
 			};
-//			var bracketsField = me.down ("*[name='brackets']");
+//			let bracketsField = me.down ("*[name='brackets']");
 //			if (bracketsField && bracketsField.getValue ()) {
 //				me.value = [andOrField.getValue (), [me.value]];
 //			} else {
@@ -184,17 +184,17 @@
 		return true;
 	},
 	getOtherAttrs: function () {
-		var me = this;
-		var r = [];
-		var get = function (layout) {
+		let me = this;
+		let r = [];
+		let get = function (layout) {
 			if (typeof (layout) != "object") {
 				return;
 			};
-			for (var a in layout) {
+			for (let a in layout) {
 				if (layout [a]) {
 					if (layout [a].id && layout [a].view && layout [a].id != me.$cmpId) {
-						var v = $o.getView (layout [a].view);
-						for (var attr in v.attrs) {
+						let v = $o.getView (layout [a].view);
+						for (let attr in v.attrs) {
 							r.push ([layout [a].id + ":" + attr, layout [a].id + ":" + v.attrs [attr].toString ()]);
 						};
 					};
@@ -206,11 +206,11 @@
 		return r;
 	},
 	save: function () {
-		var me = this;
+		let me = this;
 		me.fireEvent ("aftersave", me.value);
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		return me.value;
 	}
 });

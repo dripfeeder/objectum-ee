@@ -1,15 +1,19 @@
 //
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 //
-var db = {};
+global.db = {};
+global.dbTablesSQL = JSON.stringify (fs.readFileSync ("./server/db/tables.sql", "utf8"));
+global.dbIndexesSQL = JSON.stringify (fs.readFileSync ("./server/db/indexes.sql", "utf8"));
+global.dbDataSQL = JSON.stringify (fs.readFileSync ("./server/db/data.sql", "utf8"));
+global.dbEngineSQL = JSON.stringify (fs.readFileSync ("./server/db/engine.sql", "utf8"));
 //	Factory of databases clients
 db.create = function (options) {
 	if (options.connection.database == "postgres") {
-		var client = new db.Postgres (options);
+		let client = new db.Postgres (options);
 		return client;
 	} else
 	if (options.connection.database == "mssql") {
-		var client = new db.MSSQL (options);
+		let client = new db.MSSQL (options);
 		return client;
 	} else {
 		throw "Client ({database: '" + options.connection.database + "'}) unsupported database.";
@@ -17,8 +21,8 @@ db.create = function (options) {
 };
 // Execute fn
 db.execute = function (options) {
-	var cfg = options;
-	var storage;
+	let cfg = options;
+	let storage;
 	async.series ([
 		function (cb) {
 			projects.loadConfig ({
@@ -30,7 +34,7 @@ db.execute = function (options) {
 			});
 		},
 		function (cb) {
-			var connection = config.storages [cfg.code];
+			let connection = config.storages [cfg.code];
 			if (cfg.fn == "init") {
 				console.log ("Initializing folder ...");
 				connection.code = cfg.code;
@@ -48,7 +52,7 @@ db.execute = function (options) {
 			if (cfg.fn == "rebuild") {
 				storage = new Storage ({code: cfg.code, connection: connection, success: function () {
 					console.log ("Rebuilding storage ...");
-					var i = new Import ();
+					let i = new Import ();
 				    i.removeTOC ({storage: storage, success: function () {
 						i.createTOC ({storage: storage, success: function () {
 							console.log ("Storage rebuilded.");
@@ -60,7 +64,7 @@ db.execute = function (options) {
 			};
 			if (cfg.fn == "import") {
 				console.log ("Importing storage ...");
-				var i = new Import ();
+				let i = new Import ();
 			    i.importFromFile ({
 			    	code: cfg.code,
 			    	file: cfg.file,
@@ -73,7 +77,7 @@ db.execute = function (options) {
 			};
 			if (cfg.fn == "export") {
 				console.log ("Exporting storage ...");
-				var e = new Export ();
+				let e = new Export ();
 			    e.exportToFile ({
 			    	schema: _.has (cfg, "schema") ? cfg.schema : true,
 			    	code: cfg.code,
@@ -133,10 +137,10 @@ db.execute = function (options) {
 	});
 };
 db.clear = function (options) {
-	var me = this;
-	var storage = options.storage;
-	var success = options.success;
-	var tables = [];
+	let me = this;
+	let storage = options.storage;
+	let success = options.success;
+	let tables = [];
 	async.series ([
 		function (cb) {
 			storage.client.disconnect ();
@@ -152,9 +156,9 @@ db.clear = function (options) {
 				"where " + storage.getCurrentFilter () + "\n" +
 				"order by fid\n"
 			, success: function (options) {
-				var rows = options.result.rows;
-				for (var i = 0; i < rows.length; i ++) {
-					var tocName = rows [i].fcode + "_" + rows [i].fid;
+				let rows = options.result.rows;
+				for (let i = 0; i < rows.length; i ++) {
+					let tocName = rows [i].fcode + "_" + rows [i].fid;
 					tables.push (tocName);
 				};
 				tables.push ("taction");
@@ -201,7 +205,7 @@ db.clear = function (options) {
 	Init project folder
 */
 db.init = function (cfg, cb) {
-	var rootDir = cfg.rootDir, appDir;
+	let rootDir = cfg.rootDir, appDir;
 	async.series ([
 		function (cb) {
 			fs.mkdir (rootDir, function (err) {
@@ -294,7 +298,7 @@ db.init = function (cfg, cb) {
 			fs.writeFile (rootDir + "/plugins/actions.js", "", cb);
 		},
 		function (cb) {
-			var html =
+			let html =
 				'<html>\n' +
 				'<head>\n' +
 				'\t<title>' + cfg.name + '</title>\n' +
@@ -322,4 +326,3 @@ db.init = function (cfg, cb) {
 		cb (err);
 	});
 };
-

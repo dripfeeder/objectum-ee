@@ -2,10 +2,10 @@
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.
 	deprecated. Events disabled
 */
-var Ose = function (options) {
-	var storage = options.storage;
-	var success = options.success;
-	var ose = this;
+global.Ose = function (options) {
+	let storage = options.storage;
+	let success = options.success;
+	let ose = this;
 	if (config.storages [storage.code]) {
 		ose.config = config.storages [storage.code].ose || {enabled: 0};
 	} else {
@@ -26,24 +26,24 @@ var Ose = function (options) {
 			};
 		},
 		can: function (options) {
-			var access = options.access;
-			var success = options.success;
-			var session = options.session;
-			var object = options.object;
-			var class_ = cache.class_ [object.get ("fclass_id")];
+			let access = options.access;
+			let success = options.success;
+			let session = options.session;
+			let object = options.object;
+			let class_ = cache.class_ [object.get ("fclass_id")];
 			if (class_ && (
 				(class_ [null] && class_ [null][access]) || (class_ [session.userId] && class_ [session.userId][access])
 			)) {
 				success ();
 				return;
 			};
-			for (var i = 0; i < session.roles.length; i ++) {
+			for (let i = 0; i < session.roles.length; i ++) {
 				if (class_ [session.roles [i]] && class_ [session.roles [i]][access]) {
 					success ();
 					return;
 				};
 			};
-			var subjects = session.roles.concat (session.userId);
+			let subjects = session.roles.concat (session.userId);
 			storage.execute ({session: session, sql: {
 				select: [
 					{"a": "id"}, "id"
@@ -65,7 +65,7 @@ var Ose = function (options) {
 		}
 	};
 	ose.object = {};
-	var cache = {
+	let cache = {
 		admins: [],
 		ext: {},
 		srole: {},
@@ -74,7 +74,7 @@ var Ose = function (options) {
 	};
 	ose.load = function (options) {
 		options = options || {};
-		var success = options.success;
+		let success = options.success;
 		async.series ([
 			function (cb) {
 				storage.execute ({sql: {
@@ -87,9 +87,9 @@ var Ose = function (options) {
 					]
 				}, success: function (r) {
 					cache.srole = {};
-					for (var i = 0; i < r.length; i ++) {
-						var role = r.get (i, "role");
-						var subject = r.get (i, "subject");
+					for (let i = 0; i < r.length; i ++) {
+						let role = r.get (i, "role");
+						let subject = r.get (i, "subject");
 						cache.srole [subject] = cache.srole [subject] || [];
 						cache.srole [subject].push (role);
 					};
@@ -108,8 +108,8 @@ var Ose = function (options) {
 					]
 				}, success: function (r) {
 					cache.ext = {};
-					for (var i = 0; i < r.length; i ++) {
-						var classAttr = r.get (i, "classattr");
+					for (let i = 0; i < r.length; i ++) {
+						let classAttr = r.get (i, "classattr");
 						cache.ext [classAttr] = cache.ext [classAttr] || {};
 						cache.ext [classAttr] = {
 							classAttr: classAttr,
@@ -140,9 +140,9 @@ var Ose = function (options) {
 					]
 				}, success: function (r) {
 					cache.class_ = {};
-					for (var i = 0; i < r.length; i ++) {
-						var subject = r.get (i, "subject");
-						var class_ = r.get (i, "class");
+					for (let i = 0; i < r.length; i ++) {
+						let subject = r.get (i, "subject");
+						let class_ = r.get (i, "class");
 						cache.class_ [class_] = cache.class_ [class_] || {};
 						cache.class_ [class_][subject] = {
 							read: r.get (i, "read"),
@@ -164,7 +164,7 @@ var Ose = function (options) {
 							{"a": ose.config.admins}
 						]
 					}, success: function (r) {
-						for (var i = 0; i < r.length; i ++) {
+						for (let i = 0; i < r.length; i ++) {
 							cache.admins.push (r.get (i, "login"));
 						};
 						cb ();
@@ -190,35 +190,35 @@ var Ose = function (options) {
 		success ();
 		return;
 	};
-	var roleClassId = storage.getClass ("ose.role").get ("fid");
-	var sroleClassId = storage.getClass ("ose.srole").get ("fid");
-	var extClassId = storage.getClass ("ose.ext").get ("fid");
-	var objectClassId = storage.getClass ("ose.object").get ("fid");
-	var adminClassId = storage.getClass (ose.config.admins).get ("fid");
-	var oseClasses = [roleClassId, sroleClassId, extClassId, objectClassId, adminClassId];
-	var beforecreateobject = function (options) {
-		var success = options.success;
+	let roleClassId = storage.getClass ("ose.role").get ("fid");
+	let sroleClassId = storage.getClass ("ose.srole").get ("fid");
+	let extClassId = storage.getClass ("ose.ext").get ("fid");
+	let objectClassId = storage.getClass ("ose.object").get ("fid");
+	let adminClassId = storage.getClass (ose.config.admins).get ("fid");
+	let oseClasses = [roleClassId, sroleClassId, extClassId, objectClassId, adminClassId];
+	let beforecreateobject = function (options) {
+		let success = options.success;
 		if (options.session && options.session.username && !ose.subject.isAdmin (options.session.username) && options.classId != objectClassId && oseClasses.indexOf (options.classId) > -1) {
 			options.cancel = 1;
 		};
 		success (options);
 	};
 	storage.on ("beforecreateobject", beforecreateobject);
-	var aftercreateobject = function (options) {
-		var success = options.success;
-		var classId = options.classId;
+	let aftercreateobject = function (options) {
+		let success = options.success;
+		let classId = options.classId;
 		if (!cache.class_ [classId] || !options.session || ose.subject.isAdmin (options.session.username)) {
 			success ();
 			return;
 		};
-		var object = options.object;
-		var session = options.session;
+		let object = options.object;
+		let session = options.session;
 		storage.un ("aftercreateobject", aftercreateobject);
 		storage.un ("beforecreateobject", beforecreateobject);
 		storage.createObject ({session: session, classId: objectClassId, success: function (options) {
 			storage.on ("aftercreateobject", aftercreateobject);
 			storage.on ("beforecreateobject", beforecreateobject);
-			var o = options.object;
+			let o = options.object;
 			o.set ("object", object.get ("id"));
 			o.set ("subject", session.userId);
 			o.set ("read",  1);
@@ -232,10 +232,10 @@ var Ose = function (options) {
 		}});
 	};
 	storage.on ("aftercreateobject", aftercreateobject);
-	var aftergetobject = function (options) {
-		var success = options.success;
-		var session = options.session;
-		var object = options.object;
+	let aftergetobject = function (options) {
+		let success = options.success;
+		let session = options.session;
+		let object = options.object;
 		if (!object || !session || ose.subject.isAdmin (session.username)) {
 			success ();
 			return;
@@ -257,12 +257,12 @@ var Ose = function (options) {
 	};
 	storage.on ("aftergetobject", aftergetobject);
 	ose.ext = function (options) {
-		var success = options.success;
-		var session = options.session;
-		var object = options.object;
-		var attrs = [];
-		var cls = storage.getClass (object.get ("fclass_id"));
-		for (var attr in object.data) {
+		let success = options.success;
+		let session = options.session;
+		let object = options.object;
+		let attrs = [];
+		let cls = storage.getClass (object.get ("fclass_id"));
+		for (let attr in object.data) {
 			if (['id', 'fclass_id', 'fspace_id'].indexOf (attr) > -1) {
 				continue;
 			}
@@ -273,10 +273,10 @@ var Ose = function (options) {
 			};
 		};
 		async.eachSeries (attrs, function (attr, cb) {
-			var objectId = object.data [attr.get ("fcode")];
-			var ext = cache.ext [attr.get ("fid")];
+			let objectId = object.data [attr.get ("fcode")];
+			let ext = cache.ext [attr.get ("fid")];
 			if (ext && objectId) {
-				var r1 = [], r2 = [];
+				let r1 = [], r2 = [];
 				async.series ([
 					function (cb) {
 						storage.execute ({session: session, sql: {
@@ -295,8 +295,8 @@ var Ose = function (options) {
 								{"a": "object"}, "in", [object.get ("id"), ",", objectId]
 							]
 						}, success: function (r) {
-							for (var i = 0; i < r.length; i ++) {
-								var o = {
+							for (let i = 0; i < r.length; i ++) {
+								let o = {
 									npp: r.get (i, "npp"),
 									subject: r.get (i, "subject"),
 									read: r.get (i, "read"),
@@ -315,8 +315,8 @@ var Ose = function (options) {
 					function (cb) {
 						if (ext.take) {
 							async.eachSeries (r1, function (r, cb) {
-								var has = 0;
-								for (var i = 0; i < r2.length; i ++) {
+								let has = 0;
+								for (let i = 0; i < r2.length; i ++) {
 									if (r2 [i].subject == r.subject && r2 [i].read == r.read && r2 [i].update == r.update && r2 [i].delete_ == r.delete_) {
 										has = 1;
 										break;
@@ -330,7 +330,7 @@ var Ose = function (options) {
 									storage.createObject ({session: session, classId: objectClassId, success: function (options) {
 										storage.on ("aftercreateobject", aftercreateobject);
 										storage.on ("beforecreateobject", beforecreateobject);
-										var o = options.object;
+										let o = options.object;
 										o.set ("object", object.get ("id"));
 										o.set ("subject", r.subject);
 										o.set ("read",  r.read);
@@ -353,8 +353,8 @@ var Ose = function (options) {
 					function (cb) {
 						if (ext.give) {
 							async.eachSeries (r2, function (r, cb) {
-								var has = 0;
-								for (var i = 0; i < r1.length; i ++) {
+								let has = 0;
+								for (let i = 0; i < r1.length; i ++) {
 									if (r1 [i].subject == r.subject && r1 [i].read == r.read && r1 [i].update == r.update && r1 [i].delete_ == r.delete_) {
 										has = 1;
 										break;
@@ -368,7 +368,7 @@ var Ose = function (options) {
 									storage.createObject ({session: session, classId: objectClassId, success: function (options) {
 										storage.on ("aftercreateobject", aftercreateobject);
 										storage.on ("beforecreateobject", beforecreateobject);
-										var o = options.object;
+										let o = options.object;
 										o.set ("object", objectId);
 										o.set ("subject", r.subject);
 										o.set ("read",  r.read);
@@ -398,10 +398,10 @@ var Ose = function (options) {
 			success ();
 		});
 	};
-	var beforecommitobject = function (options) {
-		var success = options.success;
-		var session = options.session;
-		var object = options.object;
+	let beforecommitobject = function (options) {
+		let success = options.success;
+		let session = options.session;
+		let object = options.object;
 		async.series ([
 			function (cb) {
 				if (!session || ose.subject.isAdmin (session.username)) {
@@ -416,7 +416,7 @@ var Ose = function (options) {
 						storage.un ("aftergetobject", aftergetobject);
 						storage.getObject ({session: session, id: object.get ("object"), success: function (options) {
 							storage.on ("aftergetobject", aftergetobject);
-							var o = options.object;
+							let o = options.object;
 							if (o) {
 								ose.subject.can ({
 									session: session,
@@ -475,10 +475,10 @@ var Ose = function (options) {
 		});
 	};
 	storage.on ("beforecommitobject", beforecommitobject);
-	var beforeremoveobject = function (options) {
-		var success = options.success;
-		var session = options.session;
-		var object = options.object;
+	let beforeremoveobject = function (options) {
+		let success = options.success;
+		let session = options.session;
+		let object = options.object;
 		if (!object || !session || ose.subject.isAdmin (session.username)) {
 			success ();
 			return;
@@ -500,12 +500,12 @@ var Ose = function (options) {
 	};
 	storage.on ("beforeremoveobject", beforeremoveobject);
 	storage.on ("generatequeryblock", function (options) {
-		var cls = options.cls;
-		var objectField = options.objectField;
-		var session = options.session;
-		var tables = options.tables;
-		var where = options.where;
-		var alias = options.alia;
+		let cls = options.cls;
+		let objectField = options.objectField;
+		let session = options.session;
+		let tables = options.tables;
+		let where = options.where;
+		let alias = options.alia;
 		if (!session || ose.subject.isAdmin (session.username)) {
 			return;
 		};
@@ -518,8 +518,8 @@ var Ose = function (options) {
 		} else {
 			where = ' where ';
 		};
-		var subjects = session.roles.concat (session.userId);
-		var oseObject = storage.getClass ("ose.object");
+		let subjects = session.roles.concat (session.userId);
+		let oseObject = storage.getClass ("ose.object");
 		where += "exists (\n" + 
 			"select fobject_id from " + oseObject.toc + "\n" + 
 			"where " + oseObject.attrs.read.toc + " = 1 and " + oseObject.attrs.subject.toc + " in (" + subjects.join (",") + ") and\n" +

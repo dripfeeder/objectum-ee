@@ -1,18 +1,18 @@
 //
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 //
-var pdf = {};
+global.pdf = {};
 /*
 	session
 	sheet
 */
 pdf.buildReportFromXMLSS = function (options, cb) {
-	var session = options.session;
-	var sheet = options.sheet;
-	var columns = sheet.columns;
-	var orientation = sheet.orientation;
-	var rows = sheet.rows;
-	var html =
+	let session = options.session;
+	let sheet = options.sheet;
+	let columns = sheet.columns;
+	let orientation = sheet.orientation;
+	let rows = sheet.rows;
+	let html =
 		'<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n' +
 		"<style type='text/css'>\n" +
 		"* {\n" +
@@ -27,27 +27,27 @@ pdf.buildReportFromXMLSS = function (options, cb) {
 	} else {
 		html += "<table cellspacing=0 border=1>\n";
 	};
-	for (var i = 0; i < rows.length; i ++) {
-		var row = rows [i];
-		var cells = row.cells;
-		var r = "<tr height=20>\n";
-		var curCol = 1;
-		for (var j = 0; j < cells.length; j ++) {
-			var cell = cells [j];
+	for (let i = 0; i < rows.length; i ++) {
+		let row = rows [i];
+		let cells = row.cells;
+		let r = "<tr height=20>\n";
+		let curCol = 1;
+		for (let j = 0; j < cells.length; j ++) {
+			let cell = cells [j];
 			cell.text = cell.text || "";
 			cell.style = cell.style || "";
 			cell.colspan = cell.colspan || 1;
 			cell.rowspan = cell.rowspan || 1;
-			var v = cell.text;
+			let v = cell.text;
 			if (v === undefined || v === null || v === "") {
 				v = "<img width=1 height=1>";
 			};
 			if (cell.style.indexOf ("bold") > -1) {
 				v = "<b>" + v + "</b>";
 			};
-			var style = "";
-			var width = 0;
-			for (var k = curCol; k < (curCol + cell.colspan); k ++) {
+			let style = "";
+			let width = 0;
+			for (let k = curCol; k < (curCol + cell.colspan); k ++) {
 				width += columns [k] ? (columns [k].width || 0) : 0;
 			};
 			if (width) {
@@ -56,7 +56,7 @@ pdf.buildReportFromXMLSS = function (options, cb) {
 			if (cell.style.indexOf ("underline") > -1) {
 				style += "border-bottom: 1px solid #000000;";
 			};
-			var align = "";
+			let align = "";
 			if (cell.style.indexOf ("center") > -1) {
 				align = " align=center ";
 			};
@@ -71,8 +71,8 @@ pdf.buildReportFromXMLSS = function (options, cb) {
 		if (err) {
 			return cb (err);
 		};
-		var spawn = require ('child_process').spawn;
-		var args = [
+		let spawn = require ('child_process').spawn;
+		let args = [
 			"--orientation", orientation == "landscape" ? "Landscape" : "Portrait", "--dpi", 300, "--page-size", "A4",
 			__dirname + "/report/pdf/" + session.id + ".html",
 			__dirname + "/report/pdf/" + session.id + ".pdf"
@@ -80,11 +80,11 @@ pdf.buildReportFromXMLSS = function (options, cb) {
 //		if (sheet.margins) {
 //			args = args.concat ("--margin-left", sheet.margins.left, "--margin-top", sheet.margins.top, "--margin-right", sheet.margins.right, "--margin-bottom", sheet.margins.bottom);
 //		};
-		var filePath = __dirname + "/report/pdf/wkhtmltopdf";
+		let filePath = __dirname + "/report/pdf/wkhtmltopdf";
 		if (config.report && config.report.pdf) {
 			filePath = config.report.pdf;
 		}
-		var cp = spawn (filePath, args);
+		let cp = spawn (filePath, args);
 		cp.stdout.on ("data", function (data) {
 			console.log ("stdout: " + data);
 		});
@@ -112,22 +112,22 @@ pdf.buildReportFromXMLSS = function (options, cb) {
 	});
 };
 pdf.report = function (request, response, next) {
-	var session = request.session;
-	var storage = session.storage;
+	let session = request.session;
+	let storage = session.storage;
 	if (request.url.indexOf ('/pdf?') > -1 && projects.sessions [session.id]) {
-		var options = {};
-		var body = request.body;
+		let options = {};
+		let body = request.body;
 		if (body) {
 			body = body.split ("+").join ("%20");
 			body = unescape (body);
 			body = new Buffer (body, "ascii").toString ("utf8");
-			var fields = body.split ("&");
-			for (var i = 0; i < fields.length; i ++) {
-				var tokens = fields [i].split ("=");
+			let fields = body.split ("&");
+			for (let i = 0; i < fields.length; i ++) {
+				let tokens = fields [i].split ("=");
 				options [tokens [0]] = JSON.parse (tokens [1]);
 			};
 		};
-		var sheet = options ["sheets"][0];
+		let sheet = options ["sheets"][0];
 		pdf.buildReportFromXMLSS ({
 			sheet: sheet, session: session
 		}, function (err, data) {

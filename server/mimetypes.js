@@ -1,4 +1,4 @@
-var mimetypes = {};
+global.mimetypes = {};
 mimetypes.types = {
 	"3gp":"video/3gpp",
 	"aiff":"audio/x-aiff",

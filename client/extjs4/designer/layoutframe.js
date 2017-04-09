@@ -4,7 +4,7 @@
 	cmpCode: "frame",
 	border: 0,
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || {
 			frame: {
 				id: "cmp-" + (me.layoutDesigner.counter ++)
@@ -105,18 +105,18 @@
 		this.callParent (arguments);
 	},
 	getOtherAttrs: function () {
-		var me = this;
-		var r = [];
-		var get = function (layout) {
+		let me = this;
+		let r = [];
+		let get = function (layout) {
 			if (typeof (layout) != "object") {
 				return;
 			};
-			for (var a in layout) {
+			for (let a in layout) {
 				if (layout [a]) {
 					if (layout [a].id && layout [a].view && layout [a].id != me.$cmpId) {
-						var v = $o.getView (layout [a].view);
-						for (var attr in v.attrs) {
-							var va = v.attrs [attr];
+						let v = $o.getView (layout [a].view);
+						for (let attr in v.attrs) {
+							let va = v.attrs [attr];
 							if ((a == "olap" || a == "treegrid") && va.get ("classAttr") && $o.getClassAttr (va.get ("classAttr")).get ("type") == 1) {
 								r.push ([layout [a].id + "." + attr, layout [a].id + ":" + va.toString ()]);
 							};
@@ -130,7 +130,7 @@
 		return r;
 	},
 	validator: function () {
-		var me = this.up ("window");
+		let me = this.up ("window");
 		if (me.down ("*[name=id]").getValue () && (me.down ("*[name=url]").getValue () || me.down ("*[name=attr]").getValue ())) {
 			me.down ("button[name='ok']").enable ();
 		} else {

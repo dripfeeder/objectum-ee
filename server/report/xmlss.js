@@ -1,27 +1,27 @@
 //
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 //
-var xmlss = {};
+global.xmlss = {};
 
 xmlss.customReport = function (options) {
-	var styles = options ["styles"];
-	var sheets = options ["sheets"];
-	var xml = new XMLSS ();
-	for (var name in styles) {
+	let styles = options ["styles"];
+	let sheets = options ["sheets"];
+	let xml = new XMLSS ();
+	for (let name in styles) {
 		xml.addStyle (name, styles [name]);
 	};
 	// todo: has rows but no sheets
-	var xWidth = {
+	let xWidth = {
 		1: 9, 2: 14.25, 3: 19.5, 4: 24.75, 5: 30,
 		6: 35.25, 7: 40.5, 8: 45.75, 9: 51, 10: 56.25,
 		11: 61.5, 12: 66.75, 13: 72, 14: 77.25, 15: 82.5,
 		16: 87.75, 17: 93, 18: 98.25, 19: 103.5, 20: 108.75
 	};
-	for (var i = 0; i < sheets.length; i ++) {
-		var sheet = sheets [i];
-		var sheetName = sheet ["name"];
+	for (let i = 0; i < sheets.length; i ++) {
+		let sheet = sheets [i];
+		let sheetName = sheet ["name"];
 		xml.sheet.create (sheetName);
-		var orientation = "Portrait";
+		let orientation = "Portrait";
 		if (sheet ["orientation"]) {
 			if (sheet ["orientation"] == "landscape") {
 				orientation = "Landscape";
@@ -32,19 +32,19 @@ xmlss.customReport = function (options) {
 		xml.sheet.orientation.push (orientation);
 		xml.sheet.validation.push (sheet ["validation"]);
 		xml.sheet.namedRange.push (sheet ["namedRange"]);
-		var scale = sheet ["scale"] || "100";
+		let scale = sheet ["scale"] || "100";
 		xml.sheet.scale.push (scale);
-		var autoFitHeight = false;
+		let autoFitHeight = false;
 		if (sheet ["autoFitHeight"]) {		
 			autoFitHeight = true;
 		};
 		xml.sheet.autoFitHeight.push (autoFitHeight);
-		var marginBottom = 2.5;
-		var marginLeft = 2;
-		var marginRight = 2;
-		var marginTop = 2.5;
+		let marginBottom = 2.5;
+		let marginLeft = 2;
+		let marginRight = 2;
+		let marginTop = 2.5;
 		if (sheet ["margins"]) {
-			var margins = sheet ["margins"];
+			let margins = sheet ["margins"];
 			if (margins ["left"]) {
 				marginLeft = margins ["left"] / 10;			
 			};
@@ -62,40 +62,40 @@ xmlss.customReport = function (options) {
 		xml.sheet.marginLeft.push (marginLeft);
 		xml.sheet.marginRight.push (marginRight);
 		xml.sheet.marginTop.push (marginTop);
-		var rows = sheet ["rows"];
-		for (var j = 0; j < rows.length; j ++) {
-			var row = rows [j];
-			var cells = row ["cells"];
-			var height = row ["height"];
-			var startIndex = 0;
+		let rows = sheet ["rows"];
+		for (let j = 0; j < rows.length; j ++) {
+			let row = rows [j];
+			let cells = row ["cells"];
+			let height = row ["height"];
+			let startIndex = 0;
 			if (row ["startIndex"]) {
 				startIndex = row ["startIndex"];
 			};
 			xml.pushRow (height, startIndex);
-			for (var k = 0; k < cells.length; k ++) {		
-				var cell = cells [k];
-				var style = "Default";
+			for (let k = 0; k < cells.length; k ++) {		
+				let cell = cells [k];
+				let style = "Default";
 				if (cell ["style"]) {
 					style = cell ["style"];
 				}
-				var colspan = 1;
+				let colspan = 1;
 				if (cell ["colspan"]) {
 					colspan = cell ["colspan"];
 				}
-				var rowspan = 1;
+				let rowspan = 1;
 				if (cell ["rowspan"]) {
 					rowspan = cell ["rowspan"];
 				}
-				var index = 0;
+				let index = 0;
 				if (cell ["startIndex"]) {
 					index = cell ["startIndex"];
 				}
-				var text = "";
+				let text = "";
 				if (cell ["text"]) {
 					text = String (cell ["text"]);
 				}
-				var text2 = "";
-				for (var l = 0; l < text.length; l ++) {
+				let text2 = "";
+				for (let l = 0; l < text.length; l ++) {
 					if (text [l] == '\n') {
 						text2 += "&#10;";
 					} else {
@@ -109,22 +109,22 @@ xmlss.customReport = function (options) {
 			xml.pushRow ();
 			xml.pushCell ("");
 		};
-		var columns = sheet ["columns"];
-		for (var colId in columns) {
-			var column = columns [colId];
+		let columns = sheet ["columns"];
+		for (let colId in columns) {
+			let column = columns [colId];
 			if (column ["width"]) {
-				var width = column ["width"];
+				let width = column ["width"];
 				width = xWidth [width] || (width * 5);
 				xml.setColWidth (width, colId, colId, true);
 			};
 		};
 	};
-    var result = xml.content ();
+    let result = xml.content ();
     return result;
 };
 xmlss.XMLSS = XMLSS;
 function Cell (text, style, colspan, rowspan, index) {
-	var me = this;
+	let me = this;
 	me.text = text || "";
 	me.style = style || "none";
     me.colspan = colspan || 1;
@@ -147,7 +147,7 @@ function Sheet (xml) {
 	this.autoFitHeight = [];
 };
 Sheet.prototype.create = function (name) {
-	var sheetId = this.sheetName.length;
+	let sheetId = this.sheetName.length;
 	this.sheetName.push (name);
 	this.rowSheetId [this.xml.data.length] = sheetId;
 };
@@ -155,17 +155,17 @@ Sheet.prototype.getSheetNum = function () {
 	return this.sheetName.length;
 };
 Sheet.prototype.setColWidth = function (width, colId, colId2, directWidth) {
-	var mul = 6;
+	let mul = 6;
 	if (directWidth) {
 		mul = 1;
 	};
-	var sheetId = this.sheetName.length - 1;
+	let sheetId = this.sheetName.length - 1;
 	this.colWidth [sheetId] = this.colWidth [sheetId] || {};
 	if (colId2 == 0) {
 		this.colWidth [sheetId][colId] = width * mul;
 	} else 
 	if (colId2 >= colId) {
-		for (var i = colId; i <= colId2; i ++) {
+		for (let i = colId; i <= colId2; i ++) {
 			this.colWidth [sheetId][i] = width * mul;
 		};
 	};
@@ -178,7 +178,7 @@ Sheet.prototype.getColWidth = function (sheetId, colId) {
 	};
 };
 Sheet.prototype.getHeader = function (sheetId) {
-	var header = "";
+	let header = "";
 	header += "<Worksheet ss:Name='" + this.sheetName [sheetId] + "'>\n";
 	if (this.xml.printTitlesRow1 > 0) {
 		header += "<Names>\n";
@@ -186,7 +186,7 @@ Sheet.prototype.getHeader = function (sheetId) {
 		header += "</Names>\n";
 	};
 	header += "<Table ss:ExpandedColumnCount='255' ss:ExpandedRowCount='65535' x:FullColumns='1' x:FullRows='1'>\n";
-	for (var i = 1; i <= 255; i ++) {
+	for (let i = 1; i <= 255; i ++) {
 		header += "<Column ss:AutoFitWidth='0' ss:Width='";
 		header += this.getColWidth (sheetId, i);
 		header += "'/>\n";
@@ -194,8 +194,8 @@ Sheet.prototype.getHeader = function (sheetId) {
 	return header;
 };
 Sheet.prototype.getFooter = function (sheetId) {
-	var footer = "";
-	var xml = this.xml;
+	let footer = "";
+	let xml = this.xml;
 	footer += "</Table>\n";
 	footer += "<WorksheetOptions xmlns='urn:schemas-microsoft-com:office:excel'>\n";
 	footer += "<PageSetup>\n";
@@ -240,11 +240,11 @@ Sheet.prototype.getFooter = function (sheetId) {
 	footer += "<ProtectScenarios>False</ProtectScenarios>\n";
 	footer += "</WorksheetOptions>\n";
 	if (xml.sheet.validation [sheetId] && xml.sheet.validation [sheetId].length) {
-		var validation = xml.sheet.validation [sheetId];
-		for (var i = 0; i < validation.length; i ++) {
+		let validation = xml.sheet.validation [sheetId];
+		for (let i = 0; i < validation.length; i ++) {
 			footer += "<DataValidation  xmlns=\"urn:schemas-microsoft-com:office:excel\">\n";
-			var v = validation [i];
-			var range = "";
+			let v = validation [i];
+			let range = "";
 			if (v.r1) {
 				range += "R" + v.r1;
 			};
@@ -290,7 +290,7 @@ Sheet.prototype.getSheetIdByRowId = function (rowId) {
 };
 function XMLSS (options) {
 	options = options || {};
-	var me = this;
+	let me = this;
 	me.paperSizeIndex = 9; // A4
 	me.fitWidth = 0;
 	me.fitHeight = 0;
@@ -332,12 +332,12 @@ XMLSS.prototype.setDefaultStyles = function () {
 };
 XMLSS.prototype.clearColWidth = function () {
 	this.colWidth = [];
-	for (var i = 0; i < 257; i ++) {
+	for (let i = 0; i < 257; i ++) {
 		this.colWidth.push (50.58);
 	};
 };
 XMLSS.prototype.setColWidth = function (width, colId, colId2, directWidth) {
-	var mul = 6;
+	let mul = 6;
 	if (directWidth) {
 		mul = 1;
 	};
@@ -346,7 +346,7 @@ XMLSS.prototype.setColWidth = function (width, colId, colId2, directWidth) {
 			this.colWidth [colId] = width * mul;
 		} else 
 		if (colId2 >= colId) {
-			for (var i = colId; i <= colId2; i ++) {
+			for (let i = colId; i <= colId2; i ++) {
 				this.colWidth [i] = width * mul;
 			};
 		};
@@ -356,13 +356,13 @@ XMLSS.prototype.setColWidth = function (width, colId, colId2, directWidth) {
 }
 XMLSS.prototype.clearRowHeight = function () {
 	this.rowHeight = [];
-	for (var i = 0; i < this.data.length; i ++) {
+	for (let i = 0; i < this.data.length; i ++) {
 		this.rowHeight.push (this.defRowHeight);
 	};
 };
 XMLSS.prototype.clearRowStartIndex = function () {
 	this.rowStartIndex = [];
-	for (var i = 0; i < this.data.length; i ++) {
+	for (let i = 0; i < this.data.length; i ++) {
 		this.rowStartIndex.push (0);
 	};
 }
@@ -376,13 +376,13 @@ XMLSS.prototype.clearRowStartIndex = function () {
 //   numberFormat: #,##0.000
 //   borders: All,Left,Top,Right,Bottom,AllDash
 XMLSS.prototype.addStyle = function (styleName, options_) {
-	var s = "";
-	var i;
+	let s = "";
+	let i;
 	// Парсинг
-	var options = {}; // option, value
-	var option;
+	let options = {}; // option, value
+	let option;
 	for (i = 0; i < options_.length; i ++) {
-		var c = options_ [i];
+		let c = options_ [i];
 		if (c == ',' || i == options_.length - 1) {
 			if (i == options_.length - 1) {
 				s += c;
@@ -411,7 +411,7 @@ XMLSS.prototype.addStyle = function (styleName, options_) {
 		options ["fontName"] = "Arial Cyr";
 	};
 	// Стиль
-	var r = "";
+	let r = "";
 	r += "<Style ss:ID='" + styleName + "'>\n";
 	r += "<Alignment ss:Horizontal='" + options ["hAlign"] + "' ss:Vertical='" + options ["vAlign"] + "'";
 	if (options ["rotate"]) {
@@ -426,7 +426,7 @@ XMLSS.prototype.addStyle = function (styleName, options_) {
 	};
 	r += "<Borders>\n";
 	if (options ["borders"]) {
-		var borders = options ["borders"];
+		let borders = options ["borders"];
 		if (borders == "AllDash") {
     		borders = "LeftDash RightDash TopDash BottomDash";
 		} else
@@ -489,7 +489,7 @@ XMLSS.prototype.pushRow = function (height, rowStartIndex_) {
     };
     this.rowStartIndex.push (rowStartIndex_);
     this.rowHeight.push (height);
-    var row = [];
+    let row = [];
 	this.data.push (row);
     this.row = row;
     return this.data.length - 1;
@@ -502,16 +502,16 @@ XMLSS.prototype.pushCell = function (s, style, colspan, rowspan, index) {
     return this.row.length - 1;
 };
 XMLSS.prototype.content = function () {
-	var s = this.getMultiSheetContent ();
+	let s = this.getMultiSheetContent ();
     return s;
 };
 XMLSS.prototype.getMultiSheetContent = function () {
-	var s, r = "";
-    var fill = {};
-    var x, y = 1, i, j, rowId = 0, sheetId;
-    var digitNum, dotNum, textLen;
-    for (var i = 0; i < this.data.length; i ++) {
-    	var row = this.data [i];
+	let s, r = "";
+    let fill = {};
+    let x, y = 1, i, j, rowId = 0, sheetId;
+    let digitNum, dotNum, textLen;
+    for (let i = 0; i < this.data.length; i ++) {
+    	let row = this.data [i];
 		// Sheet header
 		if (this.sheet.hasStartRow (rowId)) {
 			sheetId = this.sheet.getSheetIdByRowId (rowId);
@@ -527,8 +527,8 @@ XMLSS.prototype.getMultiSheetContent = function () {
 			r += "<Row ss:AutoFitHeight='0' ss:Height='" + (this.rowHeight [y - 1]) + "'>\n";
 		};
 		x = 1;
-		for (var j = 0; j < row.length; j ++) {
-			var cell = row [j];
+		for (let j = 0; j < row.length; j ++) {
+			let cell = row [j];
 			if (cell.style != "" || cell.text != "") {
 				r += "<Cell";
 				if (cell.index > 0) {
@@ -544,7 +544,7 @@ XMLSS.prototype.getMultiSheetContent = function () {
 					r += " ss:MergeDown='" + (cell.rowspan - 1) + "'";
 				};
 				/*
-				var nr = this.getNamedRange (this.sheet.namedRange [sheetId], y, x);
+				let nr = this.getNamedRange (this.sheet.namedRange [sheetId], y, x);
 				if (nr) {
 					r += " ss:Name='" + nr + "'";
 				};
@@ -552,7 +552,7 @@ XMLSS.prototype.getMultiSheetContent = function () {
 				digitNum = 0;
 				dotNum = 0;
 				textLen = cell.text.length;
-				for (var k = 0; k < textLen; k ++) {
+				for (let k = 0; k < textLen; k ++) {
 					if ("0123456789".indexOf (cell.text [k]) > -1) {
             			digitNum ++;
 					};
@@ -563,7 +563,7 @@ XMLSS.prototype.getMultiSheetContent = function () {
 				if (textLen > 0 && (digitNum + dotNum == textLen) && digitNum > 0 && dotNum <= 1) {
 					r += "><Data ss:Type='String'>" + cell.text + "</Data></Cell>\n";
 				} else {
-					var v = cell.text.split ("<").join ("&lt;");
+					let v = cell.text.split ("<").join ("&lt;");
 					v = v.split (">").join ("&gt;");
 					r += "><Data ss:Type='String'>" + v + "</Data></Cell>\n";
 				};
@@ -608,8 +608,8 @@ XMLSS.prototype.getMultiSheetContent = function () {
 	return s;
 };
 XMLSS.prototype.getNamedRange = function (namedRange, r, c) {
-    for (var j = 0; j < namedRange.length; j ++) {
-    	var o = namedRange [j];
+    for (let j = 0; j < namedRange.length; j ++) {
+    	let o = namedRange [j];
     	if ((r >= o.r1 && c >= o.c1 && r <= o.r2 && c <= o.c2) ||
     		(r == o.r1 && (c == o.c1 || (c >= o.c1 && c <= o.c2) || !o.c1)) ||
     		(c == o.c1 && (r == o.r1 || (r >= o.r1 && r <= o.r2) || !o.r1))
@@ -619,12 +619,12 @@ XMLSS.prototype.getNamedRange = function (namedRange, r, c) {
     };
 };
 XMLSS.prototype.getNamedRangeList = function () {
-	var r = "";
-    for (var i = 0; i < this.sheet.namedRange.length; i ++) {
-    	var nr = this.sheet.namedRange [i];
+	let r = "";
+    for (let i = 0; i < this.sheet.namedRange.length; i ++) {
+    	let nr = this.sheet.namedRange [i];
     	if (nr && nr.length) {
-		    for (var j = 0; j < nr.length; j ++) {
-				var range = "";
+		    for (let j = 0; j < nr.length; j ++) {
+				let range = "";
 				if (nr [j].r1) {
 					range += "R" + nr [j].r1;
 				};
@@ -648,18 +648,18 @@ XMLSS.prototype.getNamedRangeList = function () {
 };
 // application.student.surname -> Иванов
 xmlss.getAttr = function (options) {
-	var storage = options.storage;
-	var tags = options.tags;
-	var success = options.success;
-	var tokens = options.text.split (".");
-	var onlyDate = false;
+	let storage = options.storage;
+	let tags = options.tags;
+	let success = options.success;
+	let tokens = options.text.split (".");
+	let onlyDate = false;
 	if (tokens.length && tokens [tokens.length - 1] == "$date") {
 		tokens.splice (tokens.length - 1, 1);
 		onlyDate = true;
 	};
-	var o, attr;
+	let o, attr;
 	options.timeOffset = options.timeOffset || (-240 * 60 * 1000); // MSK +4
-	var UTCDateToClientDate = function (value) {
+	let UTCDateToClientDate = function (value) {
 		if (!value) {
 			return value;
 		};
@@ -726,13 +726,13 @@ xmlss.getAttr = function (options) {
 	});
 };
 xmlss.updateTags = function (options) {
-	var success = options.success;
+	let success = options.success;
 	options.timeOffset = options.request.query.time_offset_min * 60 * 1000;
-	var tags = [];
-	var r = options.data;
-	for (var i = 1; i < r.length; i ++) {
+	let tags = [];
+	let r = options.data;
+	for (let i = 1; i < r.length; i ++) {
 		if (r [i] == "$" && r [i - 1] == "[") {
-			var tag = "";
+			let tag = "";
 			for (i ++; i < r.length; i ++) {
 				if (r [i] == "]") {
 					break;
@@ -758,17 +758,17 @@ xmlss.updateTags = function (options) {
 };
 xmlss.report = function (request, response, next) {
 	if (request.url.indexOf ('/report?') > -1) {
-		var url = request.url;
+		let url = request.url;
 		if (request.query.custom != 1) {
 			url = url.split ('&view').join ('&noview');
 			url += '&custom=1';
 		}
-		var options = {};
-		var body = request.body;
+		let options = {};
+		let body = request.body;
 		if (body) {
-			var fields = body.split ("&");
-			for (var i = 0; i < fields.length; i ++) {
-				var tokens = fields [i].split ("=");
+			let fields = body.split ("&");
+			for (let i = 0; i < fields.length; i ++) {
+				let tokens = fields [i].split ("=");
 				tokens [1] = tokens [1].split ("+").join ("%20");
 				tokens [1] = unescape (tokens [1]);
 				tokens [1] = new Buffer (tokens [1], "ascii").toString ("utf8");
@@ -779,7 +779,7 @@ xmlss.report = function (request, response, next) {
 			}
 		};
 		if (request.query.csv == 1) {
-			var r = new Buffer (common.UnicodeToWin1251 (options ["body"]), "binary");
+			let r = new Buffer (common.UnicodeToWin1251 (options ["body"]), "binary");
 			response.header ("Content-Type", "application/x-download; charset=windows-1251");
 			response.header ("Content-Disposition", "attachment; filename=report.csv");
 			response.header ("Expires", "-1");
@@ -788,7 +788,7 @@ xmlss.report = function (request, response, next) {
 			response.end (r);
 		} else
 		if (request.query.custom == 1) {
-			var r = xmlss.customReport (options);
+			let r = xmlss.customReport (options);
 			response.header ("Content-Type", "application/x-download");
 			response.header ("Content-Disposition", "attachment; filename=report.xml");
 			response.header ("Expires", "-1");
@@ -798,52 +798,52 @@ xmlss.report = function (request, response, next) {
 		} else
 		if (request.query.view) {
 			// olapReport
-			var session = request.session;
-			var storage = session.storage;
-			var total = null;
-			var viewId = request.query.view;
-			var view = storage.viewsMap [viewId];
-			var viewQuery = JSON.parse (view.get ('fquery'));
-			var filter = options.filter || [];
+			let session = request.session;
+			let storage = session.storage;
+			let total = null;
+			let viewId = request.query.view;
+			let view = storage.viewsMap [viewId];
+			let viewQuery = JSON.parse (view.get ('fquery'));
+			let filter = options.filter || [];
 			if (filter && filter.length) {
 				viewQuery.where = viewQuery.where || [];
 				if (viewQuery.where.length) {
 					viewQuery.where.push ('and');				
 				};
-				var attrs = {};
-				for (var i = 1; i < viewQuery.select.length; i += 2) {
+				let attrs = {};
+				for (let i = 1; i < viewQuery.select.length; i += 2) {
 					attrs [viewQuery.select [i]] = viewQuery.select [i - 1];
 				};
-				for (var i = 0; i < filter.length; i ++) {
+				for (let i = 0; i < filter.length; i ++) {
 					if (attrs [filter [i]]) {
 						filter [i] = attrs [filter [i]];
 					};
 				};
 				viewQuery.where.push (filter);
 			}
-			var order = null;
+			let order = null;
 			if (request.query.order) {
 				order = JSON.parse (request.query.order);
 			}
-			var dateAttrs = [];
+			let dateAttrs = [];
 			if (options.options) {
 				dateAttrs = options.options.dateAttrs || [];
 			};
 			if (order && order.length) {
 				viewQuery.order = order;
 			};
-			var colsArray = options.cols || [];
-			var cols = {};
-			for (var i = 0; i < colsArray.length; i ++) {
+			let colsArray = options.cols || [];
+			let cols = {};
+			for (let i = 0; i < colsArray.length; i ++) {
 				cols [colsArray [i].attrId] = colsArray [i];
 			};
-			var query = new Query ({session: session, storage: storage, sql: viewQuery});
+			let query = new Query ({session: session, storage: storage, sql: viewQuery});
 			query.generate ();
 			storage.query ({sql: query.selectSQL + query.fromSQL + query.whereSQL + query.orderSQL + (storage.client.database != "mssql" ? ('\nlimit ' + config.query.maxRowNum + ' offset 0\n') : ""), success: function (options) {
-				var rows = options.result.rows;
-				var attrs = view.attrs, attrsNum = 0;
-				var orderAttrs = [];
-				for (var attrCode in attrs) {
+				let rows = options.result.rows;
+				let attrs = view.attrs, attrsNum = 0;
+				let orderAttrs = [];
+				for (let attrCode in attrs) {
 					if (cols [attrs [attrCode].get ('fid')] && cols [attrs [attrCode].get ('fid')].hidden) {
 						continue;
 					};
@@ -872,40 +872,40 @@ xmlss.report = function (request, response, next) {
 					};
 					return 0;					
 				});
-				var reportColumns = {};
-				for (var i = 0; i < orderAttrs.length; i ++) {
+				let reportColumns = {};
+				for (let i = 0; i < orderAttrs.length; i ++) {
 					reportColumns [i + 1] = {width: parseInt (orderAttrs [i].get ('fcolumn_width') / 6.5)};
 					if (cols [orderAttrs [i].get ('fid')] && cols [orderAttrs [i].get ('fid')].width) {
 						reportColumns [i + 1].width = cols [orderAttrs [i].get ('fid')].width / 6.5;
 					};
 				}
-				var reportRows = [];
-				var row = {height: 12.75, cells: []};
-				for (var j = 0; j < orderAttrs.length; j ++) {
+				let reportRows = [];
+				let row = {height: 12.75, cells: []};
+				for (let j = 0; j < orderAttrs.length; j ++) {
 //					if (orderAttrs [j].get ('farea') != 1) {
 //						continue;
 //					}
 					if (cols [orderAttrs [j].get ('fid')] && cols [orderAttrs [j].get ('fid')].hidden) {
 						continue;
 					};
-					var name = orderAttrs [j].get ('fname');
+					let name = orderAttrs [j].get ('fname');
 					row.cells.push ({
 						text: common.unescape (name), style: 'border_bold'
 					});
 				};
 				reportRows.push (row);
-				var timeOffset = request.query.time_offset_min * 60 * 1000;
-				for (var i = 0; i < rows.length; i ++) {
-					var row = {height: 12.75, cells: []};
-					for (var j = 0; j < orderAttrs.length; j ++) {
+				let timeOffset = request.query.time_offset_min * 60 * 1000;
+				for (let i = 0; i < rows.length; i ++) {
+					let row = {height: 12.75, cells: []};
+					for (let j = 0; j < orderAttrs.length; j ++) {
 //						if (orderAttrs [j].get ('farea') != 1) {
 //							continue;
 //						}
 						if (cols [orderAttrs [j].get ('fid')] && cols [orderAttrs [j].get ('fid')].hidden) {
 							continue;
 						};
-						var field = orderAttrs [j].get ('fcode').toLowerCase () + '_';
-						var value = rows [i][field];
+						let field = orderAttrs [j].get ('fcode').toLowerCase () + '_';
+						let value = rows [i][field];
 						if (typeof (value) == 'string') {
 							value = value;
 						} else
@@ -931,7 +931,7 @@ xmlss.report = function (request, response, next) {
 					reportRows.push (row);
 				}
 				if (request.query.format == "xmlss") {
-					var r = xmlss.customReport ({
+					let r = xmlss.customReport ({
 						styles: {
 							'default': 'hAlign:Left,vAlign:Center,wrap:true,fontSize:9',
 							'center': 'hAlign:Center,vAlign:Center,wrap:true,fontSize:9',
@@ -998,26 +998,25 @@ xmlss.report = function (request, response, next) {
 					});
 				} else
 				if (request.query.format == "ods") {
-//					var AdmZip = require (config.rootDir + "/node_modules/adm-zip");
-					var AdmZip = require ("adm-zip");
-					var zip = new AdmZip ();
-					var fs = require ("fs");
+//					let AdmZip = require (config.rootDir + "/node_modules/adm-zip");
+					let AdmZip = require ("adm-zip");
+					let zip = new AdmZip ();
+					let fs = require ("fs");
 					zip.addLocalFolder (__dirname + "/report/template.ods");
-					var fs = require ("fs");
 					fs.readFile (__dirname + "/report/template.ods/content.xml", "utf8", function (err, data) {
-//						var xml2js = require (config.rootDir + "/node_modules/xml2js");
-						var xml2js = require ("xml2js");
-						var parser = new xml2js.Parser ({explicitArray: false});
+//						let xml2js = require (config.rootDir + "/node_modules/xml2js");
+						let xml2js = require ("xml2js");
+						let parser = new xml2js.Parser ({explicitArray: false});
 						parser.parseString (data, function (err, doc) {
 							doc ["office:document-content"]["office:body"]["office:spreadsheet"]["table:table"]["table:table-row"] = [];
 							_.each (reportRows, function (row) {
-								var cells = [];
+								let cells = [];
 								_.each (row.cells ,function (cell) {
 									cell.text = cell.text || "";
 									cell.style = cell.style || "";
 									cell.colspan = cell.colspan || 1;
 									cell.rowspan = cell.rowspan || 1;
-									var v = cell.text;
+									let v = cell.text;
 									cells.push ({
 										"$": {
 											"office:value-type": "string",
@@ -1033,10 +1032,10 @@ xmlss.report = function (request, response, next) {
 									"table:table-cell": cells
 								});
 							});
-							var builder = new xml2js.Builder ();
-							var xml = builder.buildObject (doc);
+							let builder = new xml2js.Builder ();
+							let xml = builder.buildObject (doc);
 							zip.updateFile ("content.xml", new Buffer (xml));
-							var buf = zip.toBuffer ();
+							let buf = zip.toBuffer ();
 							response.header ("Content-Type", "application/x-download;");
 							response.header ("Content-Disposition", "attachment; filename=report.ods");
 							response.header ("Expires", "-1");
@@ -1047,7 +1046,7 @@ xmlss.report = function (request, response, next) {
 					});
 				} else
 				if (request.query.format == "csv") {
-					var csv = "";
+					let csv = "";
 					_.each (reportRows, function (row) {
 						_.each (row.cells, function (cell) {
 							csv += (cell.text === null ? "" : cell.text) + ";";
@@ -1056,7 +1055,7 @@ xmlss.report = function (request, response, next) {
 					});
 					if (request.query.coding == "win1251") {
 						csv = common.UnicodeToWin1251 (csv);
-						var r = new Buffer (csv, "binary");
+						let r = new Buffer (csv, "binary");
 						response.header ("Content-Type", "application/x-download; charset=windows-1251");
 						response.header ("Content-Disposition", "attachment; filename=report.csv");
 						response.header ("Expires", "-1");
@@ -1073,7 +1072,7 @@ xmlss.report = function (request, response, next) {
 					}
 				} else
 				if (request.query.format == "xlsx") {
-					var rep = new ReportXSLX ();
+					let rep = new ReportXSLX ();
 					options.styles = {
 						'default': 'hAlign:Left,vAlign:Center,wrap:true,fontSize:9',
 						'center': 'hAlign:Center,vAlign:Center,wrap:true,fontSize:9',
@@ -1103,25 +1102,24 @@ xmlss.report = function (request, response, next) {
 						rows: reportRows
 					}];
 					rep.build (options);
-					var buf = XLSX.write (rep.workbook, {
+					let buf = XLSX.write (rep.workbook, {
 					    type: "base64"
 					});
-					var r = new Buffer (buf, "base64");
+					let r = new Buffer (buf, "base64");
 					response.header ("Content-Type", "application/x-download;");
 					response.header ("Content-Disposition", "attachment; filename=report.xlsx");
 					response.header ("Expires", "-1");
 					response.header ("Content-Length", r.length);
 					response.statusCode = 200;
 					response.end (r);
-					delete rep;
 				}
 			}});
 		} else {
 			// template
-			var session = request.session;
-			var storage = session.storage;
-			var filename = config.storages [storage.code].rootDir + (request.query.files ? "/files/" : "/reports/") + request.query.template;
-			var data;
+			let session = request.session;
+			let storage = session.storage;
+			let filename = config.storages [storage.code].rootDir + (request.query.files ? "/files/" : "/reports/") + request.query.template;
+			let data;
 			_.extend (options, request.query);
 			if (options.format == "xmlss") {
 				async.series ([
@@ -1144,8 +1142,8 @@ xmlss.report = function (request, response, next) {
 					}
 				], function (err, results) {
 					response.header ("Content-Type", "application/x-download");
-					var tokens = options.template.split (".");
-					var filename = "report." + tokens [tokens.length - 1];
+					let tokens = options.template.split (".");
+					let filename = "report." + tokens [tokens.length - 1];
 					response.header ("Content-Disposition", "attachment; filename=" + filename);
 					response.header ("Expires", "-1");
 					response.header ("Content-Length", Buffer.byteLength (data, "utf8"));
@@ -1162,9 +1160,9 @@ xmlss.report = function (request, response, next) {
 						});
 					}
 				], function (err, results) {
-//					var Docxtemplater = require (config.rootDir + "/node_modules/docxtemplater");
-					var Docxtemplater = require ("docxtemplater");
-					var doc = new Docxtemplater (data);
+//					let Docxtemplater = require (config.rootDir + "/node_modules/docxtemplater");
+					let Docxtemplater = require ("docxtemplater");
+					let doc = new Docxtemplater (data);
 					doc.setOptions ({parser: function (tag) {
 						return {
 							get: function (scope) {
@@ -1180,7 +1178,7 @@ xmlss.report = function (request, response, next) {
 					if (!options.showTags) {
 						doc.render ();
 					}
-					var buf = doc.getZip ().generate ({type: "nodebuffer"});
+					let buf = doc.getZip ().generate ({type: "nodebuffer"});
 					response.header ("Content-Type", "application/x-download");
 					response.header ("Content-Disposition", "attachment; filename=report.docx");
 					response.header ("Expires", "-1");

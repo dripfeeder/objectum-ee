@@ -4,7 +4,7 @@
 	cmpCode: "chart",
 	border: 1,
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || {
 			chart: {
 				id: "cmp-" + (me.layoutDesigner.counter ++)
@@ -68,7 +68,7 @@
 					confRef: "view",
 					choose: {
 						type: "custom", fn: function () {
-							var me = this;
+							let me = this;
 							system.view.selectQuery ({success: function (options) {
 								me.setValue (options.value);
 								me.fireEvent ("change", options.value);
@@ -81,7 +81,7 @@
 						},
 						change: function () {
 							me.validator.call (this);
-							var viewCode = this.getValue () ? $o.getView (this.getValue ()).getFullCode () : undefined;
+							let viewCode = this.getValue () ? $o.getView (this.getValue ()).getFullCode () : undefined;
 							me.changeAttr ("view", viewCode)
 							me.down ("*[name=filter]").setViewId (viewCode ? $o.getView (viewCode).get ("id") : null);
 							me.updateStores (this.getValue ());
@@ -185,22 +185,22 @@
 		this.callParent (arguments);
 	},
 	updateStores: function (viewId) {
-		var me = this;
+		let me = this;
 		me.down ("*[name=attrMark]").setValue (null);
 		me.down ("*[name=attrValue]").setValue (null);
-		var data = [];
+		let data = [];
 		if (viewId) {
-			var view = $o.getView (viewId);
-			for (var attr in view.attrs) {
+			let view = $o.getView (viewId);
+			for (let attr in view.attrs) {
 				data.push ([attr, view.attrs [attr].toString ()]);
 			};
 		};
 		me.storeMark.loadData (data);
 		data = [];
 		if (viewId) {
-			var view = $o.getView (viewId);
-			for (var attr in view.attrs) {
-				var va = view.attrs [attr];
+			let view = $o.getView (viewId);
+			for (let attr in view.attrs) {
+				let va = view.attrs [attr];
 				if (!va.get ("classAttr") || $o.getClassAttr (va.get ("classAttr")).get ("type") == 2) {
 					data.push ([attr, va.toString ()]);
 				};
@@ -209,7 +209,7 @@
 		me.storeValue.loadData (data);
 	},
 	validator: function () {
-		var me = this.up ("window");
+		let me = this.up ("window");
 		if (me.down ("*[name=view]").getValue () && me.down ("*[name=attrMark]").getValue () && me.down ("*[name=attrValue]").getValue ()) {
 			me.down ("button[name='ok']").enable ();
 		} else {

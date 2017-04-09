@@ -4,7 +4,7 @@
 	cmpCode: "image",
 	border: 1,
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || {
 			image: {
 				id: "cmp-" + (me.layoutDesigner.counter ++)
@@ -129,19 +129,19 @@
 		this.callParent (arguments);
 	},
 	getOtherAttrs: function () {
-		var me = this;
-		var r = [];
-		var get = function (layout) {
+		let me = this;
+		let r = [];
+		let get = function (layout) {
 			if (typeof (layout) != "object") {
 				return;
 			};
-			for (var a in layout) {
+			for (let a in layout) {
 				if (layout [a]) {
 					if (layout [a].id && layout [a].id != me.$cmpId) {
 						if (layout [a].view) {
-							var v = $o.getView (layout [a].view);
-							for (var attr in v.attrs) {
-								var va = v.attrs [attr];
+							let v = $o.getView (layout [a].view);
+							for (let attr in v.attrs) {
+								let va = v.attrs [attr];
 								//if ((a == "card" && va.get ("classAttr") && $o.getClassAttr (va.get ("classAttr")).get ("type") == 5) || 
 								//	(a != "card" && va.get ("classAttr") && $o.getClassAttr (va.get ("classAttr")).get ("type") == 1)
 								if (va.get ("classAttr") && $o.getClassAttr (va.get ("classAttr")).get ("type") == 5) {
@@ -150,12 +150,12 @@
 							};
 						};
 						if (a == "card" && layout [a].object && layout [a].object.cls) {
-							var cls = $o.getClass (layout [a].object.cls);
+							let cls = $o.getClass (layout [a].object.cls);
 							function getAttrs (items) {
 								if (items) {
-									for (var i = 0; i < items.length; i ++) {
-										var item = items [i];
-										var ca = cls.attrs [item.attr];
+									for (let i = 0; i < items.length; i ++) {
+										let item = items [i];
+										let ca = cls.attrs [item.attr];
 										if (item.objectId && item.attr && ca && ca.get ("type") == 5) {
 											r.push ([layout [a].id + "." + item.attr, layout [a].id + ":" + ca.toString ()]);
 										};
@@ -176,7 +176,7 @@
 		return r;
 	},
 	validator: function () {
-		var me = this.up ("window");
+		let me = this.up ("window");
 		if (me.down ("*[name=id]").getValue () && (me.down ("*[name=url]").getValue () || me.down ("*[name=attr]").getValue ())) {
 			me.down ("button[name='ok']").enable ();
 		} else {

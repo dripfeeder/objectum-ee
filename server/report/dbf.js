@@ -1,15 +1,15 @@
 //
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 //
-var Dbf = function (options) {
-	var me = this;
+global.Dbf = function (options) {
+	let me = this;
 	me.options = {};
 	me.fields = options ["fields"];
 	me.rows =  options ["rows"];
 	me.options = options ["options"];
 };
 Dbf.prototype.convertDate = function (d) {
-	var s, r;
+	let s, r;
 	if (!d)
 		r = "      ";
 	else {
@@ -28,9 +28,9 @@ Dbf.prototype.convertDate = function (d) {
 	return r;
 };
 Dbf.prototype.winToDos = function (buf) {
-	var me = this;
+	let me = this;
 	if (!Dbf.prototype.dos) {
-		var dos2 = {};
+		let dos2 = {};
 		dos2 ["А"] = 0x80;
 		dos2 ["Б"] = 0x81;
 		dos2 ["В"] = 0x82;
@@ -98,23 +98,23 @@ Dbf.prototype.winToDos = function (buf) {
 		dos2 ["ю"] = 0xee;
 		dos2 ["я"] = 0xef;
 		Dbf.prototype.dos = {};
-		for (var key in dos2) {
+		for (let key in dos2) {
 			Dbf.prototype.dos [key] = dos2 [key];
 			Dbf.prototype.dos [common.UnicodeToWin1251 (key)] = dos2 [key];
 		};
 	};
-	for (var i = 0; i < buf.length; i ++) {
-		var c = String.fromCharCode (buf [i]);
+	for (let i = 0; i < buf.length; i ++) {
+		let c = String.fromCharCode (buf [i]);
 		if (me.dos [c]) {
 			buf [i] = me.dos [c];
 		};
 	};
 };
 Dbf.prototype.getBuffer = function (coding) {
-	var me = this;
-	var i, recordSize;
-	var headerSize = 32 + 32 * me.fields.length + 1;
-	var header = new Buffer (headerSize);
+	let me = this;
+	let i, recordSize;
+	let headerSize = 32 + 32 * me.fields.length + 1;
+	let header = new Buffer (headerSize);
 	header [0] = 0x03; // нет примечаний
 	dateLastUpdate = new Date ();
 	header [1] = dateLastUpdate.getFullYear () - 1900;
@@ -144,13 +144,13 @@ Dbf.prototype.getBuffer = function (coding) {
 	// Конец векторов описания полей
 	header [32 + 32 * i] = 0x0D;
 	// Записи с данными
-	var s, format, j, records = [header];
+	let s, format, j, records = [header];
 	for (i = 0; i < me.rows.length; i ++) {
-		var record = new Buffer (recordSize);
+		let record = new Buffer (recordSize);
 		record.fill (0x20);
 		j = 1;
-		for (var k = 0; k < me.fields.length; k ++) {
-			var field = me.fields [k];
+		for (let k = 0; k < me.fields.length; k ++) {
+			let field = me.fields [k];
 			if (field.type == 'C') {
 				s = me.rows [i][field.name] || "";
                 if (s.length > field.size) {
@@ -164,7 +164,7 @@ Dbf.prototype.getBuffer = function (coding) {
 			if (field.type == 'D') {
 				s = me.convertDate (me.rows [i][field.name]);
 			};
-			var r;
+			let r;
 			if (coding == "DOS") {
 				r = new Buffer (common.UnicodeToWin1251 (s), "binary");
 				me.winToDos (r);
@@ -176,28 +176,28 @@ Dbf.prototype.getBuffer = function (coding) {
 		};
 		records.push (record);
 	};
-	var bufAll = Buffer.concat (records);
+	let bufAll = Buffer.concat (records);
 	if (records.length > 1) {
-		for (var i = 0; i < records.length; i ++) {
+		for (let i = 0; i < records.length; i ++) {
 			delete records [i];
 		};
 	};
 	return bufAll;
 };
-dbf = {};
+global.dbf = {};
 dbf.report = function (request, response, next) {
 	if (request.url.indexOf ('/report?') > -1 && request.query.format == "dbf") {
-		var options = {};
-		var fields = request.body.split ("&");
-		for (var i = 0; i < fields.length; i ++) {
-			var tokens = fields [i].split ("=");
+		let options = {};
+		let fields = request.body.split ("&");
+		for (let i = 0; i < fields.length; i ++) {
+			let tokens = fields [i].split ("=");
 			tokens [1] = tokens [1].split ("+").join ("%20");
 			tokens [1] = unescape (tokens [1]);
 			tokens [1] = new Buffer (tokens [1], "ascii").toString ("utf8");
 			options [tokens [0]] = JSON.parse (tokens [1]);
 		};
-		var d = new Dbf (options);
-		var b = d.getBuffer (options.options.coding);
+		let d = new Dbf (options);
+		let b = d.getBuffer (options.options.coding);
 		response.header ("Content-Type", "application/x-download;");
 		response.header ("Content-Disposition", "attachment; filename=" + (options.options.filename || "data.dbf"));
 		response.header ("Expires", "-1");

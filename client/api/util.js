@@ -12,8 +12,8 @@ $o.util.clone = function (o) {
 	if (typeof (o) == "object" && o && o.getMonth) {
 		return new Date (o.getTime ());
 	};
-	var c = 'function' === typeof o.pop ? [] : {};
-	var p, v;
+	let c = 'function' === typeof o.pop ? [] : {};
+	let p, v;
 	for (p in o) {
 		if (o.hasOwnProperty (p)) {
 			v = o [p];
@@ -27,8 +27,8 @@ $o.util.clone = function (o) {
 	return c;
 };
 $o.util.setCookie = function (name, value, path, expires, domain, secure) {
-	var cookie_string = name + "=" + escape (value);
-	var expiresDefault = new Date ();
+	let cookie_string = name + "=" + escape (value);
+	let expiresDefault = new Date ();
 	expiresDefault.setDate (expiresDefault.getDate () + 30);
 	expires = expires || expiresDefault;
 	if (expires) {
@@ -46,12 +46,12 @@ $o.util.setCookie = function (name, value, path, expires, domain, secure) {
 	document.cookie = cookie_string;
 };
 $o.util.removeCookie = function (cookie_name) {
-	var cookie_date = new Date ();
+	let cookie_date = new Date ();
 	cookie_date.setTime (cookie_date.getTime() - 1);
 	document.cookie = cookie_name += "=; expires=-1";// + cookie_date.toGMTString ();
 };
 $o.util.getCookie = function (cookie_name) {
-	var results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
+	let results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
 	if (results) {
 		return (unescape (results [2]));
 	} else {
@@ -59,9 +59,9 @@ $o.util.getCookie = function (cookie_name) {
 	}
 };
 $o.util.getStyle = function (className) {
-    var classes = document.styleSheets [0].rules || document.styleSheets [0].cssRules;
-    var r;
-    for (var x = 0; x < classes.length; x ++) {
+    let classes = document.styleSheets [0].rules || document.styleSheets [0].cssRules;
+    let r;
+    for (let x = 0; x < classes.length; x ++) {
         if (classes [x].selectorText == className) {
             if (classes [x].cssText) {
             	r = classes [x].cssText;
@@ -77,7 +77,7 @@ $o.util.isEmptyObject = function (obj) {
 	if (!obj) {
 		return true;
 	};
-	for (var prop in obj) {
+	for (let prop in obj) {
 		if (Object.prototype.hasOwnProperty.call (obj, prop)) {
 			return false;
 		};
@@ -85,7 +85,7 @@ $o.util.isEmptyObject = function (obj) {
 	return true;
 };
 $o.util.loadCSS = function (file, cb) {
-	var link = document.createElement ("link");
+	let link = document.createElement ("link");
 	link.setAttribute ("rel", "stylesheet");
 	link.setAttribute ("type", "text/css");
 	link.setAttribute ("href", file);
@@ -103,11 +103,11 @@ $o.util.loadCSS = function (file, cb) {
 	document.getElementsByTagName ("head")[0].appendChild (link)
 };
 $o.util.loadJS = function (file, cb) {
-	var script = document.createElement ('script');
+	let script = document.createElement ('script');
 	script.src = file;
 	script.type = "text/javascript";
 	script.language = "javascript";
-	var head = document.getElementsByTagName ('head')[0];
+	let head = document.getElementsByTagName ('head')[0];
 	if (cb) {
 		if (script.onreadystatechange === undefined) {
 			script.onload = cb;    

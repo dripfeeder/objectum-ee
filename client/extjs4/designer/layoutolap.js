@@ -3,13 +3,13 @@ Ext.define ("$o.LayoutOlap.Widget", {
 	alias: ["widget.$o.layoutolap", "widget.$layoutolap"],
 	cmpCode: "olap",
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || {
 			olap: {
 				id: "cmp-" + (me.layoutDesigner.counter ++)
 			}
 		};
-		var filterAction = null;
+		let filterAction = null;
 		if (me.value.olap.filter && typeof (me.value.olap.filter) == "string") {
 			filterAction = $o.getAction (me.value.olap.filter).get ("id");
 		};
@@ -67,7 +67,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 					confRef: "view",
 					choose: {
 						type: "custom", fn: function () {
-							var objectfield = this;
+							let objectfield = this;
 							dialog.getView ({hasQuery: 1, success: function (options) {
 								objectfield.setValue (options.id);
 							}});
@@ -79,7 +79,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 						},
 						change: function () {
 							me.validator ();
-							var viewCode = this.getValue () ? $o.getView (this.getValue ()).getFullCode () : undefined;
+							let viewCode = this.getValue () ? $o.getView (this.getValue ()).getFullCode () : undefined;
 							me.changeAttr ("view", viewCode)
 							//me.down ("*[name=filter]").setValue ([]);
 							me.down ("*[name=filter]").setViewId (viewCode ? $o.getView (viewCode).get ("id") : null);
@@ -120,7 +120,7 @@ Ext.define ("$o.LayoutOlap.Widget", {
 					confRef: "action",
 					choose: {
 						type: "custom", fn: function () {
-							var f = this;
+							let f = this;
 							dialog.getAction ({success: function (options) {
 								f.setValue (options.id);
 							}});
@@ -238,8 +238,8 @@ Ext.define ("$o.LayoutOlap.Widget", {
 		this.callParent (arguments);
 	},
 	validator: function () {
-		var me = this;
-		var of = me.down ("*[name='view']");
+		let me = this;
+		let of = me.down ("*[name='view']");
 		if (of.getValue ()) {
 			if (!$o.getView (of.getValue ()).get ("query")) {
 				common.message ($o.getString ("Selected view does not contain a query"));

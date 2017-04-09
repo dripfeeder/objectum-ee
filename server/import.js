@@ -1,17 +1,17 @@
 ﻿/*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
-var Import = function () {
-	var storage, session;
+global.Import = function () {
+	let storage, session;
 	// Здесь импортируемые данные
 	this.data = {};
 	// Добавляет get, чтобы можно было получать значения через названия атрибутов
 	this.addGet = function (options) {
-		var result = {};
+		let result = {};
 		result.values = options.values;
 		result.fields = this.data.fields [options.table];
 		result.get = function (field) {			
-			for (var i = 0; i < this.fields.length; i ++) {
+			for (let i = 0; i < this.fields.length; i ++) {
 				if (this.fields [i] == field) {
 					break;
 				};
@@ -26,7 +26,7 @@ var Import = function () {
 	// Удаляет неактуальные объекты, атрибуты объектов и т.д.
 	this.removeTrash = function (options) {
 		log.info ({cls: "Import", fn: "removeTrash"});
-		var success = options.success;
+		let success = options.success;
 		async.series ([
 			function (cb) {
 				// Удалить неактуальные представления
@@ -47,7 +47,7 @@ var Import = function () {
 							"and a.fparent_id not in (select b.fid from tview b where " +
 							storage.getCurrentFilter ({alias: "b"}) + ")\n"
 						, success: function (options) {
-							var r = options.result.rows;
+							let r = options.result.rows;
 							if (r [0].num == 0) {
 								cb ("end");
 							} else {
@@ -90,7 +90,7 @@ var Import = function () {
 							"and a.fparent_id not in (select b.fid from tclass b where " +
 							storage.getCurrentFilter ({alias: "b"}) + ")\n"
 						, success: function (options) {
-							var r = options.result.rows;
+							let r = options.result.rows;
 							if (r [0].num == 0) {
 								cb ("end");
 							} else {
@@ -157,15 +157,17 @@ var Import = function () {
 	// Подготавливает базу для импорта. Удаляет корневые узлы классов, представлений, которые есть в файле импорта
 	// Не используется. Нужен в случае если импортируется не схема
 	this.prepareStorageForImport = function (options) {
-		var me = this;
-		var success = options.success;
+		throw new Error ("prepareStorageForImport not exists");
+/*
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "prepareStorageForImport"});
 		async.series ([
 			function (cb) {
 				async.eachSeries (me.data.views, function (view, cb) {
-					var view = me.addGet ({values: view.values, table: "tview"});
-					var code = view.get ("fcode");
-					var parentId = view.get ("fparent_id");
+					let view = me.addGet ({values: view.values, table: "tview"});
+					let code = view.get ("fcode");
+					let parentId = view.get ("fparent_id");
 					if (parentId == "") {
 						storage.query ({session: session, sql: 
 							"delete from tview where fparent_id is null and fcode='" + code + "'"
@@ -179,9 +181,9 @@ var Import = function () {
 			},			
 			function (cb) {
 				async.eachSeries (me.data.classes, function (cls, cb) {
-					var cls = me.addGet ({values: cls.values, table: "tclass"});
-					var code = cls.get ("fcode");
-					var parentId = cls.get ("fparent_id");
+					let cls = me.addGet ({values: cls.values, table: "tclass"});
+					let code = cls.get ("fcode");
+					let parentId = cls.get ("fparent_id");
 					if (parentId == "") {
 						storage.query ({session: session, sql: 
 							"delete from tclass where fparent_id is null and fcode='" + code + "'"
@@ -201,6 +203,7 @@ var Import = function () {
 		], function (err, results) {
 			success ();
 		});
+*/
 	};
 	// Счетчики идентификаторов по таблицам
 	this.tableId = {};
@@ -219,10 +222,10 @@ var Import = function () {
 	this.startRevisionMin = null;
 	// Получает счетчики по таблицам
 	this.getSequences = function (options) {
-		var me = this;
-		var success = options.success;
-		var session = options.session;
-		var tables = ["tclass",	"tclass_attr", "tview", "tview_attr", "taction", "taction_attr", "tobject", "tobject_attr", "trevision"];
+		let me = this;
+		let success = options.success;
+		let session = options.session;
+		let tables = ["tclass",	"tclass_attr", "tview", "tview_attr", "taction", "taction_attr", "tobject", "tobject_attr", "trevision"];
 		async.eachSeries (tables, function (table, cb) {
 			storage.client.getNextId ({session: session, table: table, success: function (options) {
 				me.tableId [table] = options.id;
@@ -233,10 +236,10 @@ var Import = function () {
 		});
 	}
 	this.updateEngineTables = function (opts, cb) {
-		var me = this;
+		let me = this;
 		log.info ({cls: "Import", fn: "updateEngineTables"});
-		var session = opts.session;
-		var fields = {
+		let session = opts.session;
+		let fields = {
 			"_class": [
 				"fid",
 				"fparent_id",
@@ -286,7 +289,7 @@ var Import = function () {
 					}});
 				},
 				function (cb) {
-					var sql =
+					let sql =
 						"insert into _" + code + " (" + fields ["_" + code].join (",") + ") (\n" +
 						"\tselect " + fields ["_" + code].join (",") + " from t" + code + " where fend_id = " + storage.maxRevision + "\n" +
 						")\n"
@@ -301,7 +304,7 @@ var Import = function () {
 						;
 					};
 					if (code == "view") {
-						var sql =
+						let sql =
 							"insert into _view (" + fields ["_view"].join (",") + ") (\n" +
 							"\tselect " + fields ["_view"].join (",") + " from tview where fsystem is null and fend_id = " + storage.maxRevision + "\n" +
 							")\n"
@@ -315,13 +318,13 @@ var Import = function () {
 					if (code == "object") {
 						return cb ();
 					};
-					var objectsMap = {};
-					var _fields = me.data.fields ["t" + code];
+					let objectsMap = {};
+					let _fields = me.data.fields ["t" + code];
 					_.each (me.data ["t" + code], function (rec) {
-						var o = {};
-						for (var i = 0; i < _fields.length; i ++) {
-							var field = _fields [i];
-							var value = rec.values [i];
+						let o = {};
+						for (let i = 0; i < _fields.length; i ++) {
+							let field = _fields [i];
+							let value = rec.values [i];
 							o [field] = value;
 						};
 						if (o.fend_id != storage.maxRevision) {
@@ -335,12 +338,12 @@ var Import = function () {
 							objectsMap [o.fid] = o;
 						};
 					});
-					var objects = [];
+					let objects = [];
 					_.each (objectsMap, function (o) {
 						objects.push (o);
 					});
 					async.eachSeries (objects, function (o, cb) {
-						var oo = {};
+						let oo = {};
 						async.series ([
 							function (cb) {
 								storage.query ({session: session, sql:
@@ -376,7 +379,7 @@ var Import = function () {
 								if (code != "class") {
 									return cb ();
 								};
-								var table = oo.fcode + "_" + oo.fid;
+								let table = oo.fcode + "_" + oo.fid;
 								storage.client.isTableExists ({session: session, table: table, success: function (result) {
 									if (result) {
 										return cb ();
@@ -394,13 +397,13 @@ var Import = function () {
 									if (!opts.result.rows.length) {
 										return cb ();
 									};
-									var table = opts.result.rows [0].fcode + "_" + oo.fclass_id;
-									var field = oo.fcode + "_" + oo.fid;
+									let table = opts.result.rows [0].fcode + "_" + oo.fclass_id;
+									let field = oo.fcode + "_" + oo.fid;
 									storage.client.isFieldExists ({session: session, table: table, field: field, success: function (result) {
 										if (result) {
 											return cb ();
 										};
-										var columnType = "bigint";
+										let columnType = "bigint";
 										if (oo.ftype_id == 3) {
 											columnType = "timestamp (6)";
 										};
@@ -436,7 +439,7 @@ var Import = function () {
 								}});
 							},
 							function (cb) {
-								var sql = me.generateInsert ({table: "_" + code, fields: oo});
+								let sql = me.generateInsert ({table: "_" + code, fields: oo});
 								storage.query ({session: session, sql: sql, success: function (options) {
 									cb ();
 								}});
@@ -459,15 +462,15 @@ var Import = function () {
 	};
 	// Генерация insert запроса
 	this.generateInsert = function (options) {
-	    var fields = [];
-	    var values = "";
-	    for (var key in options.fields) {
+	    let fields = [];
+	    let values = "";
+	    for (let key in options.fields) {
 			fields.push (key);
 			if (values) {
 				values += ",";
 			};
 			if (options.fields [key] != null) {
-				var value = options.fields [key];
+				let value = options.fields [key];
 				if (typeof (value) == "string") {
 					if (value.length == 24 && value [10] == "T" && value [23] == "Z") { // 2012-08-20T13:17:48.456Z
 						value = "'" + common.getUTCTimestamp (new Date (value)) + "'";
@@ -486,7 +489,7 @@ var Import = function () {
 				values += "null";
 			};
 	    };
-	    var s;
+	    let s;
 	    s = "insert into " + options.table + "(\n";
 	    s += fields.join ();
 	    s += "\n) values (\n";		    
@@ -500,16 +503,16 @@ var Import = function () {
 	};
 	// Импорт представлений
 	this.importViews = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "importViews"});
-		var viewFields = me.data.fields.tview;
+		let viewFields = me.data.fields.tview;
 		async.eachSeries (me.data.tview, function (view, cb) {process.nextTick (function () {
-			var fields = {};
-			var schemaId;
-			for (var i = 0; i < viewFields.length; i ++) {
-				var field = viewFields [i];
-				var value = view.values [i];
+			let fields = {};
+			let schemaId;
+			for (let i = 0; i < viewFields.length; i ++) {
+				let field = viewFields [i];
+				let value = view.values [i];
 				if (value != null) {
 					if (field == "fid") {
 						value = me.newId ["tview"][value];
@@ -547,7 +550,7 @@ var Import = function () {
 			} else {
 				fields ["fstart_id"] = me.newId ["trevision"][fields ["fstart_id"]];
 				fields ["fend_id"] = me.newId ["trevision"][fields ["fend_id"]];
-				var s = me.generateInsert ({table: "tview", fields: fields});
+				let s = me.generateInsert ({table: "tview", fields: fields});
 				storage.query ({session: session, sql: s, success: function (options) {
 					me.incCount ("tview", fields ["fid"]);
 					cb ();
@@ -559,17 +562,17 @@ var Import = function () {
 	};
 	// Импорт атрибутов представлений
 	this.importViewAttrs = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "importViewAttrs"});
-		var s;
-		var viewAttrFields = me.data.fields.tview_attr;
+		let s;
+		let viewAttrFields = me.data.fields.tview_attr;
 		async.eachSeries (me.data.tview_attr, function (viewAttr, cb) {process.nextTick (function () {
-			var fields = {};
-			var schemaId;
-			for (var i = 0; i < viewAttrFields.length; i ++) {
-				var field = viewAttrFields [i];
-				var value = viewAttr.values [i];
+			let fields = {};
+			let schemaId;
+			for (let i = 0; i < viewAttrFields.length; i ++) {
+				let field = viewAttrFields [i];
+				let value = viewAttr.values [i];
 				if (value != null) {
 					if (field == "fid") {
 						value = me.newId ["tview_attr"][value];
@@ -622,16 +625,16 @@ var Import = function () {
 	};
 	// Импорт классов
 	this.importClasses = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "importClasses"});
-		var classFields = me.data.fields.tclass;
+		let classFields = me.data.fields.tclass;
 		async.eachSeries (me.data.tclass, function (cls, cb) {process.nextTick (function () {
-			var fields = {};
-			var schemaId;
-			for (var i = 0; i < classFields.length; i ++) {
-				var field = classFields [i];
-				var value = cls.values [i]; 
+			let fields = {};
+			let schemaId;
+			for (let i = 0; i < classFields.length; i ++) {
+				let field = classFields [i];
+				let value = cls.values [i]; 
 				if (value != null) {
 					if (field == "fid") {
 						value = me.newId ["tclass"][value];
@@ -682,16 +685,16 @@ var Import = function () {
 	};
 	// Импорт атрибутов классов
 	this.importClassAttrs = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "importClassAttrs"});
-		var classAttrFields = me.data.fields.tclass_attr;
+		let classAttrFields = me.data.fields.tclass_attr;
 		async.eachSeries (me.data.tclass_attr, function (classAttr, cb) {process.nextTick (function () {
-			var fields = {};
-			var schemaId;
-			for (var i = 0; i < classAttrFields.length; i ++) {
-				var field = classAttrFields [i];
-				var value = classAttr.values [i];
+			let fields = {};
+			let schemaId;
+			for (let i = 0; i < classAttrFields.length; i ++) {
+				let field = classAttrFields [i];
+				let value = classAttr.values [i];
 				if (value != null) {
 					if (field == "fid") {
 						value = me.newId ["tclass_attr"][value];
@@ -700,9 +703,9 @@ var Import = function () {
 						value = me.newId ["tclass"][value];
 					} else
 					if (field == "ftype_id") {
-						var typeId = value;
+						let typeId = value;
 						if (typeId >= 1000) {
-							var id = me.newId ["tclass"][typeId];
+							let id = me.newId ["tclass"][typeId];
 							value = id;
 							me.classAttrType [fields ["fid"]] = id;
 						} else {
@@ -748,16 +751,16 @@ var Import = function () {
 	};
 	// Импорт действий
 	this.importActions = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "importActions"});
-		var actionFields = me.data.fields.taction;
+		let actionFields = me.data.fields.taction;
 		async.eachSeries (me.data.taction, function (action, cb) {process.nextTick (function () {
-			var fields = [];
-			var schemaId;
-			for (var i = 0; i < actionFields.length; i ++) {
-				var field = actionFields [i];
-				var value = action.values [i];
+			let fields = [];
+			let schemaId;
+			for (let i = 0; i < actionFields.length; i ++) {
+				let field = actionFields [i];
+				let value = action.values [i];
 				if (value != null) {
 					if (field == "fid") {
 						value = me.newId ["taction"][value];
@@ -804,17 +807,17 @@ var Import = function () {
 	};
 	// Импорт объектов
 	this.importObjects = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "importObjects"});
-		var objectFields = me.data.fields.tobject;
-		var count = 0;
+		let objectFields = me.data.fields.tobject;
+		let count = 0;
 		async.eachSeries (me.data.tobject, function (object, cb) {process.nextTick (function () {
-			var fields = {};
-			var schemaId;
-			for (var i = 0; i < objectFields.length; i ++) {
-				var field = objectFields [i];
-				var value = object.values [i];
+			let fields = {};
+			let schemaId;
+			for (let i = 0; i < objectFields.length; i ++) {
+				let field = objectFields [i];
+				let value = object.values [i];
 				if (value != null) {
 					if (field == "fid") {
 						value = me.newId ["tobject"][value];
@@ -868,24 +871,24 @@ var Import = function () {
 	};
 	// Импорт атрибутов объектов
 	this.importObjectAttrs = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "importObjectAttrs"});
-		var objectAttrFields = me.data.fields.tobject_attr;
-		var count = 0;
+		let objectAttrFields = me.data.fields.tobject_attr;
+		let count = 0;
 		async.eachSeries (me.data.tobject_attr, function (objectAttr, cb) {process.nextTick (function () {
-			var fields = {};
-			var schemaId;
-			var typeId = 0;
-			for (var i = 0; i < objectAttrFields.length; i ++) {
-				var field = objectAttrFields [i];
-				var value = objectAttr.values [i];
+			let fields = {};
+			let schemaId;
+			let typeId = 0;
+			for (let i = 0; i < objectAttrFields.length; i ++) {
+				let field = objectAttrFields [i];
+				let value = objectAttr.values [i];
 				if (value != null) {
 					if (field == "fid") {
 						value = me.newId ["tobject_attr"][value];
 					} else
 					if (field == "fclass_attr_id") {
-						var classAttrId = me.newId ["tclass_attr"][value];
+						let classAttrId = me.newId ["tclass_attr"][value];
 						value = classAttrId;
 						typeId = me.classAttrType [classAttrId];
 					} else
@@ -975,16 +978,16 @@ var Import = function () {
 	};
 	// Создание схемы
 	this.createSchema = function (options) {
-		var result = null;
-		var success = options.success;
-		var schemaCode = options.code;
+		let result = null;
+		let success = options.success;
+		let schemaCode = options.code;
 		storage.query ({session: session, sql: "select fid from tschema where fcode='" + schemaCode + "'", success: function (options) {
-			var qr = options.result.rows;
+			let qr = options.result.rows;
 			if (qr.length == 0) {
 				// Добавление записи в tschema
-				var nextId = null;
+				let nextId = null;
 				storage.query ({session: session, sql: "select max (fid) as fid from tschema", success: function (options) {
-					var qr = options.result.rows;
+					let qr = options.result.rows;
 					if (qr.length) {
 						nextId = qr [0].fid + 1;
 					};
@@ -1004,14 +1007,14 @@ var Import = function () {
 	}
 	// Получение идентификатора схемы
 	this.getSchemaId = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		if (!options || !options.code) {
 			throw "schema.getId (): options.code must be defined";
 		}
-		var result = null;
+		let result = null;
 		storage.query ({session: session, sql: "select fid from tschema where fcode='" + options.code + "'", success: function (options) {
-			var r = options.result.rows;
+			let r = options.result.rows;
 			if (r.length > 0) {
 				result = r [0].fid;
 				success (result);
@@ -1022,30 +1025,30 @@ var Import = function () {
 	}
 	// TODO: Получение карты соответствия schemaId, recordId и localId
 	this.getNewId = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "getNewId"});
 		async.eachSeries (me.data.tschema, function (schema, cb) {
 			me.getSchemaId ({code: schema.values [3], success: function (schemaId) {
 				if (schemaId == null) {
 					cb ();
 				} else {
-					var tables = [];
-					for (var table in ifields) {
+					let tables = [];
+					for (let table in ifields) {
 						tables.push (table);
 					};
 					async.eachSeries (tables, function (table, cb) {
-						var schemaColId = ifields [table].indexOf ("fschema_id");
-						var recordColId = ifields [table].indexOf ("frecord_id");
+						let schemaColId = ifields [table].indexOf ("fschema_id");
+						let recordColId = ifields [table].indexOf ("frecord_id");
 						if (schemaColId == -1) {
 							cb ();
 						} else {
 							storage.query ({session: session, sql: "select distinct (frecord_id) as frecord_id, fid from " + table + " where frecord_id is not null and fschema_id=" + schemaId, success: function (options) {
-								var qr = options.result.rows;
-								var data = me.data [table];
-								for (var j = 0; j < qr.length; j ++) {
-									var recordId = qr [j].frecord_id;
-									for (var k = 0; k < data.length; k ++) {
+								let qr = options.result.rows;
+								let data = me.data [table];
+								for (let j = 0; j < qr.length; j ++) {
+									let recordId = qr [j].frecord_id;
+									for (let k = 0; k < data.length; k ++) {
 										if (schema.values [0] != data [k].values [schemaColId]) {
 											continue;
 										}
@@ -1069,14 +1072,14 @@ var Import = function () {
 	}
 	// Импорт ревизий
 	this.importRevisions = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "importRevisions"});
-		var revisionFields = me.data.fields.trevision;
-		var schemaColId = revisionFields.indexOf ("fschema_id");
+		let revisionFields = me.data.fields.trevision;
+		let schemaColId = revisionFields.indexOf ("fschema_id");
 		async.eachSeries (me.data.trevision, function (revision, cb) {
 			process.nextTick (function () {
-				var schemaId = revision.values [schemaColId];
+				let schemaId = revision.values [schemaColId];
 				// Эта ревизия уже есть
 				if (me.newId ["trevision"][revision.values [0]]) {
 					cb ();
@@ -1089,11 +1092,11 @@ var Import = function () {
 					}
 					log.info ({cls: "Import"}, "startRevision [" + schemaId + "] = " + revision.values [0] + " ");
 				}
-				var fields = {};
-				var id;
-				for (var i = 0; i < revisionFields.length; i ++) {
-					var field = revisionFields [i];
-					var value = revision.values [i]; 
+				let fields = {};
+				let id;
+				for (let i = 0; i < revisionFields.length; i ++) {
+					let field = revisionFields [i];
+					let value = revision.values [i]; 
 					if (value != null) {
 						if (field == "fid") {
 							id = value;
@@ -1123,16 +1126,16 @@ var Import = function () {
 	};
 	// Импорт схем
 	this.importSchemas = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "importSchemas"});
-		var schemaFields = me.data.fields.tschema;
+		let schemaFields = me.data.fields.tschema;
 		this.startRevision = {};
 		async.eachSeries (me.data.tschema, function (schema, cb) {
 			me.startRevision [schema.values [0]] = null;
-			for (var i = 0; i < schemaFields.length; i ++) {
-				var field = schemaFields [i];
-				var value = schema.values [i]; 
+			for (let i = 0; i < schemaFields.length; i ++) {
+				let field = schemaFields [i];
+				let value = schema.values [i]; 
 				if (value != null && field == "fcode") {
 					me.createSchema ({code: value, success: function (schemaId) {
 						me.newId ["tschema"][schema.values [0]] = schemaId;
@@ -1147,20 +1150,20 @@ var Import = function () {
 	}
 	// Генерация идентификаторов для создаваемых объектов
 	this.generateNewId = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "generateNewId"});
-		var tables = ["tclass", "tclass_attr", "tview", "tview_attr", "taction", "taction_attr", "tobject", "tobject_attr"];
-		for (var j = 0; j < tables.length; j ++) {
-			var t = tables [j];
+		let tables = ["tclass", "tclass_attr", "tview", "tview_attr", "taction", "taction_attr", "tobject", "tobject_attr"];
+		for (let j = 0; j < tables.length; j ++) {
+			let t = tables [j];
 			if (!me.data [t]) {
 				continue;
 			}
-			for (var i = 0; i < me.data [t].length; i ++) {
-				var fields = {};
-				for (var k = 0; k < me.data.fields [t].length; k ++) {
-					var field = me.data.fields [t][k];
-					var value = me.data [t][i].values [k]; 
+			for (let i = 0; i < me.data [t].length; i ++) {
+				let fields = {};
+				for (let k = 0; k < me.data.fields [t].length; k ++) {
+					let field = me.data.fields [t][k];
+					let value = me.data [t][i].values [k]; 
 					fields [field] = value;
 				};
 				if (me.schema && (me.startRevision [fields ["fschema_id"]] == null || fields ["fstart_id"] < me.startRevision [fields ["fschema_id"]])) {
@@ -1176,26 +1179,26 @@ var Import = function () {
 	};
 	// Удалить таблицу
 	this.removeTOC = function (options) {
-		var me = this;
-		var success = options.success;
-		var session = options.session;
+		let me = this;
+		let success = options.success;
+		let session = options.session;
 		if (options.storage) {
 			storage = options.storage;
 		};
 		log.info ({cls: "Import", fn: "removeTOC"});
-		var s = "select c.fid from tclass c\n";
+		let s = "select c.fid from tclass c\n";
 		s += "where c.fid >= 1000 and " + storage.getCurrentFilter ({alias: "c"}) + "\n";
 		if (options && options.classId) {
 			s += "and c.fid=" + options.classId + "\n";
 		};
 		s += "order by c.fid\n";
 		storage.query ({session: session, sql: s, success: function (options) {
-			var classes = options.result.rows;
+			let classes = options.result.rows;
 			async.eachSeries (classes, function (cls, cb) {
-				var name = storage.getClass (cls.fid).toc;
+				let name = storage.getClass (cls.fid).toc;
 				storage.client.isTableExists ({session: session, table: name, success: function (result) {
 					if (result) {
-						var s;
+						let s;
 						if (storage.client.database == "mssql") {
 							s = "drop table " + name + "\n";
 						} else {
@@ -1215,8 +1218,8 @@ var Import = function () {
 	};
 	// Убирает лишние экземпляры объектов
 	this.removeObjectDuplicates = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "removeObjectDuplicates"});
 		storage.query ({session: session, sql:
 			"select count (*), o.fid from tobject o\n" +
@@ -1224,15 +1227,15 @@ var Import = function () {
 			"group by o.fid\n" +
 			"having count (*) > 1\n"
 		, success: function (options) {
-			var objects = options.result.rows;
+			let objects = options.result.rows;
 			async.eachSeries (objects, function (object, cb) {
-				var objectId = object.fid;
+				let objectId = object.fid;
 				storage.query ({session: session, sql:
 					"select o.fstart_id from tobject o\n" +
 					"where o.fid=" + objectId + " and " + storage.getCurrentFilter ({alias: "o"}) + "\n" +
 					"order by o.fstart_id desc\n"
 				, success: function (options) {
-					var dubs = options.result.rows;
+					let dubs = options.result.rows;
 					dubs.splice (0, 1);
 					async.eachSeries (dubs, function (dub, cb) {
 						storage.query ({session: session, sql:
@@ -1252,8 +1255,8 @@ var Import = function () {
 	};
 	// Убирает лишние экземпляры атрибутов
 	this.removeObjectAttrDuplicates = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Import", fn: "removeObjectAttrDuplicates"});
 		storage.query ({session: session, sql:
 			"select oa.fclass_attr_id, oa.fobject_id from tobject_attr oa\n" +
@@ -1261,17 +1264,17 @@ var Import = function () {
 			"group by oa.fclass_attr_id, oa.fobject_id\n" +
 			"having count (*) > 1\n"
 		, success: function (options) {
-			var objects = options.result.rows;
+			let objects = options.result.rows;
 			async.eachSeries (objects, function (object, cb) {
-				var classAttrId = object.fclass_attr_id;
-				var objectId = object.fobject_id;
+				let classAttrId = object.fclass_attr_id;
+				let objectId = object.fobject_id;
 				// classAttrId, objectId
 				storage.query ({session: session, sql:
 					"select oa.fid from tobject_attr oa\n" +
 					"where oa.fclass_attr_id=" + classAttrId + " and oa.fobject_id=" + objectId + " and " + storage.getCurrentFilter ({alias: "oa"}) + "\n" +
 					"order by oa.FSTART_ID desc\n"
 				, success: function (options) {
-					var attrs = options.result.rows;
+					let attrs = options.result.rows;
 					attrs.splice (0, 1); // 2015-12-15
 					async.eachSeries (attrs, function (attr, cb) {
 						storage.query ({session: session, sql:
@@ -1291,15 +1294,15 @@ var Import = function () {
 	};
 	// Получение списка дочерних записей
 	this.getChilds = function (options) {
-		var me = this;
-		var success = options.success;
-		var meOptions = options;
+		let me = this;
+		let success = options.success;
+		let meOptions = options;
 		storage.query ({session: session, sql:
 			"select fid from " + options.table + " where fparent_id " +
 			(options.parentId ? ("= " + options.parentId) : "is null") + " and " +
 			storage.getCurrentFilter ()
 		, success: function (options) {
-			var qr = options.result.rows;
+			let qr = options.result.rows;
 			if (!meOptions.childs) {
 				meOptions.childs = [];
 			};
@@ -1315,13 +1318,13 @@ var Import = function () {
 	}
 	// Создать таблицу
 	this.createTOC = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		if (options.storage) {
 			storage = options.storage;
 		};
 		log.info ({cls: "Import", fn: "createTOC"});
-		var classes;
+		let classes;
 		async.series ([
 			function (cb) {
 				me.removeObjectAttrDuplicates ({success: function () {
@@ -1331,7 +1334,7 @@ var Import = function () {
 				}});
 			},
 			function (cb) {
-				var s;
+				let s;
 				s = "select\n";
 				s += "	" + ifields.tclass + "\n";
 				s += "from\n";
@@ -1350,8 +1353,8 @@ var Import = function () {
 			},
 			function (cb) {
 				async.eachSeries (classes, function (cls, cb) {
-					var classId = cls.fid;
-					var tocName = storage.getClass (classId).toc;
+					let classId = cls.fid;
+					let tocName = storage.getClass (classId).toc;
 					if (tocName.toLowerCase ().substring (0, 5) == "view_") {
 						cb ();
 						return;
@@ -1361,11 +1364,11 @@ var Import = function () {
 							cb ();
 							return;
 						};
-						var sqlInsert = "insert into " + tocName + " (fobject_id";
-						var sqlSelect = "select o.fid";
-						var sqlJoin = "";
-						var classAttrs;
-						var classChilds = [];
+						let sqlInsert = "insert into " + tocName + " (fobject_id";
+						let sqlSelect = "select o.fid";
+						let sqlJoin = "";
+						let classAttrs;
+						let classChilds = [];
 						async.series ([
 							function (cb) {
 								log.info ({cls: "Import"}, "Creating toc for class '" + cls.fcode + "' [" + classId + "] ...");
@@ -1374,7 +1377,7 @@ var Import = function () {
 										cb ();
 									}});
 								} else {
-									var s = "create table " + tocName + " (fobject_id bigint not null, primary key (fobject_id))";
+									let s = "create table " + tocName + " (fobject_id bigint not null, primary key (fobject_id))";
 									if (storage.client.version >= 91 && config.storages [storage.code] && config.storages [storage.code].unlogged) {
 										s = "create unlogged table " + tocName + " (fobject_id bigint not null, primary key (fobject_id))";
 									};
@@ -1404,15 +1407,15 @@ var Import = function () {
 							},
 							function (cb) {
 								async.eachSeries (classAttrs, function (classAttr, cb) {
-									var classAttrId = classAttr.fid;
-									var opts = {};
+									let classAttrId = classAttr.fid;
+									let opts = {};
 									try {
 										opts = JSON.parse (classAttr.fformat_func) || {};
 									} catch (e) {
 									}
-									var hasRownumColumn;
-									var type = "$tnumber$";
-									var ftype = "fnumber";	    
+									let hasRownumColumn;
+									let type = "$tnumber$";
+									let ftype = "fnumber";	    
 									switch (classAttr.ftype_id) {
 										case 2:
 											type = "$tnumber_value$";
@@ -1427,8 +1430,8 @@ var Import = function () {
 											ftype = "ftime";
 										break;
 									};
-									var tocFieldName = storage.getClassAttr (classAttrId).toc;
-									var s = "alter table " + tocName + " add column " + tocFieldName + " " + type;
+									let tocFieldName = storage.getClassAttr (classAttrId).toc;
+									let s = "alter table " + tocName + " add column " + tocFieldName + " " + type;
 									if (storage.client.database == "mssql") {
 										s = "alter table " + tocName + " add " + tocFieldName + " " + type;
 									};
@@ -1438,7 +1441,7 @@ var Import = function () {
 										sqlJoin += "left join tobject_attr oa" + classAttrId + " on (oa" + classAttrId + ".fobject_id = o.fid and oa" + classAttrId + ".fclass_attr_id = " + classAttrId + " and " + storage.getCurrentFilter ({alias: "oa" + classAttrId}) + ")\n";
 										if (classAttr.ftype_id == 12 || classAttr.ftype_id >= 1000 || classAttr.funique || opts.index) {
 											log.info ({cls: "Import"}, "created index for class_attr: " + classAttr.fcode);
-											var s = "create index " + tocName + "_" + tocFieldName + " on $schema_prefix$" + tocName + " (" + tocFieldName + ")";
+											let s = "create index " + tocName + "_" + tocFieldName + " on $schema_prefix$" + tocName + " (" + tocFieldName + ")";
 											if (classAttr.funique && storage.client.database == "mssql" && ftype == "fstring") {
 												s = "create index " + tocName + "_" + tocFieldName + " on $schema_prefix$" + tocName + " (fobject_id) include (" + tocFieldName + ")";
 											};
@@ -1448,14 +1451,14 @@ var Import = function () {
 										} else {
 											if (config.index && config.index.text_pattern_ops && classAttr.ftype_id == 1 && storage.client.database == "postgres") {
 												log.info ({cls: "Import"}, "created text index for class_attr: " + classAttr.fcode);
-												var s = "create index " + tocName + "_" + tocFieldName + " on $schema_prefix$" + tocName + " (" + tocFieldName + " text_pattern_ops)";
+												let s = "create index " + tocName + "_" + tocFieldName + " on $schema_prefix$" + tocName + " (" + tocFieldName + " text_pattern_ops)";
 												storage.query ({session: session, sql: s, success: function () {
 													cb ();
 												}});
 											} else
 											if (config.index && config.index.substr && classAttr.ftype_id == 1 && storage.client.database == "postgres") {
 												log.info ({cls: "Import"}, "created text index for class_attr: " + classAttr.fcode);
-												var s = "create index " + tocName + "_" + tocFieldName + " on $schema_prefix$" + tocName + " (substr (" + tocFieldName + ", 1, 1024))";
+												let s = "create index " + tocName + "_" + tocFieldName + " on $schema_prefix$" + tocName + " (substr (" + tocFieldName + ", 1, 1024))";
 												storage.query ({session: session, sql: s, success: function () {
 													cb ();
 												}});
@@ -1492,8 +1495,8 @@ var Import = function () {
 	// Импорт из файла
 	// example: importFromFile ({file: "pm.js"})
 	this.importFromFile = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		session = {
 			id: "import_" + options.code,
 			username: "admin",
@@ -1544,8 +1547,8 @@ var Import = function () {
 			},
 			function (cb) {
 				storage.query ({session: session, sql: "select fcode from tschema", success: function (options) {
-					var r = options.result.rows;
-					for (var i = 0; i < r.length; i ++) {
+					let r = options.result.rows;
+					for (let i = 0; i < r.length; i ++) {
 						if (!r [i].fcode || r [i].fcode == "undefined") {
 							cb ("Schema undefined.");
 							return;
@@ -1752,16 +1755,16 @@ var Import = function () {
 				};
 			},
 			function (cb) {
-				var redisClient = redis.createClient (config.redis.port, config.redis.host);
+				let redisClient = redis.createClient (config.redis.port, config.redis.host);
 				redisClient.del (options.code + "-requests");
 				redisClient.del (options.code + "-objects");
 				redisClient.keys ("*-content", function (err, result) {
-					for (var i = 0; i < result.length; i ++) {
+					for (let i = 0; i < result.length; i ++) {
 						redisClient.del (result [i]);
 					}
 				});
 				redisClient.keys ("*-clschange", function (err, result) {
-					for (var i = 0; i < result.length; i ++) {
+					for (let i = 0; i < result.length; i ++) {
 						redisClient.del (result [i]);
 					}
 				});

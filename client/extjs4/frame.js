@@ -7,7 +7,7 @@ Ext.define ("$o.Frame.Widget", {
 	alias: ["widget.$o.frame"],
     border: 0,
 	initComponent: function () {		
-		var me = this;
+		let me = this;
 		me.relatives = me.relatives || {};
 		me.relatives [me.zid] = me;
 		me.targets = {};
@@ -16,13 +16,13 @@ Ext.define ("$o.Frame.Widget", {
         me.callParent (arguments);
     },
 	refresh: function (options) {
-        var me = this;
+        let me = this;
         if (me.attr) {
-            var cmp = me.relatives [me.attr.split (".")[0]];
-            var attr = me.attr.split (".")[1];
+            let cmp = me.relatives [me.attr.split (".")[0]];
+            let attr = me.attr.split (".")[1];
             if (cmp) {
                 cmp.targets [me.zid] = me;
-                var url = cmp.getValue (attr);
+                let url = cmp.getValue (attr);
                 me.update ('<iframe src="' + url + '" frameborder="0" width="100%" height="100%">');
             };        
         };

@@ -7,7 +7,7 @@
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.filter = me.filter || [];
 		me.value = {};
 		me.tbar = [{
@@ -25,11 +25,11 @@
 				me.up ("window").close ();
 			}
 		}];
-		var data = [];
-		for (var i = 0; i < me.$classes.length; i ++) {
-			var cls = $o.getClass (me.$classes [i]);
+		let data = [];
+		for (let i = 0; i < me.$classes.length; i ++) {
+			let cls = $o.getClass (me.$classes [i]);
 			data.push ([me.$aliases [i] + ":id", me.$aliases [i] + ":id"]);
-			for (var attr in cls.attrs) {
+			for (let attr in cls.attrs) {
 				data.push ([me.$aliases [i] + ":" + attr, me.$aliases [i] + ":" + cls.attrs [attr].toString ()]);
 			};
 		};
@@ -99,7 +99,7 @@
 			displayField: "text",
 			listeners: {
 				select: function () {
-					var v = this.getValue ();
+					let v = this.getValue ();
 					if (v == "is null" || v == "is not null") {
 						me.down ("*[name='value']").disable ();
 						me.down ("*[name='attr2']").disable ();
@@ -153,12 +153,12 @@
 		this.callParent (arguments);
 	},
 	validator: function (value) {
-		var me = this.up ("panel");
-		var andOrField = me.down ("*[name='and_or']");
-		var attr1Field = me.down ("*[name='attr1']");
-		var operField = me.down ("*[name='oper']");
-		var valueField = me.down ("*[name='value']");
-		var attr2Field = me.down ("*[name='attr2']");
+		let me = this.up ("panel");
+		let andOrField = me.down ("*[name='and_or']");
+		let attr1Field = me.down ("*[name='attr1']");
+		let operField = me.down ("*[name='oper']");
+		let valueField = me.down ("*[name='value']");
+		let attr2Field = me.down ("*[name='attr2']");
 		if (andOrField && !andOrField.getValue ()) {
 			me.down ("button[name='save']").disable ();
 			return true;
@@ -167,21 +167,21 @@
 			operField.getValue () == "is null" || operField.getValue () == "is not null" || valueField.getValue () || attr2Field.getValue ()
 		)) {
 			me.down ("button[name='save']").enable ();
-			var attr1 = attr1Field.getValue ();
-			var o1 = {};
+			let attr1 = attr1Field.getValue ();
+			let o1 = {};
 			o1 [attr1.split (":")[0]] = attr1.split (":")[1];
 			if (operField.getValue () == "is null" || operField.getValue () == "is not null") {
 				me.value = [o1, operField.getValue ()];
 			} else {
-				var val = valueField.getValue ();
+				let val = valueField.getValue ();
 				if (attr2Field.getValue ()) {
-					var attr2 = attr2Field.getValue ();
+					let attr2 = attr2Field.getValue ();
 					val = {};
 					val [attr2.split (":")[0]] = attr2.split (":")[1];
 				};
 				me.value = [o1, operField.getValue (), val];
 			};
-//			var bracketsField = me.down ("*[name='brackets']");
+//			let bracketsField = me.down ("*[name='brackets']");
 //			if (bracketsField && bracketsField.getValue ()) {
 //				me.value = [andOrField.getValue (), [me.value]];
 //			} else {
@@ -196,11 +196,11 @@
 		return true;
 	},
 	save: function () {
-		var me = this;
+		let me = this;
 		me.fireEvent ("aftersave", me.value);
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		return me.value;
 	}
 });

@@ -1,7 +1,7 @@
 ﻿/*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
-var ifields = {
+let ifields = {
 	tclass: ["fid", "fparent_id", "fname", "fcode", "fdescription", "fformat", "fview_id", "ftype", "fsystem", "fschema_id", "frecord_id", "fstart_id", "fend_id"],
 	tclass_attr: ["fid", "fclass_id", "fname", "fcode", "ftype_id", "forder", "fnot_null", "fvalid_func", "fformat_func", "fdescription", "fsecure", "fmax_str", "fmin_str", "fmax_number", "fmin_number", "fmax_ts", "fmin_ts", "funique", "fformat_number", "fformat_ts", "fremove_rule", "fschema_id", "frecord_id", "fstart_id", "fend_id"],
 	tview: ["fid", "fparent_id", "fname", "fcode", "fdescription", "flayout", "fkey", "fparent_key", "fclass_id", "funrelated", "fquery", "ftype", "fsystem", "fmaterialized", "forder", "fschema_id", "frecord_id", "ficon_cls", "fstart_id", "fend_id"],
@@ -13,8 +13,8 @@ var ifields = {
 	tschema: ["fid", "fparent_id", "fname", "fcode"]
 };
 
-var Export = function () {
-	var storage;
+global.Export = function () {
+	let storage;
 	// Здесь собираются данные для экспорта
 	this.data = {};
 	// id классов для экспорта
@@ -28,7 +28,7 @@ var Export = function () {
 	// Получить коды всех классов верхнего уровня
 	this.getTopClassesCodes = function (options) {
 		log.info ({cls: "Export", fn: "getTopClassesCodes"});
-		var success = options.success;
+		let success = options.success;
 		storage.query ({sql: 
 			"select\n" +
 			"	distinct (a.fid) as fid\n" +
@@ -37,9 +37,9 @@ var Export = function () {
 			"where\n" +
 			"	a.fparent_id is null and a.fid >= 1000\n"
 		, success: function (options) {
-			var r = options.result.rows;
-			var result = [];
-			for (var i = 0; i < r.length; i ++) {
+			let r = options.result.rows;
+			let result = [];
+			for (let i = 0; i < r.length; i ++) {
 				result.push (r [i].fid);
 			};
 			success (result);
@@ -48,7 +48,7 @@ var Export = function () {
 	// Получить коды всех представлений верхнего уровня
 	this.getTopViewsCodes = function (options) {
 		log.info ({cls: "Export", fn: "getTopViewsCodes"});
-		var success = options.success;
+		let success = options.success;
 		storage.query ({sql: 
 			"select\n" +
 			"	distinct (a.fid) as fid\n" +
@@ -57,29 +57,29 @@ var Export = function () {
 			"where\n" +
 			"	a.fparent_id is null\n"
 		, success: function (options) {
-			var r = options.result.rows;
-			var result = [];
-			for (var i = 0; i < r.length; i ++) {
+			let r = options.result.rows;
+			let result = [];
+			for (let i = 0; i < r.length; i ++) {
 				result.push (r [i].fid);
 			};
 			success (result);
 		}});
 	}
 	this.getNodesId = function (options) {
-		var me = this;
-		var result = [];
-		var success = options.success;
-		var table = options.table;
+		let me = this;
+		let result = [];
+		let success = options.success;
+		let table = options.table;
 		async.mapSeries (options.codes, function (code, cb) {
-			var id;
-			var whereCondition;
+			let id;
+			let whereCondition;
 			async.series ([
 				function (cb) {
 					if (String (typeof (code)).toLowerCase () == "number") {
 						id = code;
 						cb ();
 					} else {
-						var s = 
+						let s = 
 							"select\n" +
 							"	distinct (a.fid) as fid\n" +
 							"from\n" +
@@ -105,15 +105,15 @@ var Export = function () {
 						"	a.fparent_id=" + id + "\n" +
 						"order by a.fid\n"
 					, success: function (options) {
-						var r = options.result.rows;
-						var childsId = [];
-						for (var j = 0; j < r.length; j ++) {
-							var childId = r [j].fid;
+						let r = options.result.rows;
+						let childsId = [];
+						for (let j = 0; j < r.length; j ++) {
+							let childId = r [j].fid;
 							childsId.push (childId);
 						};
 						if (childsId.length) {		
 							me.getNodesId ({table: table, codes: childsId, success: function (childs) {
-								for (var j = 0; j < childs.length; j ++) {
+								for (let j = 0; j < childs.length; j ++) {
 									result.push (childs [j]);				
 								};
 								cb ();
@@ -133,9 +133,9 @@ var Export = function () {
 	// Экспорт классов
 	this.exportClasses = function (options) {
 		log.info ({cls: "Export", fn: "exportClasses"});
-		var me = this;
-		var success = options.success;
-		var codes = me.data.options.classes;
+		let me = this;
+		let success = options.success;
+		let codes = me.data.options.classes;
 		async.series ([
 			function (cb) {
 				me.getNodesId ({table: "tclass", codes: codes, success: function (result) {
@@ -157,12 +157,12 @@ var Export = function () {
 						"order by\n" +
 						"	a.fid, a.fstart_id\n"
 					, success: function (options) {
-						var data = options.result.rows;
-						for (var k = 0; k < data.length; k ++) {
-							var values = [];
-							for (var j = 0; j < ifields.tclass.length; j ++) {
-								var field = ifields.tclass [j];
-								var value = data [k][field];
+						let data = options.result.rows;
+						for (let k = 0; k < data.length; k ++) {
+							let values = [];
+							for (let j = 0; j < ifields.tclass.length; j ++) {
+								let field = ifields.tclass [j];
+								let value = data [k][field];
 								if (field == "fcode" && !value) {
 									throw "exportClasses (): fcode must be not null. FID=" + data [k].fid;
 								};
@@ -174,7 +174,7 @@ var Export = function () {
 								}
 								values.push (value);
 							};
-							var classObject = {};
+							let classObject = {};
 							classObject.values = values;
 							me.data.tclass.push (classObject);
 						}
@@ -188,8 +188,8 @@ var Export = function () {
 	};
 	// Экспорт атрибутов класса
 	this.exportClassAttrs = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		me.data.tclass_attr = [];
 		storage.query ({sql:
 			"select\n" +
@@ -201,13 +201,13 @@ var Export = function () {
 			"order by\n" +
 			"	a.fid, a.fstart_id\n"
 		, success: function (options) {
-			var data = options.result.rows;
-			for (var i = 0; i < data.length; i ++) {
-				var attr = {};
+			let data = options.result.rows;
+			for (let i = 0; i < data.length; i ++) {
+				let attr = {};
 				attr.values = [];
-				for (var j = 0; j < ifields.tclass_attr.length; j ++) {
-					var field = ifields.tclass_attr [j];
-					var value = data [i][field];
+				for (let j = 0; j < ifields.tclass_attr.length; j ++) {
+					let field = ifields.tclass_attr [j];
+					let value = data [i][field];
 					if (field == "fschema_id" && value == null) {
 						value = me.currentSchemaId;
 					}
@@ -223,8 +223,8 @@ var Export = function () {
 	}
 	// Экспорт действий
 	this.exportActions = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		me.data.taction = [];
 		storage.query ({sql:
 			"select\n" +
@@ -236,13 +236,13 @@ var Export = function () {
 			"order by\n" +
 			"	a.fid, a.fstart_id\n"
 		, success: function (options) {
-			var data = options.result.rows;
-			for (var i = 0; i < data.length; i ++) {
-				var action = {};
+			let data = options.result.rows;
+			for (let i = 0; i < data.length; i ++) {
+				let action = {};
 				action.values = [];
-				for (var j = 0; j < ifields.taction.length; j ++) {
-					var field = ifields.taction [j];
-					var value = data [i][field];
+				for (let j = 0; j < ifields.taction.length; j ++) {
+					let field = ifields.taction [j];
+					let value = data [i][field];
 					if (field == "fschema_id" && value == null) {
 						value = me.currentSchemaId;
 					}
@@ -251,7 +251,7 @@ var Export = function () {
 					}
 					action.values.push (value);
 				};
-				var actionId = data [i].fid;
+				let actionId = data [i].fid;
 				me.data.taction.push (action);
 			};
 			success ();
@@ -259,13 +259,13 @@ var Export = function () {
 	}
 	// Экспорт объектов
 	this.exportObjects = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		me.data.tobject = [];
-		var classes = [];
+		let classes = [];
 		if (me.except.tobject && me.except.tobject.fclass_id.length) {
-			var except = me.except.tobject.fclass_id;
-			for (var i = 0; i < me.classesId.length; i ++) {
+			let except = me.except.tobject.fclass_id;
+			for (let i = 0; i < me.classesId.length; i ++) {
 				if (except.indexOf (me.classesId [i]) == -1) {
 					classes.push (me.classesId [i]);
 				}
@@ -283,14 +283,14 @@ var Export = function () {
 			"order by\n" +
 			"	a.fid, a.fstart_id\n"
 		, success: function (options) {
-			var objects = options.result.rows;
-			for (var i = 0; i < objects.length; i ++) {
-				var object = {};
+			let objects = options.result.rows;
+			for (let i = 0; i < objects.length; i ++) {
+				let object = {};
 				object.values = [];
-				var classId;
-				for (var j = 0; j < ifields.tobject.length; j ++) {
-					var field = ifields.tobject [j];
-					var value = objects [i][field];
+				let classId;
+				for (let j = 0; j < ifields.tobject.length; j ++) {
+					let field = ifields.tobject [j];
+					let value = objects [i][field];
 					if (field == "fschema_id" && value == null) {
 						value = me.currentSchemaId;
 					}
@@ -306,13 +306,13 @@ var Export = function () {
 	}
 	// Экспорт атрибутов объектов
 	this.exportObjectAttrs = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		me.data.tobject_attr = [];
-		var classes = [];
+		let classes = [];
 		if (me.except.tobject && me.except.tobject.fclass_id.length) {
-			var except = me.except.tobject.fclass_id;
-			for (var i = 0; i < me.classesId.length; i ++) {
+			let except = me.except.tobject.fclass_id;
+			for (let i = 0; i < me.classesId.length; i ++) {
 				if (except.indexOf (me.classesId [i]) == -1) {
 					classes.push (me.classesId [i]);
 				}
@@ -330,13 +330,13 @@ var Export = function () {
 			"order by\n" +
 			"	a.fid, a.fstart_id\n"
 		, success: function (options) {
-			var objectAttrs = options.result.rows;
-			for (var i = 0; i < objectAttrs.length; i ++) {
-				var objectAttr = {};
+			let objectAttrs = options.result.rows;
+			for (let i = 0; i < objectAttrs.length; i ++) {
+				let objectAttr = {};
 				objectAttr.values = [];
-				for (var j = 0; j < ifields.tobject_attr.length; j ++) {
-					var field = ifields.tobject_attr [j];
-					var value = objectAttrs [i][field];
+				for (let j = 0; j < ifields.tobject_attr.length; j ++) {
+					let field = ifields.tobject_attr [j];
+					let value = objectAttrs [i][field];
 					if (field == "fschema_id" && value == null) {
 						value = me.currentSchemaId;
 					}
@@ -352,10 +352,10 @@ var Export = function () {
 	}
 	// Экспорт представлений
 	this.exportViews = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Export", fn: "exportViews"});
-		var codes = me.data.options.views;
+		let codes = me.data.options.views;
 		me.getNodesId ({table: "tview", codes: codes, success: function (result) {
 			me.viewsId = result;
 			if (me.viewsId.length) {
@@ -371,12 +371,12 @@ var Export = function () {
 					"order by\n" +
 					"	a.fid, a.fstart_id\n"
 				, success: function (options) {
-					var data = options.result.rows;
+					let data = options.result.rows;
 					for (k = 0; k < data.length; k ++) {
-						var values = [];
-						for (var i = 0; i < ifields.tview.length; i ++) {
-							var field = ifields.tview [i];
-							var value = data [k][field];
+						let values = [];
+						for (let i = 0; i < ifields.tview.length; i ++) {
+							let field = ifields.tview [i];
+							let value = data [k][field];
 							if (field == "fcode" && !value) {
 								throw "exportViews (): fcode must be not null. fid=" + data [k].fid;
 							};
@@ -388,7 +388,7 @@ var Export = function () {
 							}
 							values.push (value);
 						};
-						var viewObject = {};
+						let viewObject = {};
 						viewObject.values = values;
 						me.data.tview.push (viewObject);
 					}
@@ -399,8 +399,8 @@ var Export = function () {
 	}
 	// Экспорт атрибутов представлений
 	this.exportViewAttrs = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		me.data.tview_attr = [];
 		storage.query ({sql:
 			"select\n" +
@@ -412,12 +412,12 @@ var Export = function () {
 			"order by\n" +
 			"	a.fid, a.fstart_id\n"
 		, success: function (options) {
-			var data = options.result.rows;
-			for (var i = 0; i < data.length; i ++) {
-				var values = [];
-				for (var j = 0; j < ifields.tview_attr.length; j ++) {
-					var field = ifields.tview_attr [j];
-					var value = data [i][field];
+			let data = options.result.rows;
+			for (let i = 0; i < data.length; i ++) {
+				let values = [];
+				for (let j = 0; j < ifields.tview_attr.length; j ++) {
+					let field = ifields.tview_attr [j];
+					let value = data [i][field];
 					if (field == "fschema_id" && value == null) {
 						value = me.currentSchemaId;
 					}
@@ -433,21 +433,21 @@ var Export = function () {
 	}
 	// Экспорт ревизий
 	this.exportRevisions = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Export", fn: "exportRevisions"});
 		storage.query ({sql:
 			"select\n" + ifields.trevision.join () + "\n" +
 			"from trevision a\n" +
 			"order by a.fid\n"
 		, success: function (options) {
-			var qr = options.result.rows;
+			let qr = options.result.rows;
 			me.data.trevision = [];
-			for (var i = 0; i < qr.length; i ++) {
-				var values = [];
-				for (var j = 0; j < ifields.trevision.length; j ++) {
-					var field = ifields.trevision [j];
-					var value = qr [i][field];
+			for (let i = 0; i < qr.length; i ++) {
+				let values = [];
+				for (let j = 0; j < ifields.trevision.length; j ++) {
+					let field = ifields.trevision [j];
+					let value = qr [i][field];
 					if (field == "fschema_id" && value == null) {
 						value = me.currentSchemaId;
 					}
@@ -456,7 +456,7 @@ var Export = function () {
 					}
 					values.push (value);
 				};
-				var revision = {};
+				let revision = {};
 				revision.values = values;
 				me.data.trevision.push (revision);
 			};
@@ -465,24 +465,24 @@ var Export = function () {
 	}
 	// Экспорт схем
 	this.exportSchemas = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Export", fn: "exportSchemas"});
 		storage.query ({sql:
 			"select\n" + ifields.tschema.join () + "\n" +
 			"from tschema a\n" +
 			"order by a.fid\n"
 		, success: function (options) {
-			var qr = options.result.rows;
+			let qr = options.result.rows;
 			me.data.tschema = [];
-			for (var i = 0; i < qr.length; i ++) {
-				var values = [];
-				for (var j = 0; j < ifields.tschema.length; j ++) {
-					var field = ifields.tschema [j];
-					var value = qr [i][field];
+			for (let i = 0; i < qr.length; i ++) {
+				let values = [];
+				for (let j = 0; j < ifields.tschema.length; j ++) {
+					let field = ifields.tschema [j];
+					let value = qr [i][field];
 					values.push (value);
 				};
-				var schema = {};
+				let schema = {};
 				schema.values = values;
 				me.data.tschema.push (schema);
 			}
@@ -491,20 +491,20 @@ var Export = function () {
 	}
 	// Подготовить переменные для записей, которые не надо экспортировать
 	this.prepareExcept = function (options) {
-		var me = this;
-		var success = options.success;
-		var except = me.data.options.except;
+		let me = this;
+		let success = options.success;
+		let except = me.data.options.except;
 		if (!except) {
 			success ();
 			return;
 		};
-		var tables = [];
-		for (var table in except) {
+		let tables = [];
+		for (let table in except) {
 			tables.push (table);
 		};
 		async.mapSeries (tables, function (table, cb) {
-			var conditions = except [table];
-			var classes = [];
+			let conditions = except [table];
+			let classes = [];
 			async.mapSeries (conditions, function (condition, cb) {
 				if (condition.fclass_id) {
 					function addClass (classId, cb) {
@@ -521,7 +521,7 @@ var Export = function () {
 							"order by\n" +
 							"	a.fid, a.fstart_id\n"
 						, success: function (options) {
-							var data = options.result.rows;
+							let data = options.result.rows;
 							async.mapSeries (data, function (row, cb) {
 								addClass (row.fid, function () {
 									cb ();
@@ -558,10 +558,10 @@ var Export = function () {
 	}
 	// Установить в null поля TOBJECT_ATTR.FTIME < '01.01.1400'
 	this.clearBadTimeFields = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		log.info ({cls: "Export", fn: "clearBadTimeFields"});
-		var s;
+		let s;
 		s = "update tobject_attr set ftime=null\n";
 		s += "where ftime<'01.01.1400'\n";
 		storage.query ({sql: s, success: function (options) {
@@ -570,15 +570,15 @@ var Export = function () {
 	}
 	// Правка неправильных ссылок на ревизии
 	this.fixReferences = function (options) {
-		var me = this;
-		var success = options.success;
+		let me = this;
+		let success = options.success;
 		storage.query ({sql: "select min (fid) as fid from trevision", success: function (options) {
-			var rows = options.result.rows;
+			let rows = options.result.rows;
 			if (rows.length > 0) {
-				var minRevision = rows [0].fid;
-				var sql = [];
-				for (var table in ifields) {
-					var fields = ifields [table].join ();
+				let minRevision = rows [0].fid;
+				let sql = [];
+				for (let table in ifields) {
+					let fields = ifields [table].join ();
 					if (fields.indexOf ("fstart_id") == -1) {
 						continue;
 					}
@@ -603,16 +603,16 @@ var Export = function () {
 	}
 	// Создание схемы
 	this.createSchema = function (options) {
-		var result = null;
-		var success = options.success;
-		var code = options.code;
+		let result = null;
+		let success = options.success;
+		let code = options.code;
 		storage.query ({sql: "select fid from tschema where fcode='" + code + "'", success: function (options) {
-			var qr = options.result.rows;
+			let qr = options.result.rows;
 			if (qr.length == 0) {
 				// Добавление записи в tschema
-				var nextId = null;
+				let nextId = null;
 				storage.query ({sql: "select max (fid) as fid from tschema", success: function (options) {
-					var qr = options.result.rows;
+					let qr = options.result.rows;
 					if (qr.length) {
 						nextId = qr [0].fid + 1;
 					};
@@ -643,9 +643,9 @@ var Export = function () {
 				file: "pm.js"
 			});
 		*/
-		var me = this;
-		var success = options.success;
-		var timeStart = new Date ().getTime ();
+		let me = this;
+		let success = options.success;
+		let timeStart = new Date ().getTime ();
 		log.info ({cls: "Export", fn: "exportToFile"});
 		me.data.options = options;
 		async.series ([
@@ -724,8 +724,8 @@ var Export = function () {
 				};
 			}
 		], function (err, results) {
-			var stat = "";
-			for (var table in ifields) {
+			let stat = "";
+			for (let table in ifields) {
 				if (me.data [table]) {
 					stat += table + ": " + me.data [table].length + "\n";
 				};

@@ -7,7 +7,7 @@
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || [];
 		me.tbar = [{
     		text: $o.getString ("Choose"),
@@ -60,7 +60,7 @@
 	},
 	cellRenderer: function (value, metaData, record, rowIndex, colIndex, store) {
 		if (value) {
-			var tip = value;
+			let tip = value;
 			if (typeof (tip) == "string") {
 				tip = tip.split ('"').join ("'");
 			}
@@ -69,10 +69,10 @@
 		return value;
 	},
 	updateSelect: function () {
-		var me = this;
+		let me = this;
 		me.value = [];
-		for (var i = 0; i < me.store.getCount (); i ++) {
-			var o = {};
+		for (let i = 0; i < me.store.getCount (); i ++) {
+			let o = {};
 			o [me.store.getAt (i).get ("clsFrom")] = me.store.getAt (i).get ("attr");
 			me.value.push (o);
 			me.value.push (me.store.getAt (i).get ("alias"));
@@ -80,33 +80,33 @@
 		me.fireEvent ("change", me.value);
 	},
 	addAttrs: function () {
-		var me = this;
+		let me = this;
 		if (!me.$classes.length) {
 			common.message ($o.getString ("Select", "class"));
 			return;
 		};
-		var tabs = [];
-		for (var i = 0; i < me.$classes.length; i ++) {
-			var cls = $o.getClass (me.$classes [i]);
-			var data = [{
+		let tabs = [];
+		for (let i = 0; i < me.$classes.length; i ++) {
+			let cls = $o.getClass (me.$classes [i]);
+			let data = [{
 				attr: "id", name: "id", alias: i ? (me.$aliases [i] + "_id") : "id"
 			}];
-			var valueSelected = [];
-			for (var j = 0; j < me.store.getCount (); j ++) {
+			let valueSelected = [];
+			for (let j = 0; j < me.store.getCount (); j ++) {
 				if (me.store.getAt (j).get ("clsFrom") == me.$aliases [i] && me.store.getAt (j).get ("attr") == "id") {
 					valueSelected.push ("id");
 					data [0].alias = me.store.getAt (j).get ("alias");
 				};
 			};
-			for (var attr in cls.attrs) {
-				var ca = cls.attrs [attr];
-				var o = {
+			for (let attr in cls.attrs) {
+				let ca = cls.attrs [attr];
+				let o = {
 					attr: attr, 
 					name: ca.toString (), 
 					clsName: $o.getClass (ca.get ("class")).toString (),
 					alias: i ? (me.$aliases [i] + "_" + attr) : attr
 				};
-				for (var j = 0; j < me.store.getCount (); j ++) {
+				for (let j = 0; j < me.store.getCount (); j ++) {
 					if (me.store.getAt (j).get ("clsFrom") == me.$aliases [i] && me.store.getAt (j).get ("attr") == attr) {
 						valueSelected.push (attr);
 						o.alias = me.store.getAt (j).get ("alias");
@@ -114,7 +114,7 @@
 				};
 				data.push (o);
 			};
-		    var store = Ext.create ("Ext.data.Store", {
+		    let store = Ext.create ("Ext.data.Store", {
 		        data: data,
 		        fields: [{
 		        	name: "name", type: "string"
@@ -130,24 +130,24 @@
 					direction: "ASC"
 				}]	        
 		    });
-			var cellEditing = new Ext.grid.plugin.CellEditing ({
+			let cellEditing = new Ext.grid.plugin.CellEditing ({
 		        clicksToEdit: 1
 		    });    
-		    var clickedColIndex;
-		    var selModel = Ext.create ("Ext.selection.CheckboxModel", {
+		    let clickedColIndex;
+		    let selModel = Ext.create ("Ext.selection.CheckboxModel", {
 				mode: "MULTI",
 				valueSelected: valueSelected,
 				checkOnly: true
 			});
-			var grid = Ext.create ("Ext.grid.Panel", {
+			let grid = Ext.create ("Ext.grid.Panel", {
 				tbar: i ? [{
 					text: $o.getString ("Aliases by attribute code"),
 					iconCls: "gi_sort-by-alphabet",
 					handler: function () {
-						var store = this.up ("grid").getStore ();
-						for (var i = 0; i < store.getCount (); i ++) {
-							var rec = store.getAt (i);
-							var a = rec.get ("alias");
+						let store = this.up ("grid").getStore ();
+						for (let i = 0; i < store.getCount (); i ++) {
+							let rec = store.getAt (i);
+							let a = rec.get ("alias");
 							if (a.split ("_").length == 2) {
 								rec.set ("alias", a.split ("_")[1]);
 							};
@@ -174,7 +174,7 @@
 				deferRowRender: false,
 				listeners: {
 					afterrender: function () {
-						for (var j = 0; j < this.getSelectionModel ().valueSelected.length; j ++) {
+						for (let j = 0; j < this.getSelectionModel ().valueSelected.length; j ++) {
 							this.getSelectionModel ().select (this.getStore ().findRecord ("attr", this.getSelectionModel ().valueSelected [j], 0, false, false, true), true);
 						};
 					}
@@ -190,7 +190,7 @@
 				items: grid
 			});
 		};
-		var win = Ext.create ("Ext.Window", {
+		let win = Ext.create ("Ext.Window", {
 			width: 600,
 			height: 600,
 		    resizeable: false,
@@ -209,15 +209,15 @@
 				text: "Ок",
 				iconCls: "gi_ok",
 				handler: function () {
-					var data = [];
-					var tabs = win.down ("tabpanel").query ("panel[name=tab]");
-					for (var i = 0; i < tabs.length; i ++) {
-						var tab = tabs [i];
-						var selected = [];
+					let data = [];
+					let tabs = win.down ("tabpanel").query ("panel[name=tab]");
+					for (let i = 0; i < tabs.length; i ++) {
+						let tab = tabs [i];
+						let selected = [];
 						if (tab.selModel.hasSelection ()) {
 							selected = tab.selModel.getSelection ();
 						};
-						for (var j = 0; j < selected.length; j ++) {
+						for (let j = 0; j < selected.length; j ++) {
 							data.push ({
 								name: tabs [i].alias + ":" + (tab.cls.attrs [selected [j].get ("attr")] ? tab.cls.attrs [selected [j].get ("attr")].toString () : selected [j].get ("attr")),
 								clsName: tab.cls.toString (),
@@ -243,19 +243,19 @@
 		win.show ();
 	},
 	setClasses: function (classes, classAliases, aliases) {
-		var me = this;
+		let me = this;
 		me.$classes = classes;
 		me.$classAliases = classAliases;
 		me.$aliases = aliases;
 	},
 	build: function () {
-		var me = this;
-		var data = [];
+		let me = this;
+		let data = [];
 		if (me.value) {
-			for (var i = 0; i < me.value.length; i += 2) {
-				var clsId, cls, alias; for (alias in me.value [i]) {break;};
-				var attr = me.value [i][alias];
-				for (var j = 0; j < me.$aliases.length; j ++) {
+			for (let i = 0; i < me.value.length; i += 2) {
+				let clsId, cls, alias; for (alias in me.value [i]) {break;};
+				let attr = me.value [i][alias];
+				for (let j = 0; j < me.$aliases.length; j ++) {
 					if (me.$aliases [j] == alias) {
 						cls = $o.getClass (me.$classes [j]);
 					};
@@ -273,13 +273,13 @@
 		me.store.loadData (data);
 	},
 	setValue: function (value) {
-		var me = this;
+		let me = this;
 		me.value = value;
 		me.build ();
 		me.fireEvent ("change", value);
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		return me.value;
 	}
 });

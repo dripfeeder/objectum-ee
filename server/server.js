@@ -7,8 +7,8 @@ if (config.uncaughtException) {
 	process.on ("uncaughtException", function (err) {
 		console.log (err);
 		console.log (err.stack);
-		var text = "[" + common.currentDate () + " " + common.currentTime ({msec: true}) + "] ";
-		var fd = fs.openSync (config.rootDir + "/error.log", "a", 666);
+		let text = "[" + common.currentDate () + " " + common.currentTime ({msec: true}) + "] ";
+		let fd = fs.openSync (config.rootDir + "/error.log", "a", 666);
 		fs.writeSync (fd, text + "Caught exception: " + err + "\n" + err.stack + "\n", null, "utf8");
 		fs.closeSync (fd);
 		process.exit (1);
@@ -16,26 +16,26 @@ if (config.uncaughtException) {
 };
 // Количество секунд прошедших с 1 января 1970 года (UnixTime)
 config.clock = parseInt (new Date ().getTime () / 1000);
-var server = {};
+global.server = {};
 server.cache = {};
 server.www = function (options) {
-	var request = options.request;
-	var response = options.response;
-	var next = options.next;
-	var filePath = options.filePath;
-	var pathname = url.parse (request.url).pathname;
+	let request = options.request;
+	let response = options.response;
+	let next = options.next;
+	let filePath = options.filePath;
+	let pathname = url.parse (request.url).pathname;
 	if (!filePath) {
 		if (pathname == "/") {
 			pathname = "/index.html";
 		}
-		var tokens = pathname.split (".");
+		let tokens = pathname.split (".");
 		filePath = config.wwwRoot + pathname;
 	};
-	var urlTokens = pathname.split ("/");
+	let urlTokens = pathname.split ("/");
 	if (urlTokens [3] == "wsdl") {
 		console.log (pathname, decodeURI (filePath));
 		fs.readFile (decodeURI (filePath), function (err, data) {
-			var ext = filePath.split (".");
+			let ext = filePath.split (".");
 			ext = ext [ext.length - 1];
 			response.writeHead (200, {
 				"Content-Type": mimetypes.lookup (ext)
@@ -49,10 +49,10 @@ server.www = function (options) {
 			return next ();
 		};
 	};
-	var ext = filePath.split (".");
+	let ext = filePath.split (".");
 	ext = ext [ext.length - 1];
 	if (config.caching && config.caching.enabled && !options.nocache) {
-		var mtime, status = 200;
+		let mtime, status = 200;
 		async.series ([
 			function (cb) {
 				fs.stat (filePath, function (err, stats) {
@@ -65,7 +65,7 @@ server.www = function (options) {
 								server.cache [filePath] = null;
 							} else {
 								if (request.headers ["if-none-match"]) {
-									var mtimeUser = request.headers ["if-none-match"];
+									let mtimeUser = request.headers ["if-none-match"];
 									if (mtimeUser == server.cache [filePath].mtime) {
 										status = 304;
 									};
@@ -109,7 +109,7 @@ server.www = function (options) {
 					if (status == 304) {
 						response.sendStatus (304);
 					} else {
-						var headers = {
+						let headers = {
 				  			"ETag": mtime,
 				  			"Content-Type": mimetypes.lookup (ext)
 				  		};
@@ -122,7 +122,7 @@ server.www = function (options) {
 		});
 	} else {
 		fs.readFile (decodeURI (filePath), function (err, data) {
-			var ext = filePath.split (".");
+			let ext = filePath.split (".");
 			ext = ext [ext.length - 1];
 			response.writeHead (200, {
 				"Content-Type": mimetypes.lookup (ext)
@@ -137,7 +137,7 @@ server.setVars = function (request, response, next) {
 	next ();
 };
 server.loadData = function (request, response, next) {
-	var urlTokens = request.url.split ("/");
+	let urlTokens = request.url.split ("/");
 	request.setEncoding ("utf8");
 	request.on ("data", function (data) {
 		if (urlTokens [3] == "plugins") {
@@ -158,7 +158,7 @@ server.loadData = function (request, response, next) {
 };
 server.middleBodyLoader = function (request, response, next) {
 	if (request.body) {
-		var tokens = request.body.split (".");
+		let tokens = request.body.split (".");
 		if (tokens.length > 2 && ["Storage", "Object", "Class", "ClassAttr", "View", "ViewAttr", "Action"].indexOf (tokens [1]) > -1) {
 			request.storageCode = tokens [0];
 			request.storageArea = tokens [1];
@@ -172,7 +172,7 @@ server.middleBodyLoader = function (request, response, next) {
 	next ();
 };
 server.middleBodyParser = function (request, response, next) {
-	var form = new formidable.IncomingForm ();
+	let form = new formidable.IncomingForm ();
 	try {
 		form.parse (request, function (error, fields, files) {
 			if (error) {
@@ -192,7 +192,7 @@ server.middleBodyParser = function (request, response, next) {
 server.requestStart = function (request, response, next) {
 	request.storageCode = request.storageCode || request.params.storage;
 	if (request.method != "GET") {
-		var body = "", fields = "";
+		let body = "", fields = "";
 		if (request.body && request.url.indexOf ("/upload") == -1) {
 			body = ", body: " + JSON.stringify (request.body);
 		};
@@ -205,9 +205,9 @@ server.requestStart = function (request, response, next) {
 		};
 		redisClient.hincrby ("current-requests", "sequence", 1, function (err, n) {
 			response.end = function (data, encoding) {
-				var this_ = this;
+				let this_ = this;
 				redisClient.hdel ("current-requests", n, function (err, result) {
-					var duration = (new Date ().getTime () - request.objectum.start) / 1000;
+					let duration = (new Date ().getTime () - request.objectum.start) / 1000;
 					log.info ({cls: "server", fn: "requestStart"}, "duration: " + duration + ' sec., url: "' + request.url + '", ip: "' + common.getRemoteAddress (request) + '"' + body + fields);
 					if (duration > 60) {
 						log.warn ({cls: "server", fn: "requestStart"}, 'duration: ' + duration + ' sec., url: "' + request.url + '", ip: "' + common.getRemoteAddress (request) + '"' + body + fields);
@@ -229,15 +229,15 @@ server.requestStart = function (request, response, next) {
 	};
 };
 server.stat = function (options) {
-	var request = options.request;
-	var response = options.response;
+	let request = options.request;
+	let response = options.response;
 	if (config.admin.ip.indexOf (common.getRemoteAddress (request)) == -1 && config.admin.ip != "all") {
 		response.end ("forbidden");
 	};
 	log.info ({cls: "server", fn: "stat"}, "ip: " + common.getRemoteAddress (request) + ", query: " + JSON.stringify (request.query));
 	if (request.query.logs) {
 		redisClient.keys (config.redis.db + "-log-*", function (err, result) {
-			for (var i = 0; i < result.length; i ++) {
+			for (let i = 0; i < result.length; i ++) {
 				result [i] = result [i].substr ((config.redis.db + "-log-").length);
 			};
 			response.writeHead (200, {"Content-Type": "text/html; charset=utf-8"});
@@ -265,14 +265,14 @@ server.stat = function (options) {
 		});
 		return;
 	};
-	var allData = {}, num = 0, online, lost, onlineNum, onlineNumMax, onlineNumMaxTS, started, memoryUsage, idle = "";
+	let allData = {}, num = 0, online, lost, onlineNum, onlineNumMax, onlineNumMaxTS, started, memoryUsage, idle = "";
 	async.series ([
 		function (cb) {
 			redisClient.hgetall ("sessions", function (err, r) {
-				var data = [];
-				for (var k in r) {
+				let data = [];
+				for (let k in r) {
 					if (k.indexOf ("-username") > -1) {
-						var sid = k.substr (0, k.length - 9);
+						let sid = k.substr (0, k.length - 9);
 						data.push ({
 							login: r [k],
 							port: r [sid + "-port"],
@@ -289,9 +289,9 @@ server.stat = function (options) {
 		},
 		function (cb) {
 			redisClient.hgetall ("current-requests", function (err, result) {
-				var data = [];
-				for (var k in result) {
-					var r;
+				let data = [];
+				for (let k in result) {
+					let r;
 					try {
 						r = eval ("(" + result [k] + ")");
 					} catch (e) {
@@ -316,8 +316,8 @@ server.stat = function (options) {
 		},
 		function (cb) {
 			redisClient.hgetall ("server-memoryusage", function (err, result) {
-				var data = [];
-				var total = {
+				let data = [];
+				let total = {
 					current: {
 						rss: 0, heapTotal: 0, heapUsed: 0
 					},
@@ -325,8 +325,8 @@ server.stat = function (options) {
 						rss: 0, heapTotal: 0, heapUsed: 0
 					}
 				};
-				for (var k in result) {
-					var r = JSON.parse (result [k]);
+				for (let k in result) {
+					let r = JSON.parse (result [k]);
 					data.push ({
 						pid: k,
 						port: r.port,
@@ -356,10 +356,10 @@ server.stat = function (options) {
 			});
 		},
 		function (cb) {
-			var s;
+			let s;
 			for (s in config.storages) {
 				if (config.storages [s].database == "postgres") {
-					var client = new db.Postgres ({connection: config.storages [s]});
+					let client = new db.Postgres ({connection: config.storages [s]});
 					client.connect ({systemDB: true, success: function () {
 						client.query ({sql: 
 							"select (date_part ('epoch', now () - query_start)) as duration, procpid, current_query\n" +
@@ -367,9 +367,9 @@ server.stat = function (options) {
 							"where current_query <> '<IDLE>' and date_part ('epoch', now () - query_start) > 0\n" +
 							"order by 1"
 						, success: function (options) {
-							var rows = options.result.rows;
-							var data = [];
-							for (var i = 0; i < rows.length; i ++) {
+							let rows = options.result.rows;
+							let data = [];
+							for (let i = 0; i < rows.length; i ++) {
 								data.push ({
 									duration: rows [i].duration,
 									pid: rows [i].procpid,
@@ -395,7 +395,7 @@ server.stat = function (options) {
 };
 server.updateMemoryUsage = function () {
 	server.memoryUsage = server.memoryUsage || {rss: 0, heapTotal: 0, heapUsed: 0};
-	var pmu = process.memoryUsage ();
+	let pmu = process.memoryUsage ();
 	pmu.rss = (pmu.rss / (1024 * 1024)).toFixed (3);
 	pmu.heapTotal = (pmu.heapTotal / (1024 * 1024)).toFixed (3);
 	pmu.heapUsed = (pmu.heapUsed / (1024 * 1024)).toFixed (3);
@@ -425,7 +425,7 @@ server.updateMemoryUsage = function () {
 server.init = function (options) {
 	options = options || {};
 	server.objectum = options.objectum;
-	var success = options.success;
+	let success = options.success;
 	server.app = express ();
 	server.app.use (function (request, response, next) {
 		request.connection.setNoDelay (true);
@@ -505,7 +505,7 @@ server.init = function (options) {
 			server.www ({request: req, response: res, next: next});
 		});
 		server.app.use (function (err, req, res, next) {
-			var msg = err.message ? err.message : err;
+			let msg = err.message ? err.message : err;
 			log.error ({cls: "server", fn: "init", error: "express exception: " + msg + ", stack: " + JSON.stringify (err.stack)});
 			res.status (500).send ("{header: {error: '" + msg + "', stack:'" + JSON.stringify (err.stack) + "'}}");
 		});
@@ -530,22 +530,22 @@ server.init = function (options) {
 };
 server.startPlugins = function (options) {
 	options = options || {};
-	var success = options.success;
+	let success = options.success;
 	if (!config.plugins) {
 		if (success) {
 			success ();
 		};
 		return;
 	};
-	var plugins = [];
-	for (var pluginCode in config.plugins) {
+	let plugins = [];
+	for (let pluginCode in config.plugins) {
 		plugins.push (pluginCode);
 	};
 	async.map (plugins, function (pluginCode, cb) {
-		var plugin = config.plugins [pluginCode];
+		let plugin = config.plugins [pluginCode];
 		fs.exists (plugin.require, function (exists) {
 			if (exists) {
-				var m = require (plugin.require);
+				let m = require (plugin.require);
 				plugin.module = m;
 				async.series ([
 					function (cb) {
@@ -580,9 +580,9 @@ server.startPlugins = function (options) {
 };
 server.projectPlugins = {};
 server.processProjectPlugins = function (req, res, next) {
-	var urlTokens = req.url.split ("/");
+	let urlTokens = req.url.split ("/");
 	if (urlTokens [3] == "plugins") {
-		var storageCode = urlTokens [2];
+		let storageCode = urlTokens [2];
 		if (server.projectPlugins [storageCode]) {
 			server.projectPlugins [storageCode] (req, res);
 		} else {
@@ -600,13 +600,13 @@ server.processProjectPlugins = function (req, res, next) {
 };
 server.startWSDL = function (options) {
 	options = options || {};
-	var success = options.success;
-	var storages = [];
-	for (var storageCode in config.storages) {
+	let success = options.success;
+	let storages = [];
+	for (let storageCode in config.storages) {
 		storages.push (storageCode);
 	};
 	async.map (storages, function (storageCode, cb) {
-		var wsdlFile = config.storages [storageCode].rootDir + "/wsdl/wsdl.js"
+		let wsdlFile = config.storages [storageCode].rootDir + "/wsdl/wsdl.js"
 		if (config.storages [storageCode].wsdl && !config.storages [storageCode].wsdl.enabled) {
 			cb ();
 			return;
@@ -615,7 +615,7 @@ server.startWSDL = function (options) {
 			if (exists) {
 				projects.getStorage ({storageCode: storageCode, success: function (options) {
 					// todo: одинаковые wsdl.js накрывают друг друга
-					var wsdl = require (wsdlFile);
+					let wsdl = require (wsdlFile);
 					options.storage.rootDir = config.storages [storageCode].rootDir;
 					wsdl.start ({objectum: server.objectum, storage: options.storage});
 					cb ();
@@ -632,7 +632,7 @@ server.startWSDL = function (options) {
 };
 server.start = function (options, cb) {
 	server.http = http.createServer (server.app);
-	var port = options.port || config.startPort;
+	let port = options.port || config.startPort;
 	config.port = port;
 	async.series ([
 		function (cb) {
@@ -665,27 +665,27 @@ server.start = function (options, cb) {
 					redisClient.del ("files");
 					redisClient.del ("files-mtime");
 					redisClient.keys ("*-content", function (err, result) {
-						for (var i = 0; i < result.length; i ++) {
+						for (let i = 0; i < result.length; i ++) {
 							redisClient.del (result [i]);
 						}
 					});
 					redisClient.keys ("*-clschange", function (err, result) {
-						for (var i = 0; i < result.length; i ++) {
+						for (let i = 0; i < result.length; i ++) {
 							redisClient.del (result [i]);
 						}
 					});
 					redisClient.keys ("log-*", function (err, result) {
-						for (var i = 0; i < result.length; i ++) {
+						for (let i = 0; i < result.length; i ++) {
 							redisClient.del (result [i]);
 						}
 					});
 					redisClient.keys ("*-objects", function (err, result) {
-						for (var i = 0; i < result.length; i ++) {
+						for (let i = 0; i < result.length; i ++) {
 							redisClient.del (result [i]);
 						}
 					});
 					redisClient.keys ("*-data", function (err, result) {
-						for (var i = 0; i < result.length; i ++) {
+						for (let i = 0; i < result.length; i ++) {
 							redisClient.del (result [i]);
 						}
 					});

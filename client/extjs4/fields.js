@@ -26,7 +26,7 @@ Ext.define ("$o.ObjectField.Widget", {
 	alias: ["widget.objectfield", "widget.$objectfield", "widget.$o.objectfield"],
 	layout: "hbox",
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.items = [{
 			xtype: "button",
 			iconCls: "gi_edit",
@@ -34,13 +34,13 @@ Ext.define ("$o.ObjectField.Widget", {
 				marginRight: 1
 			},
 			handler: function () {
-				var me = this;
+				let me = this;
 				if (me.ro) {
 					return;
 				};
 				me.choose = me.choose || {};
-				var winWidth = me.choose.width || 800;
-				var winHeight = me.choose.height || 600;
+				let winWidth = me.choose.width || 800;
+				let winHeight = me.choose.height || 600;
 				if (me.choose.fn && me.choose.type == "custom") {
 					me.choose.fn.call (me);
 					return;
@@ -51,8 +51,8 @@ Ext.define ("$o.ObjectField.Widget", {
 				if (me.choose.listeners && me.choose.listeners.beforeShow) {
 					me.choose.listeners.beforeShow.call (me);
 				};
-				var layout;
-				var view;
+				let layout;
+				let view;
 				if (me.choose.type == "layout") {
 					layout = $o.util.clone (me.choose.layout);
 				} else {
@@ -66,9 +66,9 @@ Ext.define ("$o.ObjectField.Widget", {
 						};
 					} else {
 						// classView
-						var o = $o.getObject (me.objectId);
-						var cls = $o.getClass (o.get ("classId"));
-						var ca = cls.attrs [me.attr];
+						let o = $o.getObject (me.objectId);
+						let cls = $o.getClass (o.get ("classId"));
+						let ca = cls.attrs [me.attr];
 						layout = {
 							olap: {
 								id: "olap",
@@ -84,14 +84,14 @@ Ext.define ("$o.ObjectField.Widget", {
 				me.fireEvent ("beforechoose", {
 					layout: layout
 				});
-				var attrs = me.choose.attr.split (".");
-				var olap;
-				var view = Ext.create ("$o.Layout.Widget", {
+				let attrs = me.choose.attr.split (".");
+				let olap;
+				view = Ext.create ("$o.Layout.Widget", {
 					record: view || $zs.views.ser.card,
 					$layout: layout,
 					listeners: {
 						afterrender: function () {
-							var tb;
+							let tb;
 							if (attrs.length > 1) {
 								olap = view.relatives [attrs [0]];
 								if (olap) {
@@ -132,8 +132,8 @@ Ext.define ("$o.ObjectField.Widget", {
 								tb.setVisible (true);
 							};
 							if (me.choose.hideActions) {
-								var b = win.query ("button");
-								for (var i = 0; i < b.length; i ++) {
+								let b = win.query ("button");
+								for (let i = 0; i < b.length; i ++) {
 									if ([$o.getString ("Add"), $o.getString ("Open"), $o.getString ("Remove")].indexOf (b [i].text) > -1) {
 										b [i].hide ();
 									}; 
@@ -143,7 +143,7 @@ Ext.define ("$o.ObjectField.Widget", {
 						scope: me
 					}
 				});
-				var btnChoose = Ext.create ("Ext.Button", {
+				let btnChoose = Ext.create ("Ext.Button", {
 					text: $o.getString ("Choose"),
 					iconCls: "ok",
 					disabled: true,
@@ -153,14 +153,14 @@ Ext.define ("$o.ObjectField.Widget", {
 					},
 					scope: me
 				});
-				var btnCancel = Ext.create ("Ext.Button", {
+				let btnCancel = Ext.create ("Ext.Button", {
 					text: $o.getString ("Cancel"),
 					iconCls: "cancel",
 					handler: function () {
 						win.close ();
 					}
 				});
-				var win = Ext.create ("Ext.Window", {
+				let win = Ext.create ("Ext.Window", {
 					title: $o.getString ("Choose object"),
 					resizable: true,
 					closable: true,
@@ -231,9 +231,9 @@ Ext.define ("$o.ObjectField.Widget", {
 		me.callParent (arguments);
 	},
 	onChoose: function (view) {
-		var me = this;
-		var tokens = (me.choose.attr ? me.choose.attr : "olap.id").split (".");
-		var wId, field, value;
+		let me = this;
+		let tokens = (me.choose.attr ? me.choose.attr : "olap.id").split (".");
+		let wId, field, value;
 		if (tokens.length == 1) {
 			for (wId in view.relatives) {
 				break;
@@ -243,7 +243,7 @@ Ext.define ("$o.ObjectField.Widget", {
 			wId = tokens [0];
 			field = tokens [1];
 		};
-		var oldValue = me.getValue ();
+		let oldValue = me.getValue ();
 		value = view.relatives [wId].getCurrentValue (field);
 		me.setValue (value);
 		if (me.choose.listeners && me.choose.listeners.afterChoose) {
@@ -251,10 +251,10 @@ Ext.define ("$o.ObjectField.Widget", {
 		};
 	},
 	setValue: function (v) {
-		var me = this;
+		let me = this;
 		me.value = v;
 		if (v) {
-			var o = $o.getObject (v);
+			let o = $o.getObject (v);
 			if (o) {
 				v = o.toString ();
 			} else {
@@ -280,7 +280,7 @@ Ext.define ("$o.ObjectField.Widget", {
 		return this.value;
 	},
 	setReadOnly: function (ro) {
-		var me = this;
+		let me = this;
 		me.ro = ro;
 		if (ro) {
 			me.items.getAt (0).hide ();
@@ -307,7 +307,7 @@ Ext.define ("$o.DateTimeField.Widget", {
 	alias: ["widget.datetimefield", "widget.$datetimefield"],
 	layout: "hbox",
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.items = [{
 			xtype: "datefield",
 			width: 90,
@@ -345,7 +345,7 @@ Ext.define ("$o.DateTimeField.Widget", {
 		me.callParent (arguments);
 	},
 	setValue: function (v) {
-		var me = this;
+		let me = this;
 		me.value = v;
 		if (me.dateField && me.timeField) {
 			me.dateField.setValue (v);
@@ -353,8 +353,8 @@ Ext.define ("$o.DateTimeField.Widget", {
 		};
 	},
 	getValue: function () {
-		var v = this.dateField.getValue ();
-		var tv = this.timeField.getValue ();
+		let v = this.dateField.getValue ();
+		let tv = this.timeField.getValue ();
 		if (tv) {
 			v.setHours (tv.getHours ());
 			v.setMinutes (tv.getMinutes ());
@@ -372,9 +372,9 @@ Ext.define ("$o.MultiSelect.Widget", {
 	border: true,
 	layout: "fit",
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.title = me.fieldLabel || me.title;
-		var listeners = {
+		let listeners = {
 			render: function (c) {
 				me.$multiselect = c;
 			}
@@ -407,7 +407,7 @@ Ext.define ("$o.FileField.Widget", {
 	alias: "widget.$filefield",
 	layout: "hbox",
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.items = [{
 			xtype: "button",
 			iconCls: "gi_upload",
@@ -417,12 +417,12 @@ Ext.define ("$o.FileField.Widget", {
 				marginRight: 1
 			},
 			handler: function () {
-				var fileField = Ext.create ("Ext.form.field.File", {
+				let fileField = Ext.create ("Ext.form.field.File", {
 					fieldLabel: $o.getString ("File"),
 					buttonText: $o.getString ("Choose"),
 					name: 'file-path'
 				});
-				var fp = Ext.create ("Ext.form.Panel", {
+				let fp = Ext.create ("Ext.form.Panel", {
 					defaults: {
 						anchor: '95%'
 					},
@@ -482,7 +482,7 @@ Ext.define ("$o.FileField.Widget", {
 						}
 					}]
 				});	
-				var win = new Ext.Window ({
+				let win = new Ext.Window ({
 					title: $o.getString ("File uploading"),
 					resizable: false,
 					closable: true,
@@ -530,7 +530,7 @@ Ext.define ("$o.FileField.Widget", {
 		return this.down ("field").getValue ();
 	},
 	setReadOnly: function (ro) {
-		var me = this;
+		let me = this;
 		if (ro) {
 			me.items.getAt (0).hide ();
 			me.items.getAt (1).hide ();
@@ -542,12 +542,12 @@ Ext.define ("$o.FileField.Widget", {
 		};
 	},
 	download: function () {
-		var me = this;
-		var filename = me.getValue ();
+		let me = this;
+		let filename = me.getValue ();
 		if (filename) {
-			var fileUri = "files/" + me.objectId + "-" + me.ca.get ("id") + "-" + filename;
-//			var w = window.open (fileUri, "w" + me.objectId + "-" + me.ca.get ("id"), "resizable=yes, scrollbars=yes, status=yes, width=600, height=400");
-			var w = window.open (fileUri);
+			let fileUri = "files/" + me.objectId + "-" + me.ca.get ("id") + "-" + filename;
+//			let w = window.open (fileUri, "w" + me.objectId + "-" + me.ca.get ("id"), "resizable=yes, scrollbars=yes, status=yes, width=600, height=400");
+			let w = window.open (fileUri);
 			w.focus ();
 		}
 	}
@@ -559,14 +559,14 @@ Ext.define ("$o.ConfField.Widget", {
 	extend: "$o.ObjectField.Widget",
 	alias: ["widget.conffield", "widget.$conffield"],
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.addEvents ("change");
 		me.callParent (arguments);
 		me.setValue = function (v) {
-			var me = this;
+			let me = this;
 			me.value = v;
 			if (v) {
-				var o = $o.getConfObject (me.confRef, v);
+				let o = $o.getConfObject (me.confRef, v);
 				v = o.toString ();
 			};
 			if (me.valueField) {
@@ -585,7 +585,7 @@ Ext.define ("$o.CodeMirrorTextArea.Widget", {
 	layout: "fit",
 	border: 0,
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.items = {
 			xtype: "textarea",
 			width: "100%",
@@ -593,9 +593,9 @@ Ext.define ("$o.CodeMirrorTextArea.Widget", {
 			value: me.value,
 			listeners: {
 				afterrender: function () {
-					var ta = this;
+					let ta = this;
 					dom = ta.inputEl.dom;
-					var makeEditor = function () {
+					let makeEditor = function () {
 						me.editor = CodeMirror.fromTextArea (dom, {
 							lineNumbers: true,
 							indentUnit: 4,
@@ -629,7 +629,7 @@ Ext.define ("$o.CodeMirrorTextArea.Widget", {
 		me.callParent (arguments);
 	},
 	setValue: function (value) {
-		var me = this;
+		let me = this;
 		value = value || "";
 		if (me.editor) {
 			me.editor.setValue (value);
@@ -638,7 +638,7 @@ Ext.define ("$o.CodeMirrorTextArea.Widget", {
 		};
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		if (me.editor) {
 			return this.editor.getValue ();
 		} else {
@@ -646,7 +646,7 @@ Ext.define ("$o.CodeMirrorTextArea.Widget", {
 		};
 	},
 	setReadOnly: function (ro) {
-		var me = this;
+		let me = this;
 		if (ro) {
 			me.disable ();
 		} else {
@@ -663,7 +663,7 @@ Ext.define ("$o.IconSelector.Widget", {
 	layout: "hbox",
 	fieldLabel: $o.getString ("Icon"),
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.items = [{
 			xtype: "button",
 			iconCls: "gi_edit",
@@ -719,27 +719,27 @@ Ext.define ("$o.IconSelector.Widget", {
 		me.callParent (arguments);
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		return me.value;
 	},
 	setValue: function (value) {
-		var me = this;
+		let me = this;
 		me.value = value;
 		me.down ("button[name='icon']").setIconCls (value ? value : "");
 		me.down ("textfield[name='name']").setValue (value ? value : "");
 	},
 	getIconData: function () {
-		var result = [];
-		var ss = document.styleSheets;
-		for (var i = 0; i < ss.length; i ++) {
-			var href = ss [i].href;
+		let result = [];
+		let ss = document.styleSheets;
+		for (let i = 0; i < ss.length; i ++) {
+			let href = ss [i].href;
 			if (href && href.indexOf ("images.css") != -1) {
-				var rules = ss [i].cssRules;
+				let rules = ss [i].cssRules;
 				if (!rules) {
 					rules = ss [i].rules;
 				};
-				for (var j = 0; j < rules.length; j ++) {
-					var v = rules [j].selectorText;
+				for (let j = 0; j < rules.length; j ++) {
+					let v = rules [j].selectorText;
 					if (!v) {
 						continue;
 					};
@@ -749,8 +749,8 @@ Ext.define ("$o.IconSelector.Widget", {
 					if (v.substr (0, 3) != "gi_") {
 						continue;
 					};
-					var o = {};
-					var url = rules [j].cssText;
+					let o = {};
+					let url = rules [j].cssText;
 					url = url.split ("(")[1].split (")")[0];
 					o.url = url;
 					o.iconCls = v;
@@ -758,9 +758,9 @@ Ext.define ("$o.IconSelector.Widget", {
 				}
 			}
 		}
-		var cmp = function (o1, o2) {
-			var v1 = o1.iconCls;
-			var v2 = o2.iconCls;
+		let cmp = function (o1, o2) {
+			let v1 = o1.iconCls;
+			let v2 = o2.iconCls;
 			if (v1 > v2) {
 				return 1;
 			} else if (v1 < v2) {
@@ -773,7 +773,7 @@ Ext.define ("$o.IconSelector.Widget", {
 		return result;
 	},
 	setReadOnly: function (ro) {
-		var me = this;
+		let me = this;
 		if (ro) {
 			me.down ("button[name='choose']").disable ();
 		} else {
@@ -781,15 +781,15 @@ Ext.define ("$o.IconSelector.Widget", {
 		};
 	},
 	choose: function () {
-		var me = this;
-		var data = me.getIconData ();
-		var onClick = function () {
+		let me = this;
+		let data = me.getIconData ();
+		let onClick = function () {
 			win.close ();
 			me.setValue (this.iconCls);
 			me.fireEvent ("change", this.iconCls);
 		};
-		var items = [], row = [];
-		for (var i = 0; i < data.length; i ++) {
+		let items = [], row = [];
+		for (let i = 0; i < data.length; i ++) {
 			row.push ({
 				iconCls: data [i].iconCls
 			});
@@ -817,7 +817,7 @@ Ext.define ("$o.IconSelector.Widget", {
 				items: row
 			});
 		};
-		var win = Ext.create ("Ext.Window", {
+		let win = Ext.create ("Ext.Window", {
 			width: 500,
 			height: 570,
 			layout: "fit",

@@ -9,12 +9,12 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 	bodyPadding: 5,
 	deferredRender: false,
 	initComponent: function () {
-		var me = this;
-	    var store = Ext.create ('Ext.data.Store', {
+		let me = this;
+	    let store = Ext.create ('Ext.data.Store', {
 	        fields: ["action", "line", "msg", "src"],
 	        data: []
 	    });
-	    var grid = Ext.create('Ext.grid.Panel', {
+	    let grid = Ext.create('Ext.grid.Panel', {
 	    	name: "errors",
 	        store: store,
 	        columns: [{
@@ -43,13 +43,13 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 	        	name: "showAction",
 	        	disabled: 1,
 	        	handler: function () {
-	        		var grid = me.down ("*[name=errors]");
+	        		let grid = me.down ("*[name=errors]");
 					if (grid.getSelectionModel ().hasSelection ()) {
-						var record = grid.getSelectionModel ().getSelection ()[0];
-						var actionCode = record.get ("action");
-						var a = $o.getAction (actionCode);
-						var body = a.get ("body");
-						var win = Ext.create ("Ext.Window", {
+						let record = grid.getSelectionModel ().getSelection ()[0];
+						let actionCode = record.get ("action");
+						let a = $o.getAction (actionCode);
+						let body = a.get ("body");
+						let win = Ext.create ("Ext.Window", {
 							width: 800, height: 600, layout: "fit",
 							frame: false, border: false, bodyPadding: 1,
 							modal: false,
@@ -107,8 +107,8 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 						me.down ("*[name=initAction]").setValue ($o.getAction ($o.visualObjectum.initAction).get ("id"));
 					};
 					if (o.scripts && o.scripts.client) {
-						var data = [];
-						for (var i = 0; i < o.scripts.client.length; i ++) {
+						let data = [];
+						for (let i = 0; i < o.scripts.client.length; i ++) {
 							data.push ({name: o.scripts.client [i]});
 						};
 						me.down ("*[name=clientScripts]").getStore ().loadData (data);
@@ -229,7 +229,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 						me.down ("*[name=errNum]").setValue ($o.getString ("building") + " ...");
 						me.down ("*[name=showAction]").disable ();
 						$o.app.name = $ptitle = me.down ("*[name=name]").getValue ();
-						var args = {
+						let args = {
 							name: me.down ("*[name=name]").getValue (),
 							build: me.down ("radiogroup").getValue ().rgBuild
 	//						siteView: me.down ("*[name=siteView]").getValue ()
@@ -247,7 +247,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 							password: me.down ("*[name=smtpPassword]").getValue (),
 							sender: me.down ("*[name=smtpSender]").getValue ()
 						};
-						var buildTime = null;//me.down ("*[name=timeMachineBuildTime]").getValue ();
+						let buildTime = null;//me.down ("*[name=timeMachineBuildTime]").getValue ();
 						args.timeMachine = {
 							cardButton: me.down ("*[name=timeMachineCardButton]").getValue () ? 1 : 0,
 							showDates: 0//me.down ("*[name=timeMachineShowDates]").getValue () ? 1 : 0
@@ -269,9 +269,9 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 						$o.visualObjectum.timeMachine.cardButton = args.timeMachine.cardButton;
 						$o.visualObjectum.timeMachine.showDates = args.timeMachine.showDates;
 						$o.visualObjectum.timeMachine.buildTime = args.timeMachine.buildTime;
-						var clientScripts = [];
-						var store = me.down ("*[name=clientScripts]").getStore ();
-						for (var i = 0; i < store.getCount (); i ++ ) {
+						let clientScripts = [];
+						let store = me.down ("*[name=clientScripts]").getStore ();
+						for (let i = 0; i < store.getCount (); i ++ ) {
 							clientScripts.push (store.getAt (i).get ("name"));
 						};
 						args.scripts = {client: clientScripts};
@@ -361,7 +361,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 		        	text: $o.getString ("Add"),
 		        	iconCls: "gi_circle_plus",
 		        	handler: function () {
-		        		var grid = this.up ("grid");
+		        		let grid = this.up ("grid");
 		        		dialog.getString ({fieldLabel: $o.getString ("Enter script location on server"), success: function (text) {
 		        			grid.getStore ().add ({name: text});
 		        		}});
@@ -370,10 +370,10 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 		        	text: $o.getString ("Remove"),
 		        	iconCls: "gi_circle_minus",
 		        	handler: function () {
-		        		var grid = this.up ("grid");
-		        		var sm = grid.getSelectionModel ();
+		        		let grid = this.up ("grid");
+		        		let sm = grid.getSelectionModel ();
 		        		if (sm.hasSelection ()) {
-		        			var rec = sm.getSelection ()[0];
+		        			let rec = sm.getSelection ()[0];
 		        			grid.getStore ().remove (rec);
 		        		};
 		        	}
@@ -389,7 +389,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				style: "margin-top: 5px",
 				choose: {
 					type: "custom", fn: function () {
-						var f = this;
+						let f = this;
 						dialog.getAction ({success: function (options) {
 							f.setValue (options.id);
 						}});
@@ -439,7 +439,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 				name: "actions",
 				listeners: {
 					afterrender: function () {
-						var ta = this;
+						let ta = this;
 						$o.execute ({fn: "vo.getActions", success: function (o) {
 							ta.setValue (o.actions);
 						}});
@@ -450,7 +450,7 @@ Ext.define ("$o.ProjectDesigner.Widget", {
 		this.callParent (arguments);
 	},
 	showBuildResults: function (o) {
-		var me = this;
+		let me = this;
 		me.down ("*[name=time]").setValue ((o.time / 1000).toFixed (3) + " сек.");
 		o.err = o.err || [];
 		me.down ("*[name=errNum]").setValue (o.err.length);

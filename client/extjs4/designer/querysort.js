@@ -7,7 +7,7 @@
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || [];
 		me.tbar = [{
 			text: $o.getString ("Add"),
@@ -53,7 +53,7 @@
 	},
 	cellRenderer: function (value, metaData, record, rowIndex, colIndex, store) {
 		if (value) {
-			var tip = value;
+			let tip = value;
 			if (typeof (tip) == "string") {
 				tip = tip.split ('"').join ("'");
 			}
@@ -62,22 +62,22 @@
 		return value;
 	},
 	setClasses: function (classes, classAliases, aliases) {
-		var me = this;
+		let me = this;
 		me.$classes = classes;
 		me.$classAliases = classAliases;
 		me.$aliases = aliases;
 	},
 	create: function () {
-		var me = this;
-		var data = [];
-		for (var i = 0; i < me.$classes.length; i ++) {
-			var cls = $o.getClass (me.$classes [i]);
+		let me = this;
+		let data = [];
+		for (let i = 0; i < me.$classes.length; i ++) {
+			let cls = $o.getClass (me.$classes [i]);
 			data.push ([me.$aliases [i] + ":id", me.$aliases [i] + ":id"]);
-			for (var attr in cls.attrs) {
+			for (let attr in cls.attrs) {
 				data.push ([me.$aliases [i] + ":" + attr, me.$aliases [i] + ":" + cls.attrs [attr].toString ()]);
 			};
 		};
-		var win = Ext.create ("Ext.Window", {
+		let win = Ext.create ("Ext.Window", {
 			width: 400,
 			height: 150,
 			layout: "vbox",
@@ -95,12 +95,12 @@
 				name: "create",
 				disabled: 1,
 				handler: function () {
-					var attr = win.down ("*[name=attr]").getValue ();
+					let attr = win.down ("*[name=attr]").getValue ();
 					me.value = me.value || [];
 					if (me.value.length) {
 						me.value.push (",");
 					};
-					var o = {};
+					let o = {};
 					o [attr.split (":")[0]] = attr.split (":")[1];
 					me.value.push (o);
 					if (win.down ("*[name=dir]").getValue () == "DESC") {
@@ -184,18 +184,18 @@
 		win.show ();
 	},
 	clear: function () {
-		var me = this;
+		let me = this;
 		me.setValue ([]);
 	},
 	build: function () {
-		var me = this;
-		var data = [];
+		let me = this;
+		let data = [];
 		if (me.value) {
-			for (var i = 0; i < me.value.length; i += 2) {
+			for (let i = 0; i < me.value.length; i += 2) {
 				if (me.value [i] == ",") {
 					i ++;
 				};
-				var r = {};
+				let r = {};
 				if (me.value [i + 1] == "DESC") {
 					r.dir = $o.getString ("Sort descending");
 					r.dir_id = "DESC";
@@ -203,11 +203,11 @@
 					r.dir = $o.getString ("Sort ascending");
 					r.dir_id = "ASC";
 				};
-				var alias; for (alias in me.value [i]) {break;};
-				var attr = me.value [i][alias];
-				for (var j = 0; j < me.$aliases.length; j ++) {
+				let alias; for (alias in me.value [i]) {break;};
+				let attr = me.value [i][alias];
+				for (let j = 0; j < me.$aliases.length; j ++) {
 					if (me.$aliases [j] == alias) {
-						var cls = $o.getClass (me.$classes [j]);
+						let cls = $o.getClass (me.$classes [j]);
 						r.attr = alias + ":" + cls.attrs [attr].toString ();
 						r.alias = alias;
 						break;
@@ -219,13 +219,13 @@
 		me.store.loadData (data);
 	},
 	setValue: function (value) {
-		var me = this;
+		let me = this;
 		me.value = value;
 		me.build ();
 		me.fireEvent ("change", value);
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		return me.value;
 	}
 });

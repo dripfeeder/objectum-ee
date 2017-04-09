@@ -1,45 +1,10 @@
 "use strict"
-var gulp = require ("gulp");
-var concat = require ("gulp-concat");
-var uglify = require ("gulp-uglifyjs");
-var fs = require ("fs");
-var prepareSQL = function () {
-    var r =
-        "\nvar dbTablesSQL = " + JSON.stringify (fs.readFileSync ("./server/db/tables.sql", "utf8")) + ";\n" +
-        "\nvar dbIndexesSQL = " + JSON.stringify (fs.readFileSync ("./server/db/indexes.sql", "utf8")) + ";\n" +
-        "\nvar dbDataSQL = " + JSON.stringify (fs.readFileSync ("./server/db/data.sql", "utf8")) + ";\n" +
-        "\nvar dbEngineSQL = " + JSON.stringify (fs.readFileSync ("./server/db/engine.sql", "utf8")) + ";\n"
-    ;
-    fs.writeFileSync ("./server/db/sql.js", r);
-};
-var jsServer = [
-    "./server/header.js",
-    "./server/modules.js",
-    "./server/common.js",
-    "./server/export.js",
-    "./server/import.js",
-    "./server/mail.js",
-    "./server/meta.js",
-    "./server/mimetypes.js",
-    "./server/projects.js",
-    "./server/query.js",
-    "./server/server.js",
-    "./server/sha.js",
-    "./server/storage.js",
-    "./server/db/client.js",
-    "./server/db/postgres.js",
-    "./server/db/mssql.js",
-    "./server/db/sql.js",
-    "./server/report/dbf.js",
-    "./server/report/xmlss.js",
-    "./server/report/pdf.js",
-    "./server/report/xlsx.js",
-    "./server/toc.js",
-    "./server/ose.js",
-    "./server/deprecated/*.js",
-    "./server/footer.js"
-];
-var jsClient = [
+const gulp = require ("gulp");
+const concat = require ("gulp-concat");
+const uglify = require ("gulp-uglifyjs");
+const fs = require ("fs");
+const babel = require ("gulp-babel");
+const js = [
     "./www/third-party/js/async.js",
     "./www/third-party/js/sha1.js",
     "./www/third-party/js/lodash.min.js",
@@ -107,49 +72,21 @@ var jsClient = [
     "./www/third-party/extjs4/examples/ux/grid/menu/RangeMenu.js"
 ];
 gulp.task ("bundle", function () {
-    prepareSQL ();
-    gulp.src (jsServer)
-        .pipe (concat ("objectum-debug.js"))
-        .pipe (gulp.dest ("."))
-        .pipe (uglify ("objectum.js"))
-        .pipe (gulp.dest ("."))
-    ;
-    gulp.src (jsClient)
+    gulp.src (js)
         .pipe (concat ("all-debug.js"))
         .pipe (gulp.dest ("./www/client/extjs4"))
+		.pipe (babel ({
+			compact: true,
+			presets: ["es2015"]
+		}))
         .pipe (uglify ("all.js"))
         .pipe (gulp.dest ("./www/client/extjs4"))
     ;
 });
-gulp.task ("server", function () {
-    prepareSQL ();
-    gulp.src (jsServer)
-        .pipe (concat ("objectum-debug.js"))
-        .pipe (gulp.dest ("."))
-        .pipe (uglify ("objectum.js"))
-        .pipe (gulp.dest ("."))
-    ;
-});
-gulp.task ("server-debug", function () {
-    prepareSQL ();
-    gulp.src (jsServer)
-        .pipe (concat ("objectum-debug.js"))
-        .pipe (gulp.dest ("."))
-    ;
-});
-gulp.task ("client", function () {
-    gulp.src (jsClient)
-        .pipe (concat ("all-debug.js"))
-        .pipe (gulp.dest ("./www/client/extjs4"))
-        .pipe (uglify ("all.js"))
-        .pipe (gulp.dest ("./www/client/extjs4"))
-    ;
-});
-gulp.task ("client-debug", function () {
-    gulp.src (jsClient)
+gulp.task ("debug", function () {
+    gulp.src (js)
         .pipe (concat ("all-debug.js"))
         .pipe (gulp.dest ("./www/client/extjs4"))
     ;
 });
 gulp.task ("default", ["bundle"]);
-

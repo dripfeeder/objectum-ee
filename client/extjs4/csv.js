@@ -9,13 +9,13 @@ Ext.define ("ImportCSVObjects.Widget", {
     bodyPadding: 2,
     classId: null,
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.oCls = $o.getClass (me.classId);
 		me.attrs = _.map (me.oCls.attrs, function (ca) {
 			ca.set ("fullName", ca.get ("name") + " (" + ca.get ("code") + ")");
 			return ca;
 		});
-		var filePanel = new Ext.Panel ({
+		let filePanel = new Ext.Panel ({
 			bodyStyle: 'background-color: white; padding: 5px;',
 			border: false,
 			html: '<input type="file" id="selectedFile">'
@@ -45,18 +45,18 @@ Ext.define ("ImportCSVObjects.Widget", {
 			name: "load",
 			disabled: true,
 			handler: function () {
-				var inp = Ext.getDom ("selectedFile");
-				var file = inp.files [0];
-				var reader = new FileReader ();
+				let inp = Ext.getDom ("selectedFile");
+				let file = inp.files [0];
+				let reader = new FileReader ();
 				reader.onload = function () {
-					var rows = reader.result.split ("\n");
+					let rows = reader.result.split ("\n");
 					me.data = [];
 					me.fields = [];
 					_.each (rows, function (row, i) {
-						var cells = row.split (";");
-						var o = {};
+						let cells = row.split (";");
+						let o = {};
 						_.each (cells, function (s, j) {
-							var s = s == null ? "" : s.trim ();
+							s = s == null ? "" : s.trim ();
 							if (!i) {
 								me.fields.push ({
 									name: s,
@@ -73,7 +73,7 @@ Ext.define ("ImportCSVObjects.Widget", {
 					if (me.fields.length && !me.fields [me.fields.length - 1].name) {
 						me.fields.splice (me.fields.length - 1, 1);
 					}
-					var grid = me.down ("*[name=grid]");
+					let grid = me.down ("*[name=grid]");
 		            grid.reconfigure ({
 						xtype: "store",
 						fields: _.map (me.fields, function (a) {
@@ -89,14 +89,14 @@ Ext.define ("ImportCSVObjects.Widget", {
 					}));
 		            grid.getStore ().loadData (me.data);
 		            me.down ("*[name=recNum]").setValue (me.data.length);
-					var items = _.map (me.fields, function (field) {
-						var value;
+					let items = _.map (me.fields, function (field) {
+						let value;
 						_.each (me.attrs, function (ca) {
 							if (ca.get ("name") == field.name) {
 								value = ca.get ("code");
 							}
 						});
-						var o = {
+						let o = {
 							xtype: "combo",
 							fieldLabel: field.name,
 							name: field.code,
@@ -144,13 +144,13 @@ Ext.define ("ImportCSVObjects.Widget", {
 					});	
 					setTimeout (function () {
 						$o.startTransaction ();
-						var map = {};
+						let map = {};
 						_.each (me.fields, function (field) {
-							var c = me.down ("*[name=" + field.code + "]");
+							let c = me.down ("*[name=" + field.code + "]");
 							map [field.code] = c.getValue ();
 						});
-						var recs = [];
-						var idAttr = me.down ("*[name=idAttr]").getValue ();
+						let recs = [];
+						let idAttr = me.down ("*[name=idAttr]").getValue ();
 						if (idAttr) {
 							recs = $o.execute ({
 								asArray: true,
@@ -163,16 +163,16 @@ Ext.define ("ImportCSVObjects.Widget", {
 								]
 							});
 						}
-						var idMap = {};
+						let idMap = {};
 						_.each (recs, function (rec) {
 							idMap [rec [idAttr]] = rec.id;
 						});
 						async.reduce (me.data, 0, function (i, rec, cb) {
-							var attrs = {};
+							let attrs = {};
 							_.each (rec, function (v, a) {
 								attrs [map [a]] = v;
 							});
-							var o;
+							let o;
 							if (!idAttr || (idAttr && attrs [idAttr])) {
 								if (idAttr) {
 									if (idMap [attrs [idAttr]]) {

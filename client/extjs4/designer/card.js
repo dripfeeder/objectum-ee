@@ -7,7 +7,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 		border: 0
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.counter = 1;
 		me.data = {};
 		me.treeStore = Ext.create ('Ext.data.TreeStore', {
@@ -200,7 +200,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 							confRef: "view",
 							choose: {
 								type: "custom", fn: function () {
-									var me = this;
+									let me = this;
 									dialog.getView ({success: function (options) {
 										me.setValue (options.id);
 									}});
@@ -235,7 +235,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 							confRef: "action",
 							choose: {
 								type: "custom", fn: function () {
-									var f = this;
+									let f = this;
 									dialog.getAction ({success: function (options) {
 										f.setValue (options.id);
 									}});
@@ -324,10 +324,10 @@ Ext.define ("$o.CardDesigner.Widget", {
 		this.callParent (arguments);
 	},
 	addField: function () {
-		var me = this;
-		var tree = me.down ("treepanel");
-		var sm = tree.getSelectionModel ();
-		var node;
+		let me = this;
+		let tree = me.down ("treepanel");
+		let sm = tree.getSelectionModel ();
+		let node;
 		if (sm.hasSelection ()) {
             node = sm.getSelection ()[0];
 			if (node.get ("text").substr (0, 5) == ($o.getString ("Field") + ":")) {
@@ -338,16 +338,16 @@ Ext.define ("$o.CardDesigner.Widget", {
             node = tree.getStore ().getRootNode ();
         };
         node.expand ();
-        var rec = {
+        let rec = {
         	id: me.counter ++, text: $o.getString ("Field") + ":", leaf: true
         };
         node.appendChild (rec);
 	},
 	addComposite: function () {
-		var me = this;
-		var tree = me.down ("treepanel");
-		var sm = tree.getSelectionModel ();
-		var node;
+		let me = this;
+		let tree = me.down ("treepanel");
+		let sm = tree.getSelectionModel ();
+		let node;
 		if (sm.hasSelection ()) {
             node = sm.getSelection ()[0];
             node.set ("leaf", false);
@@ -355,16 +355,16 @@ Ext.define ("$o.CardDesigner.Widget", {
             node = tree.getStore ().getRootNode ();
         };
         node.expand ();
-        var rec = {
+        let rec = {
         	id: me.counter ++, text: $o.getString ("Composite") + ":", leaf: true
         };
         node.appendChild (rec);
 	},
 	addGroup: function () {
-		var me = this;
-		var tree = me.down ("treepanel");
-		var sm = tree.getSelectionModel ();
-		var node;
+		let me = this;
+		let tree = me.down ("treepanel");
+		let sm = tree.getSelectionModel ();
+		let node;
 		if (sm.hasSelection ()) {
             node = sm.getSelection ()[0];
             node.set ("leaf", false);
@@ -372,23 +372,23 @@ Ext.define ("$o.CardDesigner.Widget", {
             node = tree.getStore ().getRootNode ();
         };
         node.expand ();
-        var rec = {
+        let rec = {
         	id: me.counter ++, text: $o.getString ("Group") + ":", leaf: true
         };
         node.appendChild (rec);
 	},
 	selectionChange: function () {
-		var me = this;
-		var tree = me.down ("treepanel");
-		var sm = tree.getSelectionModel ();
+		let me = this;
+		let tree = me.down ("treepanel");
+		let sm = tree.getSelectionModel ();
        	me.down ("*[name=addField]").enable ();
     	me.down ("*[name=addComposite]").enable ();
     	me.down ("*[name=addGroup]").enable ();
 		if (sm.hasSelection ()) {
 			me.down ("*[name=remove]").enable ();
 			me.down ("*[name=card]").show ();
-            var node = sm.getSelection ()[0];
-            var kind = "field";
+            let node = sm.getSelection ()[0];
+            let kind = "field";
             if (node.get ("text").substr (0, 10) == ($o.getString ("Composite") + ":")) {
             	kind = "composite";
 			};            
@@ -442,10 +442,10 @@ Ext.define ("$o.CardDesigner.Widget", {
 		};
 	},
 	updateCard: function (id, kind) {
-		var me = this;
+		let me = this;
 		me.selectedId = id;
 		me.data [id] = me.data [id] || {};
-		var o = me.data [id];
+		let o = me.data [id];
 		if (o.attr && (!me.tag || o.tag != me.tag)) {
 	        me.down ("*[name=card]").disable ();
 			return;
@@ -519,16 +519,16 @@ Ext.define ("$o.CardDesigner.Widget", {
 	    };
 	},
 	onChange: function () {
-		var me = this.cardDesigner;
-		var field = this;
+		let me = this.cardDesigner;
+		let field = this;
 		me.data [me.selectedId] = me.data [me.selectedId] || {};
-		var o = me.data [me.selectedId];
+		let o = me.data [me.selectedId];
 		o.tag = me.tag;
 		o.classId = me.classId;
 		if (field.name == "name") {
 			o.name = field.getValue ();
-			var node = me.down ("treepanel").getSelectionModel ().getSelection ()[0];
-			var tokens = node.get ("text").split (":");
+			let node = me.down ("treepanel").getSelectionModel ().getSelection ()[0];
+			let tokens = node.get ("text").split (":");
 			node.set ("text", tokens [0] + ": " + o.name);
 		};
 		if (field.name == "labelWidth") {
@@ -567,12 +567,12 @@ Ext.define ("$o.CardDesigner.Widget", {
 		if (field.name == "attr") {
 			o.attr = field.getValue ();
 			me.updateCard (me.selectedId, "field");
-			var cls = $o.getClass (me.classId);
-			var data = [];
-			for (var i = 0; i < cls.attrsArray.length; i ++) {
-				var ca = cls.attrsArray [i];
-				var has = 0;
-				for (var id in me.data) {
+			let cls = $o.getClass (me.classId);
+			let data = [];
+			for (let i = 0; i < cls.attrsArray.length; i ++) {
+				let ca = cls.attrsArray [i];
+				let has = 0;
+				for (let id in me.data) {
 					if (me.data [id].attr == ca.get ("code") && me.data [id].tag == me.tag) {
 						has = 1;
 					};
@@ -587,18 +587,18 @@ Ext.define ("$o.CardDesigner.Widget", {
 			};
 		};
 		if (field.name == "view") {
-			var prevView = o.view;
+			let prevView = o.view;
 			o.view = field.getValue () ? $o.getView (field.getValue ()).getFullCode () : null;
 			if (prevView != o.view) {
 				me.down ("*[name=viewAttr]").setValue (null);
 			};
-			var data = [];
+			let data = [];
 			if (field.getValue ()) {
-				var v = $o.getView (field.getValue ());
+				let v = $o.getView (field.getValue ());
 				if (v.get ("layout")) {
 					data = me.layoutCard.getViewCmpAttrs (v.get ("layout"));
 				} else {
-    				for (var attr in v.attrs) {
+    				for (let attr in v.attrs) {
     					data.push ([attr, v.attrs [attr].toString ()]);
     				};
     			};
@@ -613,36 +613,36 @@ Ext.define ("$o.CardDesigner.Widget", {
 		};
 	},
 	setClassId: function (classId, tag) {
-		var me = this;
+		let me = this;
 		me.classId = classId;
 		me.tag = tag;
-		var data = [];
+		let data = [];
 		if (classId) {
-			var cls = $o.getClass (classId);
+			let cls = $o.getClass (classId);
 			me.attrs = cls.attrs;
-			for (var i = 0; i < cls.attrsArray.length; i ++) {
-				var ca = cls.attrsArray [i];
+			for (let i = 0; i < cls.attrsArray.length; i ++) {
+				let ca = cls.attrsArray [i];
 				data.push ([ca.get ("code"), ca.toString ()]);
 			};
 		};
 		me.storeAttrs.loadData (data);
 		/*
 		me.data = {};
-		var root = me.down ("treepanel").getRootNode ();
-		for (var i = root.childNodes.length - 1; i >= 0; i --) {
+		let root = me.down ("treepanel").getRootNode ();
+		for (let i = root.childNodes.length - 1; i >= 0; i --) {
 			root.childNodes [i].remove ();
 		};
 		*/
 	},
 	getValue: function (options) {
 		options = options || {};
-		var me = this;
-		var items = [];
-		var getNodes = function (parent, items) {
-			for (var i = 0; i < parent.childNodes.length; i ++) {
-				var node = parent.childNodes [i];
-				var o = me.data [node.get ("id")] || {};
-				var oo = {};
+		let me = this;
+		let items = [];
+		let getNodes = function (parent, items) {
+			for (let i = 0; i < parent.childNodes.length; i ++) {
+				let node = parent.childNodes [i];
+				let o = me.data [node.get ("id")] || {};
+				let oo = {};
 				if (o.width) {
 					oo.width = o.width;
 				} else {
@@ -651,16 +651,16 @@ Ext.define ("$o.CardDesigner.Widget", {
 				switch (node.get ("text").split (":")[0]) {
 				case $o.getString ("Field"):
 					if (o.attr) {
-						var cls = me.getClsByTag (o.tag);
-						var attrs = cls.attrs;
-						var typeId = attrs [o.attr].get ("type");
+						let cls = me.getClsByTag (o.tag);
+						let attrs = cls.attrs;
+						let typeId = attrs [o.attr].get ("type");
 						oo.fieldLabel = o.name;
 						oo.attr = o.attr;
 						if (options.preview) {
 							oo.objectId = $o.createObject (o.classId, "local").get ("id");
 						} else {
 							if (me.layoutCard.value.card.object.cmpAttr) {
-								var tokens = o.tag.split (".");
+								let tokens = o.tag.split (".");
 								oo.id = tokens [0];
 								oo.attr = tokens [1] + "." + o.attr;
 							} else {
@@ -737,12 +737,12 @@ Ext.define ("$o.CardDesigner.Widget", {
 					oo.items = [];
 					getNodes (node, oo.items);
 					if (node.get ("text").split (":")[0] == $o.getString ("Composite")) {
-						for (var j = 0; j < oo.items.length; j ++) {
-							var b = oo.items [j];
+						for (let j = 0; j < oo.items.length; j ++) {
+							let b = oo.items [j];
 							//b.hideLabel = true;
 							b.style = "margin-right: 10px";
 							if (b.attr && !b.fieldLabel) {
-								var typeId = me.attrs [b.attr].get ("type");
+								let typeId = me.attrs [b.attr].get ("type");
 								if (typeId == 2 || typeId == 3) {
 									b.width = 100;
 								};
@@ -762,27 +762,27 @@ Ext.define ("$o.CardDesigner.Widget", {
 		return items;
 	},
 	getClsByTag: function (tag) {
-		var me = this;
-		var oo = me.layoutCard.value.card.object;
-		for (var i = 0; i < oo.length; i ++) {
+		let me = this;
+		let oo = me.layoutCard.value.card.object;
+		for (let i = 0; i < oo.length; i ++) {
 			if (oo [i].tag == tag) {
-				var cls = $o.getClass (oo [i].cls);
+				let cls = $o.getClass (oo [i].cls);
 				return cls;
 			};
 		};
 	},
 	setValue: function (items) {
-		var me = this;
+		let me = this;
 		items = items || [];
-		var root = me.down ("treepanel").getRootNode ();
-		for (var i = root.childNodes.length - 1; i >= 0; i --) {
+		let root = me.down ("treepanel").getRootNode ();
+		for (let i = root.childNodes.length - 1; i >= 0; i --) {
 			root.childNodes [i].remove ();
 		};
 		function getChildren (items, node) {
-			for (var i = 0; i < items.length; i ++) {
-				var item = items [i];
-				var id = me.counter ++;
-				var o;
+			for (let i = 0; i < items.length; i ++) {
+				let item = items [i];
+				let id = me.counter ++;
+				let o;
 				if (item.xtype == "fieldcontainer") {
 					o = {
 				        id: id, text: $o.getString ("Composite") + ": " + (item.fieldLabel || ""), leaf: !(item.items && item.items.length)
@@ -807,9 +807,9 @@ Ext.define ("$o.CardDesigner.Widget", {
 						name: "xtype: " + (item.xtype || ""), item: item
 					};
 				} else {
-					var cls = me.getClsByTag (item.objectId);
-					var attrs = cls.attrs;
-					var attr = attrs [item.attr] || attrs [item.attr.split (".")[1]];
+					let cls = me.getClsByTag (item.objectId);
+					let attrs = cls.attrs;
+					let attr = attrs [item.attr] || attrs [item.attr.split (".")[1]];
 			        o = {
 			        	id: id, text: $o.getString ("Field") + ": " + (item.fieldLabel || attr.get ("name")), leaf: true
 			        };
@@ -833,7 +833,7 @@ Ext.define ("$o.CardDesigner.Widget", {
 						me.data [id].filterAction = item.listeners ? item.listeners.beforechoose : undefined;
 						me.data [id].hideActions = item.choose.hideActions;
 					};
-					for (var j = 0; j < me.storeAttrs.getCount (); j ++) {
+					for (let j = 0; j < me.storeAttrs.getCount (); j ++) {
 						if (me.storeAttrs.getAt (j).get ("id") == attr.get ("code")) {
 							me.storeAttrs.removeAt (j);
 							break;
@@ -854,11 +854,11 @@ Ext.define ("$o.CardDesigner.Widget", {
 		getChildren (items, root);
 	},
 	remove: function () {
-		var me = this;
-		var tree = me.down ("treepanel");
-		var sm = tree.getSelectionModel ();
-        var node = sm.getSelection ()[0];
-        var parentNode = node.parentNode;
+		let me = this;
+		let tree = me.down ("treepanel");
+		let sm = tree.getSelectionModel ();
+        let node = sm.getSelection ()[0];
+        let parentNode = node.parentNode;
         delete me.data [node.get ("id")];
         me.down ("*[name=attr]").setValue (null);
 		node.remove ();
@@ -867,8 +867,8 @@ Ext.define ("$o.CardDesigner.Widget", {
 		};
 	},
 	preview: function (classId) {
-		var me = this;
-		var win = Ext.create ("Ext.Window", {
+		let me = this;
+		let win = Ext.create ("Ext.Window", {
 			width: 800,
 			height: 600,
 			layout: "fit",

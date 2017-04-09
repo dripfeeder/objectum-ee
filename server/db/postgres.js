@@ -1,7 +1,7 @@
 //
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.
 //
-var pgTypes = pg.types;
+let pgTypes = pg.types;
 // types: select typname, oid, typarray from pg_type where typtype = 'b' order by oid
 if (pgTypes) {
 	// numeric
@@ -32,7 +32,7 @@ if (pgTypes) {
 //	Class for PostgreSQL database
 
 db.Postgres = function (options) {
-	var me = this;
+	let me = this;
 	me.storage = options;
 	me.database = "postgres";
 	me.dbEngine = options.connection.dbEngine;
@@ -64,9 +64,9 @@ db.Postgres = function (options) {
 };
 db.Postgres.prototype.connect = function (options) {
 	options = options || {};
-	var me = this;
-	var success = options.success;
-	var client = new pg.Client (options.systemDB ? me.adminConnection : me.connection);
+	let me = this;
+	let success = options.success;
+	let client = new pg.Client (options.systemDB ? me.adminConnection : me.connection);
 	client.connect (function (err) {
 		if (!err) {
 			me.client = client;
@@ -76,7 +76,7 @@ db.Postgres.prototype.connect = function (options) {
 				client.pauseDrain ();
 			};
 			me.query ({sql: "select version ()", success: function (options) {
-				var v = options.result.rows [0].version;
+				let v = options.result.rows [0].version;
 				v = v.split (" ")[1];
 				v = v.split (".");
 				v = Number (v [0] * 10) + Number (v [1]);
@@ -102,14 +102,14 @@ db.Postgres.prototype.connect = function (options) {
 	});
 };
 db.Postgres.prototype.disconnect = function (options) {
-	var me = this;
+	let me = this;
 	if (me.client && me.client.end) {
 		me.client.end ();
 		me.connected = 0;
 	};
 };
 db.Postgres.prototype.query = function (options) {
-	var me = this;
+	let me = this;
 	function go () {	
 		me.lastActivity = new Date ().getTime ();
 		log.debug ({cls: "Postgres", fn: "query", sql: options.sql, params: options.params});
@@ -139,7 +139,7 @@ db.Postgres.prototype.query = function (options) {
 	};
 };
 db.Postgres.prototype.startTransaction = function (options) {
-	var me = this;
+	let me = this;
 	this.query ({sql: "begin", success: function () {
 		options.success ();
 	}, failure: function (err) {
@@ -149,7 +149,7 @@ db.Postgres.prototype.startTransaction = function (options) {
 	}});
 };
 db.Postgres.prototype.commitTransaction = function (options) {
-	var me = this;
+	let me = this;
 	this.query ({sql: "commit", success: function () {
 		options.success ();
 	}, failure: function (err) {
@@ -160,7 +160,7 @@ db.Postgres.prototype.commitTransaction = function (options) {
 	}});
 };
 db.Postgres.prototype.rollbackTransaction = function (options) {
-	var me = this;
+	let me = this;
 	this.query ({sql: "rollback", success: function () {
 		options.success ();
 	}, failure: function (err) {
@@ -170,10 +170,10 @@ db.Postgres.prototype.rollbackTransaction = function (options) {
 	}});
 };
 db.Postgres.prototype.getNextId = function (options) {
-	var me = this;
-	var success = options.success;
+	let me = this;
+	let success = options.success;
 	me.query ({sql: "select nextval ('" + options.table + "_fid_seq') as id", success: function (options) {
-		var id = options.result.rows [0].id;
+		let id = options.result.rows [0].id;
 		success ({id: id});
 	}, failure: function (err) {
 		if (options.failure) {
@@ -186,8 +186,8 @@ db.Postgres.prototype.currentTimestamp = function () {
 };
 // DB struct update
 db.Postgres.prototype.update = function (options) {
-	var me = this;
-	var storage = me.storage;
+	let me = this;
+	let storage = me.storage;
 	async.series ([
 		function (cb) {
 			storage.query ({sql: 'select fremove_rule from tclass_attr', success: function (options) {
@@ -247,7 +247,7 @@ db.Postgres.prototype.update = function (options) {
 		},
 		function (cb) {
 			storage.query ({sql: "select data_type from information_schema.columns where table_catalog='" + storage.code + "' and table_name='tview_attr' and column_name='forder'", success: function (options) {
-				var rows = options.result.rows;
+				let rows = options.result.rows;
 				if (rows.length && rows [0].data_type != "numeric") {
 					storage.query ({sql: "alter table tview_attr alter column forder type numeric", success: function () {
 						cb ();
@@ -277,13 +277,13 @@ db.Postgres.prototype.update = function (options) {
 	});
 };
 db.Postgres.prototype.updateSequences = function (options) {
-	var me = this;
-	var storage = me.storage;
-	var tables = ["tclass", "tclass_attr", "tobject", "tobject_attr", "tview", "tview_attr", "taction", "trevision"];
+	let me = this;
+	let storage = me.storage;
+	let tables = ["tclass", "tclass_attr", "tobject", "tobject_attr", "tview", "tview_attr", "taction", "trevision"];
 	async.map (tables, function (table, cb) {
 		storage.query ({sql: "select max (fid) as max_id from " + table, success: function (options) {
-			var qr = options.result.rows;
-			var n;
+			let qr = options.result.rows;
+			let n;
 			if (qr.length) {
 				n = qr [0].max_id + 1;
 			};
@@ -307,11 +307,11 @@ db.Postgres.prototype.updateSequences = function (options) {
 	});
 };
 db.Postgres.prototype.create = function (options) {
-	var me = this;
-	var storage = me.storage;
-	var connection = options.connection;
-	var cfg = options.cfg;
-	var success = options.success;
+	let me = this;
+	let storage = me.storage;
+	let connection = options.connection;
+	let cfg = options.cfg;
+	let success = options.success;
 	async.series ([
 		function (cb) {
 			storage.query ({client: me, sql: "create role " + connection.dbUser + " noinherit login password '" + connection.dbPassword + "'", success: function (options) {
@@ -350,7 +350,7 @@ db.Postgres.prototype.create = function (options) {
 			}});
 		},
 		function (cb) {
-			var sql = dbTablesSQL;
+			let sql = dbTablesSQL;
 			storage.query ({client: me, sql: sql, success: function (options) {
 				cb ();
 			}, failure: function (err) {
@@ -358,7 +358,7 @@ db.Postgres.prototype.create = function (options) {
 			}});
 		},
 		function (cb) {
-			var sql = dbIndexesSQL;
+			let sql = dbIndexesSQL;
 			storage.query ({client: me, sql: sql, success: function (options) {
 				cb ();
 			}, failure: function (err) {
@@ -367,7 +367,7 @@ db.Postgres.prototype.create = function (options) {
 		},
 		function (cb) {
 			if (me.dbEngine && me.dbEngine.enabled) {
-				var sql = dbEngineSQL;
+				let sql = dbEngineSQL;
 				storage.query ({client: me, sql: sql, success: function (options) {
 					cb ();
 				}, failure: function (err) {
@@ -378,7 +378,7 @@ db.Postgres.prototype.create = function (options) {
 			};
 		},
 		function (cb) {
-			var sql = dbDataSQL;
+			let sql = dbDataSQL;
 			storage.query ({client: me, sql: sql, success: function (options) {
 				cb ();
 			}, failure: function (err) {
@@ -395,11 +395,11 @@ db.Postgres.prototype.create = function (options) {
 	});
 };
 db.Postgres.prototype.remove = function (options) {
-	var me = this;
-	var storage = me.storage;
-	var connection = options.connection;
-	var cfg = options.cfg;
-	var success = options.success;
+	let me = this;
+	let storage = me.storage;
+	let connection = options.connection;
+	let cfg = options.cfg;
+	let success = options.success;
 	async.series ([
 		function (cb) {
 			me.disconnect ();
@@ -450,12 +450,12 @@ db.Postgres.prototype.remove = function (options) {
 	});
 };
 db.Postgres.prototype.createField = function (options) {
-	var storage = this.storage;
-	var toc = options.toc;
-	var tocField = options.tocField;
-	var type = options.type;
-	var caId = options.caId;
-	var success = options.success;
+	let storage = this.storage;
+	let toc = options.toc;
+	let tocField = options.tocField;
+	let type = options.type;
+	let caId = options.caId;
+	let success = options.success;
 	async.series ([
 		function (cb) {
 			storage.query ({session: options.session, sql: "alter table " + toc + " add column " + tocField + " " + type, success: function () {
@@ -491,8 +491,8 @@ db.Postgres.prototype.createField = function (options) {
 */
 };
 db.Postgres.prototype.createIndex = function (options) {
-	var storage = this.storage;
-	var success = options.success;
+	let storage = this.storage;
+	let success = options.success;
 	storage.query ({session: options.session, sql: "create index " + options.table + "_" + options.field + " on " + options.table + " (" + options.field + ")", success: function () {
 		success ();
 	}, failure: function (err) {
@@ -502,9 +502,9 @@ db.Postgres.prototype.createIndex = function (options) {
 	}});
 };
 db.Postgres.prototype.isTableExists = function (options) {
-	var success = options.success;
+	let success = options.success;
 	this.storage.query ({session: options.session, sql: "select count (*) as num from pg_tables where upper (schemaname) = upper ('$schema$') and upper (tablename) = upper ('" + options.table + "')", success: function (options) {
-		var r = options.result.rows;
+		let r = options.result.rows;
 		success (r [0].num);
 	}, failure: function (err) {
 		if (options.failure) {
@@ -513,9 +513,9 @@ db.Postgres.prototype.isTableExists = function (options) {
 	}});
 };
 db.Postgres.prototype.isFieldExists = function (options) {
-	var success = options.success;
+	let success = options.success;
 	this.storage.query ({session: options.session, sql: "select count (*) as num from information_schema.columns where lower (table_name) = lower ('" + options.table + "') and lower (column_name) = lower ('" + options.field + "')", success: function (options) {
-		var r = options.result.rows;
+		let r = options.result.rows;
 		success (r [0].num);
 	}, failure: function (err) {
 		if (options.failure) {
@@ -524,13 +524,13 @@ db.Postgres.prototype.isFieldExists = function (options) {
 	}});
 };
 db.Postgres.prototype.isIndexExists = function (options) {
-	var success = options.success;
+	let success = options.success;
 	this.storage.query ({session: options.session, sql:
 		"select count (*) as num from pg_catalog.pg_class as c\n" +
 		"left join pg_catalog.pg_namespace as n on (n.oid = c.relnamespace)\n" +
 		"where c.relkind = 'i' and lower (c.relname) = lower ('" + options.index + "') and n.nspname = '" + this.storage.code + "'"
 	, success: function (options) {
-		var r = options.result.rows;
+		let r = options.result.rows;
 		success (r [0].num);
 	}, failure: function (err) {
 		if (options.failure) {

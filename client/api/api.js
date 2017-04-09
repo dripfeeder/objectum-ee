@@ -53,9 +53,9 @@ Ext.define ("$o", {
 		);
 	},
 	load: function (options) {
-		var me = this;
-		var success = options.success;
-		var scope = options.scope;
+		let me = this;
+		let success = options.success;
+		let scope = options.scope;
 		me.initModels ();
 		me.initStores ({success: function (options) {
 			me.initClasses (options);
@@ -75,11 +75,11 @@ Ext.define ("$o", {
 		if (!options) {
 			throw new Error ("$o.init must have options: {success}");
 		};
-		var me = this;
+		let me = this;
 		me.code = options.code;
-		var mainOptions = options;
-		var failure = options.failure;
-		var scope = options.scope;
+		let mainOptions = options;
+		let failure = options.failure;
+		let scope = options.scope;
 		if (me.authorized) {
 			me.load (options);
 		} else {
@@ -97,7 +97,7 @@ Ext.define ("$o", {
 		password // SHA-1
 	*/
 	authorize: function (options) {
-		var mainOptions = options;
+		let mainOptions = options;
 		Ext.Ajax.request ({
 			url: "?authorize=1",
 //			params: options.login + "\n" + options.password + "\n" + options.passwordPlain,
@@ -112,7 +112,7 @@ Ext.define ("$o", {
 				};
 				if (response.responseText.substr (0, 4) == "wait") {
 					if (mainOptions.failure) {
-						var secs = response.responseText.split (" ")[1];
+						let secs = response.responseText.split (" ")[1];
 						mainOptions.failure.call (mainOptions.scope || this, $o.getString ("Wait") + " " + (secs / 60 | 0) + $o.getString (" ", "min", "and", "try again"));
 					};
 					return;
@@ -135,9 +135,9 @@ Ext.define ("$o", {
 					};
 					return;
 				};
-				var tokens = response.responseText.split (" ");
-				var sessionId = tokens [0];
-				var userId = tokens [1];
+				let tokens = response.responseText.split (" ");
+				let sessionId = tokens [0];
+				let userId = tokens [1];
 				if (userId == "null") {
 					userId = null;
 				};
@@ -158,7 +158,7 @@ Ext.define ("$o", {
 					$o.menuId = tokens [4] == "null" ? null : tokens [4];
 				};
 				*/
-				var opts = JSON.parse (response.responseText);
+				let opts = JSON.parse (response.responseText);
 				if (!opts || opts.error) {
 					if (mainOptions.failure) {
 						mainOptions.failure.call (mainOptions.scope || this, opts.error);
@@ -182,11 +182,11 @@ Ext.define ("$o", {
 				$o.roleId = opts.roleId;
 				$o.menuId = opts.menuId;
 				$o.idleTimer = 0;
-				var userAction = function () {
+				let userAction = function () {
 					$o.idleTimer = 0;
 				};
 				if (this.currentUser != "autologin") {
-					var timerIntervalId = setInterval (function () {
+					let timerIntervalId = setInterval (function () {
 						$o.idleTimer += 1;
 						$o.maxIdleSec = $o.maxIdleSec || (60 * 30);
 						if ($o.idleTimer > $o.maxIdleSec) {
@@ -209,7 +209,7 @@ Ext.define ("$o", {
 			},
 			failure: function (response, options) {
 				if (mainOptions.failure) {
-					var opts, err;
+					let opts, err;
 					try {
 						opts = JSON.parse (response.responseText);
 						err = opts.error;
@@ -229,10 +229,10 @@ Ext.define ("$o", {
 		Выход из системы
 	*/
 	logout: function (options) {
-		var me = this;
+		let me = this;
 		options = options || {};
-		var success = options.success;
-		var failure = options.failure;
+		let success = options.success;
+		let failure = options.failure;
 		function go () {
 			Ext.Ajax.request ({
 				url: "?logout=1&sessionId=" + me.sessionId,
@@ -253,7 +253,7 @@ Ext.define ("$o", {
 		}
 		if ($o.util.getCookie ("esiaAuth")) {
 			$o.util.setCookie ("esiaAuth", "", "/");
-			var w = window.open ("https://esia-portal1.test.gosuslugi.ru/profile/user/saml/Logout");
+			let w = window.open ("https://esia-portal1.test.gosuslugi.ru/profile/user/saml/Logout");
 			setTimeout (function () {
 				w.close ();
 				window.open ("https://esia-portal1.test.gosuslugi.ru/profile/user/saml/Logout");
@@ -264,25 +264,25 @@ Ext.define ("$o", {
 		}
 	},
 	initModels: function () {
-		var storage = this;
+		let storage = this;
 		Ext.define ("$o.Base.Model", {
 		    extend: "Ext.data.Model",
 			constructor: function (config) {
-				var me = this;
+				let me = this;
 				me.callParent (arguments);
 			    me.remove = function () {
 			    	me.removed = true;
 			    };
 			},		    
 		    sync: function () {
-		    	var me = this;
+		    	let me = this;
 		    	if (me.removed) {
-					var r = Ext.Ajax.request ({
+					let r = Ext.Ajax.request ({
 						async: false,
 						url: "?sessionId=" + $sessionId,
 						params: storage.code + "." + me.tableName + ".remove(" + me.get ("id") + ")"
 					});
-					var store;
+					let store;
 					if (me.tableName == "Class") {
 						store = storage.store.classes;
 					};
@@ -299,7 +299,7 @@ Ext.define ("$o", {
 						delete storage.actionsMap [me.get ("id")];
 						return;
 					};
-					var rec = store.findRecord ("id", me.get ("id"), 0, false, false, true);
+					let rec = store.findRecord ("id", me.get ("id"), 0, false, false, true);
 					store.remove (rec);
 					if (me.tableName == "Class" || me.tableName == "ClassAttr") {
 						storage.initClasses ();
@@ -312,33 +312,33 @@ Ext.define ("$o", {
 					};
 					return;
 		    	};
-		    	var values = [];
-				for (var i = 0; i < me.fieldsArray.length; i ++) {
+		    	let values = [];
+				for (let i = 0; i < me.fieldsArray.length; i ++) {
 					values.push (Ext.encode (me.get (me.fieldsArray [i]) || null));
 				};
 				if (me.get ("id")) {
-					var valuesStr = values.join (",");
+					let valuesStr = values.join (",");
 					if (me.tableName != "Action") {
 						valuesStr = valuesStr.split ("false").join ("0").split ("true").join ("1");
 					};
-					var r = Ext.Ajax.request ({
+					let r = Ext.Ajax.request ({
 						async: false,
 						url: "?sessionId=" + $sessionId,
 						params: storage.code + "." + me.tableName + ".set(" + valuesStr + ")"
 					});
 				} else {
 					values.splice (0, 1);
-					var valuesStr = values.join (",");
+					let valuesStr = values.join (",");
 					if (me.tableName != "Action") {
 						valuesStr = valuesStr.split ("false").join ("0").split ("true").join ("1");
 					};
-					var r = Ext.Ajax.request ({
+					let r = Ext.Ajax.request ({
 						async: false,
 						url: "?sessionId=" + $sessionId,
 						params: storage.code + "." + me.tableName + ".create(" + valuesStr + ")"
 					});
 					storage.checkException (r);
-					var o = eval ("(" + r.responseText + ")");
+					let o = eval ("(" + r.responseText + ")");
 					me.set ("id", o.data [0][0]);
 					if (me.tableName == "Class") {
 						storage.store.classes.add (me);
@@ -359,7 +359,7 @@ Ext.define ("$o", {
 				if (me.tableName == "ClassAttr") {
 					storage.initClassAttr (me);
 					if (me.get ("class")) {
-						var cls = $o.getClass (me.get ("class"));
+						let cls = $o.getClass (me.get ("class"));
 						if (cls) {
 							storage.initClass (cls);
 						}
@@ -373,12 +373,12 @@ Ext.define ("$o", {
 				};
 		    },
 		    toString: function () {
-		    	var me = this;
-		    	var code = me.get ("code");
+		    	let me = this;
+		    	let code = me.get ("code");
 		    	if (me.getFullCode) {
 		    		code = me.getFullCode ();
 		    	};
-		    	var r;
+		    	let r;
 		    	if (me.tableName == "Action") {
 		    		r = me.get ("name") + " (" + code + ":" + me.get ("id") + ")" + (
 		    			me.get ("class") ? (", " + $o.getString ("Class") + ": " + $o.getClass (me.get ("class")).toString ()) : ""
@@ -416,7 +416,7 @@ Ext.define ("$o", {
 				"id", "parent", "name", "code", "description", "format", "view", "type", "system"
 		    ],
 		    getFullCode: function () {
-		    	var code = "";
+		    	let code = "";
 		    	if (this.get ("parent")) {
 		    		code = $o.classesMap [this.get ("parent")].getFullCode ();
 		    	};
@@ -434,13 +434,13 @@ Ext.define ("$o", {
 		    	storage.updateDefaultActions.call (this);
 		    },
 		    hasAttrInHierarchy: function (attr) {
-		    	var me = this;
+		    	let me = this;
 		    	function has (cls, attr) {
 		    		if (cls.attrs [attr]) {
 		    			return $o.getClass (cls.attrs [attr].get ("class"));
 		    		} else {
-		    			for (var i = 0; i < cls.childs.length; i ++) {
-		    				var r = has ($o.getClass (cls.childs [i]), attr);
+		    			for (let i = 0; i < cls.childs.length; i ++) {
+		    				let r = has ($o.getClass (cls.childs [i]), attr);
 		    				if (r) {
 		    					return r;
 		    				};
@@ -448,7 +448,7 @@ Ext.define ("$o", {
 		    		};
 		    		return 0;
 		    	};
-		    	var r = has (me, attr);
+		    	let r = has (me, attr);
 		    	return r;
 		    }
 		});
@@ -503,7 +503,7 @@ Ext.define ("$o", {
 				"id", "class", "name", "code", "type", "order", "notNull", "validFunc", "formatFunc", "description", "secure", "maxString", "minString", "maxNumber", "minNumber", "maxDate", "minDate", "unique", "numberFormat", "dateFormat", "removeRule"
 		    ],
 			getDataType: function () {
-				var r;
+				let r;
 				switch (this.get ("type")) {
 				case 1: // string
 				case 5: // file
@@ -530,8 +530,8 @@ Ext.define ("$o", {
 				return r;
 			},
 			getFieldType: function () {
-				var dt = this.getDataType ();
-				var r = "numberfield";
+				let dt = this.getDataType ();
+				let r = "numberfield";
 				if (dt == "string") {
 					r = "textfield";
 				};
@@ -550,21 +550,21 @@ Ext.define ("$o", {
 				return r;
 			},
 			getFilterDataType: function () {
-				var r = this.getDataType ();
+				let r = this.getDataType ();
 				if (r == "number") {
 					r = "numeric";
 				};
 				return r;
 			},
 			getVType: function () {
-				var me = this;
-				var code;
+				let me = this;
+				let code;
 				if (me.get ("validFunc")) {
-					var code = $o.getClass (me.get ("class")).getFullCode () + "." + me.get ("code");
+					let code = $o.getClass (me.get ("class")).getFullCode () + "." + me.get ("code");
 					if (!Ext.form.VTypes [code]) {
 						try {
-							var vf = eval ("(" + me.get ("validFunc") + ")");
-							var o = {};
+							let vf = eval ("(" + me.get ("validFunc") + ")");
+							let o = {};
 							o [code] = vf.fn;
 							o [code + "Text"] = typeof (vf.description) == "function" ? eval ("(" + vf.description + ")") : vf.description;
 							Ext.apply (Ext.form.VTypes, o);
@@ -616,7 +616,7 @@ Ext.define ("$o", {
 		    	"id", "parent", "name", "code", "description", "layout", "key", "parentKey", "class", "unrelated", "query", "type", "system", "materialized", "order", "iconCls"
 		    ],
 		    getFullCode: function () {
-		    	var code = "";
+		    	let code = "";
 		    	if (this.get ("parent")) {
 		    		code = $o.viewsMap [this.get ("parent")].getFullCode ();
 		    	};
@@ -698,17 +698,17 @@ Ext.define ("$o", {
 				"id", "class", "name", "code", "description", "order", "body", "layout"
 		    ],
 			initAction: function () {
-				var actionId = this.get ("id");
-				var a = $o.getAction (actionId);
-				var cls = $o.getClass (a.get ("class"));
-				var fName = cls.getFullCode () + "." + a.get ("code");
+				let actionId = this.get ("id");
+				let a = $o.getAction (actionId);
+				let cls = $o.getClass (a.get ("class"));
+				let fName = cls.getFullCode () + "." + a.get ("code");
 				Ext.namespace (fName);
-				var f = 
+				let f = 
 					fName + " = function (options) {\n" +
 					a.get ("body") +
 					"};\n"
 				;
-				var l;
+				let l;
 				try {
 					l = JSON.parse (a.get ("layout"));
 				} catch (e) {
@@ -721,7 +721,7 @@ Ext.define ("$o", {
 				} catch (e) {
 				};
 				if (l && l.layout) {
-					var fl = 
+					let fl = 
 						fName + ".layout = " +
 						JSON.stringify (l.layout, null, "\t") +
 						";\n"
@@ -736,15 +736,15 @@ Ext.define ("$o", {
 				};
 			},
 			getFullCode: function () {
-				var cls = $o.getClass (this.get ("class"));
-				var fn = (cls ? (cls.getFullCode () + ".") : "") + this.get ("code");
+				let cls = $o.getClass (this.get ("class"));
+				let fn = (cls ? (cls.getFullCode () + ".") : "") + this.get ("code");
 				return fn;
 			},
 		    getPath: function () {
 		    	return this.getFullCode ();
 		    },
 			execute: function (options) {
-				var fn_ = eval (this.getFullCode ());
+				let fn_ = eval (this.getFullCode ());
 				if (typeof (fn_) == "function") {
 					fn_ (options);
 				};
@@ -752,8 +752,8 @@ Ext.define ("$o", {
 		});
 	},
 	initStores: function (options) {
-		var me = this;
-		var mainOptions = options;
+		let me = this;
+		let mainOptions = options;
 		Ext.define ("$o.Class.Store", {
 			extend: "Ext.data.Store",
 			model: "$o.Class.Model"
@@ -781,7 +781,7 @@ Ext.define ("$o", {
 				url: "?sessionId=" + me.sessionId,
 				params: me.code + ".Storage.getAll(\"\")",
 				success: function (response, options) {
-					var d = eval ("(" + response.responseText + ")");
+					let d = eval ("(" + response.responseText + ")");
 					me.store.classes.loadData (d.classes);
 					me.store.classAttrs.loadData (d.classAttrs);
 					me.store.views.loadData (d.views);
@@ -804,7 +804,7 @@ Ext.define ("$o", {
 						url: "?sessionId=" + me.sessionId + "&username=" + $o.currentUser,
 						params: me.code + ".Storage.getClasses(\"\")",
 						success: function (response, options) {
-							var d = eval ("(" + response.responseText + ")");
+							let d = eval ("(" + response.responseText + ")");
 							me.store.classes.loadData (d.data);
 							me.data.classes = d.data;
 							mainOptions.data.classes = d.data;
@@ -818,7 +818,7 @@ Ext.define ("$o", {
 						url: "?sessionId=" + me.sessionId + "&username=" + $o.currentUser,
 						params: me.code + ".Storage.getClassAttrs(\"\")",
 						success: function (response, options) {
-							var d = eval ("(" + response.responseText + ")");
+							let d = eval ("(" + response.responseText + ")");
 							me.store.classAttrs.loadData (d.data);
 							me.classAttrs = {};
 							me.data.classAttrs = d.data;
@@ -833,7 +833,7 @@ Ext.define ("$o", {
 						url: "?sessionId=" + me.sessionId + "&username=" + $o.currentUser,
 						params: me.code + ".Storage.getViews(\"\")",
 						success: function (response, options) {
-							var d = eval ("(" + response.responseText + ")");
+							let d = eval ("(" + response.responseText + ")");
 							me.store.views.loadData (d.data);
 							me.data.views = d.data;
 							mainOptions.data.views = d.data;
@@ -847,7 +847,7 @@ Ext.define ("$o", {
 						url: "?sessionId=" + me.sessionId + "&username=" + $o.currentUser,
 						params: me.code + ".Storage.getViewAttrs(\"\")",
 						success: function (response, options) {
-							var d = eval ("(" + response.responseText + ")");
+							let d = eval ("(" + response.responseText + ")");
 							me.store.viewAttrs.loadData (d.data);
 							me.data.viewAttrs = d.data;
 							mainOptions.data.viewAttrs = d.data;
@@ -865,7 +865,7 @@ Ext.define ("$o", {
 		if ($o.app) {
 			return; // $o.app.requestcomplete
 		};
-		var r = eval ("(" + options.responseText + ")");
+		let r = eval ("(" + options.responseText + ")");
 		if (r && r.header && r.header.error) {
 			throw new Error (r.header.error);
 		};
@@ -881,14 +881,14 @@ Ext.define ("$o", {
 				Сохраняет на сервер локальный объект и цепочку зависимых объектов, которые ссылаются на него
 			*/
 			commitLocal: function () {
-				var me = this;
+				let me = this;
 				if (me.local == "child") {
 					return;
 				};
 				me.local = null;
 				me.commit ();
-				for (var id in me.localChilds) {
-					var o = $o.getObject (id);
+				for (let id in me.localChilds) {
+					let o = $o.getObject (id);
 					if (me.localChilds [id].place == "their") {
 						o.set (me.localChilds [id].attr, me.get ("id"));
 					};
@@ -911,10 +911,10 @@ Ext.define ("$o", {
 		    		this.storage.removeObject (this.get ("id"));
 		    		return;
 		    	};
-				var changes = {};
-				var changedNum = 0;
-				for (var i = 0; i < this.fields.getCount (); i ++){
-					var attr = this.fields.getAt (i).name;
+				let changes = {};
+				let changedNum = 0;
+				for (let i = 0; i < this.fields.getCount (); i ++){
+					let attr = this.fields.getAt (i).name;
 					if (attr == "id") {
 						continue;
 					};
@@ -924,7 +924,7 @@ Ext.define ("$o", {
 					) {
 						continue;
 					};
-					var ca = this.getClassAttr (attr);
+					let ca = this.getClassAttr (attr);
 					if (ca.getDataType () == "date" && (
 							(!this.data [attr] && !this.originalData [attr]) ||
 							(this.data [attr] && this.originalData [attr] && this.data [attr].getTime () == this.originalData [attr].getTime ())
@@ -933,7 +933,7 @@ Ext.define ("$o", {
 						continue;
 					};
 					this.originalData [attr] = this.data [attr];
-					var v = this.get (attr);
+					let v = this.get (attr);
 					if (v && typeof (v) == "object" && v.getMonth () && v.getFullYear () == 2000 && v.getMonth () == 1 && v.getDate () == 2 && v.getHours () == 3 && v.getMinutes () == 4 && v.getSeconds () == 5) {
 						v = "$CURRENT_TIMESTAMP$";
 					};
@@ -943,8 +943,8 @@ Ext.define ("$o", {
 					if (ca.getDataType () == "date" && v && v != "$CURRENT_TIMESTAMP$") {
 //						v = v.toUTCString ();
 						if (v.getHours () == 0 && v.getMinutes () == 0 && v.getSeconds () == 0) {
-							var dd = v.getDate ();
-							var mm = v.getMonth () + 1;
+							let dd = v.getDate ();
+							let mm = v.getMonth () + 1;
 							v = v.getFullYear () + "-";
 							if (mm < 10) {
 								v += "0";
@@ -975,24 +975,24 @@ Ext.define ("$o", {
 					if (this.get ("id") < 0) {
 						this.set ("id", null)
 					};
-			    	var a = [
+			    	let a = [
 			    		this.get ("id"),
 			    		changes,
 			    		this.get ("classId")
 			    	];
-					var r = Ext.Ajax.request ({
+					let r = Ext.Ajax.request ({
 						async: false,
 						url: "?sessionId=" + this.storage.sessionId,
 						params: this.storage.code + ".Object.setAttrs([!" + JSON.stringify (a) + "!])"
 					});
 					this.storage.checkException.call (this.storage, r);
-					var o = eval ("(" + r.responseText + ")");
+					let o = eval ("(" + r.responseText + ")");
 					if (!this.get ("id") || this.get ("id") < 0) {
 						if (o.data.id) {
 							this.set ("id", o.data.id || o.data);
 						};
 					};
-					for (var a in o.data) {
+					for (let a in o.data) {
 						if (this.get (a) == '$CURRENT_TIMESTAMP$') {
 							this.set (a, new Date (o.data [a]));
 						};
@@ -1010,16 +1010,16 @@ Ext.define ("$o", {
 		    	this.removed = true;
 		    },
 		    getClassAttr: function (attr) {
-		    	var cls = $o.classesMap [this.get ("classId")];
+		    	let cls = $o.classesMap [this.get ("classId")];
 		    	return cls.attrs [attr];
 		    },
 			toString: function () {
-		    	var cls = $o.classesMap [this.get ("classId")];
-				var ff = cls.get ('format');
-				var r = this.get ('name');
+		    	let cls = $o.classesMap [this.get ("classId")];
+				let ff = cls.get ('format');
+				let r = this.get ('name');
 				if (ff) {
 					try {
-						var fn = eval ("(function () {" + ff + "})");
+						let fn = eval ("(function () {" + ff + "})");
 						r = fn.call (this);
 					} catch (e) {
 						console.log ("toString exception");
@@ -1034,7 +1034,7 @@ Ext.define ("$o", {
 				};
 				if (this.getClassAttr (field) && this.getClassAttr (field).get ("type") >= 1000) {
 					if (value && value < 0) {
-						var o = $o.getObject (value);
+						let o = $o.getObject (value);
 						if (this.local == "root") {
 							this.localChilds [o.get ("id")] = {attr: field, place: "mine"};
 						} else {
@@ -1048,7 +1048,7 @@ Ext.define ("$o", {
 					} else {
 						/* возврат непонятно как делать т.к. несколько атрибутов могут ссылаться на локальные объекты
 						if (this.get (field) && this.get (field) < 0) {
-							var o = $o.getObject (this.get (field));
+							let o = $o.getObject (this.get (field));
 							if (o.localChilds.indexOf (this.get ("id")) > -1) {
 								o.localChilds.splice (o.localChilds.indexOf (this.get ("id")), 1);
 							};
@@ -1063,15 +1063,15 @@ Ext.define ("$o", {
 				return this.get ("id");
 			}
 		});
-		for (var i = 0; i < this.store.classes.getCount (); i ++) {
-			var o = this.store.classes.getAt (i);
-			var fields = [{
+		for (let i = 0; i < this.store.classes.getCount (); i ++) {
+			let o = this.store.classes.getAt (i);
+			let fields = [{
 				name: "id", type: "number", useNull: true
 			}, {
 				name: "classId", type: "number", useNull: true
 			}];
-			for (var attr in o.attrs) {
-				var ca = o.attrs [attr];
+			for (let attr in o.attrs) {
+				let ca = o.attrs [attr];
 				fields.push ({
 					name: ca.get ("code"),
 					type: ca.getDataType (), 
@@ -1085,7 +1085,7 @@ Ext.define ("$o", {
 		};
 	},
 	initClass: function (o) {
-		var me = this;
+		let me = this;
 		o.stub = o;
 		o.attrs = o.attrs || {};
 		o.attrsArray = o.attrsArray || [];
@@ -1095,7 +1095,7 @@ Ext.define ("$o", {
 			me.classesMap [o.get ("parent")].childs.push (o.get ("id"));
 		};
 		this.classesCode [o.getFullCode ()] = o;
-		var tokens = o.getFullCode ().split ('.');
+		let tokens = o.getFullCode ().split ('.');
 		if (tokens.length == 3) {
 			me.classesCode [tokens [0] + '.' + tokens [2]] = me.classesCode [tokens [0] + '.' + tokens [2]] || o;
 		};
@@ -1104,20 +1104,20 @@ Ext.define ("$o", {
 		};
 		// classAttr
 		if (o.get ("parent")) {
-			var parent = $o.getClass (o.get ("parent"));
-			for (var attr in parent.attrs) {
+			let parent = $o.getClass (o.get ("parent"));
+			for (let attr in parent.attrs) {
 				o.attrs [attr] = parent.attrs [attr];
 				o.attrsArray.push (parent.attrs [attr]);
 			};
 		};
 		// model
-		var fields = [{
+		let fields = [{
 			name: "id", type: "number", useNull: true
 		}, {
 			name: "classId", type: "number", useNull: true
 		}];
-		for (var attr in o.attrs) {
-			var ca = o.attrs [attr];
+		for (let attr in o.attrs) {
+			let ca = o.attrs [attr];
 			fields.push ({
 				name: ca.get ("code"),
 				type: ca.getDataType (), 
@@ -1125,7 +1125,7 @@ Ext.define ("$o", {
 			});
 		};
 		if (Ext.ClassManager.get ("$o.Class." + o.get ("id") + ".Model")) {
-			var _fields = Ext.ClassManager.get ("$o.Class." + o.get ("id") + ".Model").prototype.fields;
+			let _fields = Ext.ClassManager.get ("$o.Class." + o.get ("id") + ".Model").prototype.fields;
 			_.each (fields, function (field) {
 				if (!_fields.contains ({name: field.name})) {
 					_fields.add (field);
@@ -1143,27 +1143,27 @@ Ext.define ("$o", {
 	*/
 	initClasses: function (options) {
 		this.classesMap = this.classesMap || {};
-		for (var i = 0; i < this.store.classes.getCount (); i ++) {
-			var o = this.store.classes.getAt (i);
+		for (let i = 0; i < this.store.classes.getCount (); i ++) {
+			let o = this.store.classes.getAt (i);
 			o.stub = o;
 			o.childs = [];
 			this.classesMap [o.get ("id")] = o;
 		};
 		this.classesTree = this.classesTree || {};
 		this.classesCode = this.classesCode || {};
-		var getTree = function (options) {
-			for (var i = 0; i < this.store.classes.getCount (); i ++) {
-				var o = this.store.classes.getAt (i);
+		let getTree = function (options) {
+			for (let i = 0; i < this.store.classes.getCount (); i ++) {
+				let o = this.store.classes.getAt (i);
 				if (o.get ("parent") == options.parent) {
 					if (options.parent) {
 						this.classesMap [options.parent].childs.push (o.get ("id"));
 					};
 					options.node [o.get ("code")] = {id: o.get ("id"), stub: o};
-					var code = options.code ? options.code + '.' + o.get ('code') : o.get ('code');
+					let code = options.code ? options.code + '.' + o.get ('code') : o.get ('code');
 					o.attrs = {};
 					o.attrsArray = [];
 					this.classesCode [code] = o;
-					var tokens = code.split ('.');
+					let tokens = code.split ('.');
 					if (tokens.length == 3) {
 						this.classesCode [tokens [0] + '.' + tokens [2]] = this.classesCode [tokens [0] + '.' + tokens [2]] || o;
 					};
@@ -1177,14 +1177,14 @@ Ext.define ("$o", {
 		getTree.call (this, {node: this.classesTree, parent: null});
 	},
 	initClassAttr: function (o) {
-		var me = this;
+		let me = this;
 		me.classAttrs [o.get ("id")] = o;
 		me.classAttrsMap [o.get ("id")] = o;
 		if (me.classesMap [o.get ("class")]) {
-			var addClassAttr = function (oClass) {
+			let addClassAttr = function (oClass) {
 				oClass.attrs [o.get ('code')] = o;
 				oClass.attrsArray.push (o);
-				for (var i = 0; i < oClass.childs.length; i ++) {
+				for (let i = 0; i < oClass.childs.length; i ++) {
 					addClassAttr (me.classesMap [oClass.childs [i]]);
 				}
 			};
@@ -1195,23 +1195,23 @@ Ext.define ("$o", {
 		Инициализация атрибутов классов
 	*/
 	initClassAttrs: function (options) {
-		var me = this;
+		let me = this;
 		me.classAttrs = me.classAttrs || {};
-		for (var i = 0; i < me.store.classAttrs.getCount (); i ++) {
-			var ca = me.store.classAttrs.getAt (i);
+		for (let i = 0; i < me.store.classAttrs.getCount (); i ++) {
+			let ca = me.store.classAttrs.getAt (i);
 			me.classAttrs [ca.get ("id")] = ca;
 		};
 		me.classAttrsMap = me.classAttrsMap || {};
-		for (var i = 0; i < me.store.classAttrs.getCount (); i ++) {
-			var o = this.store.classAttrs.getAt (i);
+		for (let i = 0; i < me.store.classAttrs.getCount (); i ++) {
+			let o = this.store.classAttrs.getAt (i);
 			me.classAttrsMap [o.get ("id")] = o;
 			if (me.classesMap [o.get ("class")]) {
-				var addClassAttr = function (oClass) {
+				let addClassAttr = function (oClass) {
 					oClass.attrs = oClass.attrs || {};
 					oClass.attrs [o.get ('code')] = o;
 					oClass.attrsArray = oClass.attrsArray || [];
 					oClass.attrsArray.push (o);
-					for (var i = 0; i < oClass.childs.length; i ++) {
+					for (let i = 0; i < oClass.childs.length; i ++) {
 						addClassAttr (me.classesMap [oClass.childs [i]]);
 					}
 				};
@@ -1225,7 +1225,7 @@ Ext.define ("$o", {
 		o.childs = o.childs || [];
 		this.viewsMap [o.get ("id")] = o;
 		this.viewsCode [o.getFullCode ()] = o;
-		var tokens = o.getFullCode ().split ('.');
+		let tokens = o.getFullCode ().split ('.');
 		if (tokens.length == 3) {
 			this.viewsCode [tokens [0] + '.' + tokens [2]] = this.viewsCode [tokens [0] + '.' + tokens [2]] || o;
 		};
@@ -1241,27 +1241,27 @@ Ext.define ("$o", {
 	*/
 	initViews: function (options) {
 		this.viewsMap = this.viewsMap || {};
-		for (var i = 0; i < this.store.views.getCount (); i ++) {
-			var o = this.store.views.getAt (i);
+		for (let i = 0; i < this.store.views.getCount (); i ++) {
+			let o = this.store.views.getAt (i);
 			o.stub = o;
 			o.childs = [];
 			this.viewsMap [o.get ("id")] = o;
 		};
 		this.viewsTree = this.viewsTree || {};
 		this.viewsCode = this.viewsCode || {};
-		var getTree = function (options) {
-			for (var i = 0; i < this.store.views.getCount (); i ++) {
-				var o = this.store.views.getAt (i);
+		let getTree = function (options) {
+			for (let i = 0; i < this.store.views.getCount (); i ++) {
+				let o = this.store.views.getAt (i);
 				if (o.get ("parent") == options.parent) {
 					if (options.parent) {
 						this.viewsMap [options.parent].childs.push (o.get ("id"));
 					};
 					options.node [o.get ("code")] = {id: o.get ("id"), stub: o};
-					var code = options.code ? options.code + '.' + o.get ('code') : o.get ('code');
+					let code = options.code ? options.code + '.' + o.get ('code') : o.get ('code');
 					o.attrs = {};
 					this.viewsCode [code] = o;
 					if (code) {
-						var tokens = code.split ('.');
+						let tokens = code.split ('.');
 						if (tokens.length == 3) {
 							this.viewsCode [tokens [0] + '.' + tokens [2]] = this.viewsCode [tokens [0] + '.' + tokens [2]] || o;
 						};
@@ -1276,7 +1276,7 @@ Ext.define ("$o", {
 		getTree.call (this, {node: this.viewsTree, parent: null});
 	},
 	initViewAttr: function (o) {
-		var me = this;
+		let me = this;
 		me.viewAttrsMap [o.get ("id")] = o;
 		me.viewsMap [o.get ("view")].attrs [o.get ("code")] = o;
 	},
@@ -1284,10 +1284,10 @@ Ext.define ("$o", {
 		Инициализация атрибутов представлений
 	*/
 	initViewAttrs: function (options) {
-		var me = this;
+		let me = this;
 		me.viewAttrsMap = me.viewAttrsMap || {};
-		for (var i = 0; i < me.store.viewAttrs.getCount (); i ++) {
-			var o = this.store.viewAttrs.getAt (i);
+		for (let i = 0; i < me.store.viewAttrs.getCount (); i ++) {
+			let o = this.store.viewAttrs.getAt (i);
 			me.viewAttrsMap [o.get ("id")] = o;
 			if (me.viewsMap [o.get ("view")]) {
 				me.viewsMap [o.get ("view")].attrs = me.viewsMap [o.get ("view")].attrs || {};
@@ -1316,7 +1316,7 @@ Ext.define ("$o", {
 				throw new Error ('getClass - Unknown classId: ' + options.id);
 			};
 		};
-		var code = options.classCode || options.code;
+		let code = options.classCode || options.code;
 		if (typeof (options) == "string") {
 			code = options;
 		};
@@ -1357,7 +1357,7 @@ Ext.define ("$o", {
 				throw new Error ('getView - Unknown viewId: ' + options.id);
 			};
 		};
-		var code = options.viewCode || options.code;
+		let code = options.viewCode || options.code;
 		if (typeof (options) == "string") {
 			code = options;
 		};
@@ -1382,7 +1382,7 @@ Ext.define ("$o", {
 			return null;
 		};
 		if (typeof (id) == "string" && id.indexOf (".") > -1) {
-			for (var i in this.actionsMap) {
+			for (let i in this.actionsMap) {
 				if (this.actionsMap [i].getFullCode () == id) {
 					return this.actionsMap [i];
 				};
@@ -1391,8 +1391,8 @@ Ext.define ("$o", {
 		if (this.actionsMap [id]) {
 			return this.actionsMap [id];
 		};
-		var storage = this;
-		var r = Ext.Ajax.request ({
+		let storage = this;
+		let r = Ext.Ajax.request ({
 			async: false,
 			url: "?sessionId=" + $sessionId,
 			params: storage.code + ".Action.get(" + (typeof (id) == "string" ? ('"' + id + '"') : id) + ")"
@@ -1401,8 +1401,8 @@ Ext.define ("$o", {
 		if (!r.data.length) {
 			return null;
 		};
-		var o = Ext.create ("$o.Action.Model");
-		for (var i = 0; i < r.data.length; i ++) {
+		let o = Ext.create ("$o.Action.Model");
+		for (let i = 0; i < r.data.length; i ++) {
 			o.set (o.fieldsArray [i], r.data [i]);
 		};
 		this.actionsMap [o.get ("id")] = o;
@@ -1418,14 +1418,14 @@ Ext.define ("$o", {
 		if (this.objectsMap [id]) {
 			return this.objectsMap [id];
 		};
-		var r = Ext.Ajax.request ({
+		let r = Ext.Ajax.request ({
 			async: false,
 			url: "?sessionId=" + this.sessionId,
 			params: this.code + ".Storage.getObject(" + id + ")"
 		});
-		var d = eval ("(" + r.responseText + ")");
+		let d = eval ("(" + r.responseText + ")");
 		if (d.data.id) {
-			var o = Ext.create ("$o.Class." + d.data.classId + ".Model", Ext.apply (d.data.attrs, {
+			let o = Ext.create ("$o.Class." + d.data.classId + ".Model", Ext.apply (d.data.attrs, {
 				id: id,
 				classId: d.data.classId
 			}));
@@ -1440,8 +1440,8 @@ Ext.define ("$o", {
 		Начать транзакцию
 	*/
 	startTransaction: function (options) {
-		var description = options ? options.description : "";
-		var tr = Ext.Ajax.request ({
+		let description = options ? options.description : "";
+		let tr = Ext.Ajax.request ({
 			async: false,
 			url: "?sessionId=" + this.sessionId,
 			params: this.code + ".Storage.startTransaction(\"" + description + "\")"
@@ -1483,7 +1483,7 @@ Ext.define ("$o", {
 				url: "plugins/?sessionId=" + this.sessionId,
 				params: JSON.stringify (options),
 				success: function (response, opts) {
-					var o = eval ("(" + response.responseText + ")");
+					let o = eval ("(" + response.responseText + ")");
 					if (options.success) {
 						options.success (o);
 					};
@@ -1493,10 +1493,10 @@ Ext.define ("$o", {
 				}				
 			});
 		} else {
-			var asArray = options.asArray;
+			let asArray = options.asArray;
 			delete options.asArray;
-			var sql = options.sql || options.query || options;
-			var r = Ext.Ajax.request ({
+			let sql = options.sql || options.query || options;
+			let r = Ext.Ajax.request ({
 				async: false,
 				url: "?sessionId=" + this.sessionId,
 				params: this.code + ".Storage.execute([!" + JSON.stringify (sql) + "!])",
@@ -1505,15 +1505,15 @@ Ext.define ("$o", {
 			if (!options.noException) {
 				this.checkException (r);
 			};
-			var o = eval ("(" + r.responseText + ")");
+			let o = eval ("(" + r.responseText + ")");
 			if (o.header && o.header.error) {
 				return o.header;
 			};
 			if (asArray) {
-				var r = [];
+				let r = [];
 				_.each (o.data, function (arr, i) {
-					var row = {};					
-					for (var j = 0; j < sql.select.length / 2; j ++) {
+					let row = {};					
+					for (let j = 0; j < sql.select.length / 2; j ++) {
 						row [sql.select [j * 2 + 1]] = o.data [i][j];
 					};
 					r.push (row);
@@ -1522,7 +1522,7 @@ Ext.define ("$o", {
 			} else {
 				// Поля в результате запроса по номерам
 				o.data.fields = {};
-				for (var j = 0; j < sql.select.length / 2; j ++) {
+				for (let j = 0; j < sql.select.length / 2; j ++) {
 					o.data.fields [sql.select [j * 2 + 1]] = j;
 					o.data.fields [j] = j;
 				};
@@ -1530,11 +1530,11 @@ Ext.define ("$o", {
 				// row, col - result [row] [col]
 				// col - может быть числом или названием атрибута
 				o.data.get = function (row, col) {
-					var colN = this.fields [col];
+					let colN = this.fields [col];
 					if (colN == null) {
 						throw new Error ("result.get: col unknown (row:" + row + ",col:" + col + ")");
 					};
-					var val = this [row] [colN];
+					let val = this [row] [colN];
 					if (val == undefined) {
 						val = null;
 					};
@@ -1548,18 +1548,18 @@ Ext.define ("$o", {
 		Сопоставляет атрибуты представления с атрибутами классов
 	*/
 	updateViewAttrsType: function (options) {
-		var view = options.view;
-		var query = view.get ("query");
-		var va = view.attrs;
+		let view = options.view;
+		let query = view.get ("query");
+		let va = view.attrs;
 		if (!query) {
 			return;
 		};
 		query = eval ("(" + query + ")");
-		var attrs = {};
-		for (var i = 0; i < query.select.length; i ++) {
-			var qs = query.select [i];
+		let attrs = {};
+		for (let i = 0; i < query.select.length; i ++) {
+			let qs = query.select [i];
 			if (typeof (qs) == "object") {
-				var alias;
+				let alias;
 				for (alias in qs) {
 					break;
 				};
@@ -1569,11 +1569,11 @@ Ext.define ("$o", {
 				};
 			};
 		};
-		var aliasClass = {};
-		for (var i = 0; i < query.from.length; i ++) {
-			var qf = query.from [i];
+		let aliasClass = {};
+		for (let i = 0; i < query.from.length; i ++) {
+			let qf = query.from [i];
 			if (typeof (qf) == "object") {
-				var alias;
+				let alias;
 				for (alias in qf) {
 					break;
 				};
@@ -1582,9 +1582,9 @@ Ext.define ("$o", {
 				};
 			};
 		};
-		for (var code in attrs) {
-			var attr = attrs [code];
-			var c = $o.getClass ({code: aliasClass [attr.alias]});
+		for (let code in attrs) {
+			let attr = attrs [code];
+			let c = $o.getClass ({code: aliasClass [attr.alias]});
 			if (va [code]) {
 				va [code].set ("class", c.get ("id"));
 				va [code].set ("classAttr", 
@@ -1598,10 +1598,10 @@ Ext.define ("$o", {
 			common.message ($o.getString ("Can't change data"));
 			throw new Error ($o.getString ("Can't change data"));
 		};
-		var classId = this.getClass (classCode).get ("id");
-		var local = options == "local" ? "root" : null;
+		let classId = this.getClass (classCode).get ("id");
+		let local = options == "local" ? "root" : null;
 		this.nextLocalId = this.nextLocalId || -1;
-		var o = Ext.create ("$o.Class." + classId + ".Model", {
+		let o = Ext.create ("$o.Class." + classId + ".Model", {
 			id: local ? this.nextLocalId : null,
 			classId: classId
 		});
@@ -1638,23 +1638,23 @@ Ext.define ("$o", {
 		};
 	},
 	createClass: function (options) {
-		var me = this;
-		var o = Ext.create ("$o.Class.Model");
-		for (var attr in options) {
+		let me = this;
+		let o = Ext.create ("$o.Class.Model");
+		for (let attr in options) {
 			o.set (attr, options [attr]);
 		};
 		return o;
 	},
 	createClassAttr: function (options) {
-		var me = this;
+		let me = this;
 		/*
 		// send to server
-		var fields = ["class", "name", "code", "type", "order", "notNull", "validFunc", "formatFunc", "description", "secure", "maxString", "minString", "maxNumber", "minNumber", "maxDate", "minDate", "unique", "numberFormat", "dateFormat", "removeRule"];
-		var values = [];
-		for (var i = 0; i < fields.length; i ++) {
+		let fields = ["class", "name", "code", "type", "order", "notNull", "validFunc", "formatFunc", "description", "secure", "maxString", "minString", "maxNumber", "minNumber", "maxDate", "minDate", "unique", "numberFormat", "dateFormat", "removeRule"];
+		let values = [];
+		for (let i = 0; i < fields.length; i ++) {
 			values.push (Ext.encode (options [fields [i]] || null));
 		};
-		var r = Ext.Ajax.request ({
+		let r = Ext.Ajax.request ({
 			async: false,
 			url: "?sessionId=" + me.sessionId,
 			params: me.code + ".ClassAttr.create(" + values.join (",") + ")"
@@ -1662,16 +1662,16 @@ Ext.define ("$o", {
 		// create client objects
 		r = eval ("(" + r.responseText + ")");
 		if (r.data) {
-			var o = Ext.create ("$o.ClassAttr.Model", r.data [0]);
+			let o = Ext.create ("$o.ClassAttr.Model", r.data [0]);
 			me.store.classAttrs.add (o);
 			me.initClasses ();
 			me.initClassAttrs ();
 			me.initClassModels ();
 		};
 		*/
-		var o = Ext.create ("$o.ClassAttr.Model");
-		for (var attr in options) {
-			var a = attr;
+		let o = Ext.create ("$o.ClassAttr.Model");
+		for (let attr in options) {
+			let a = attr;
 			if (a == "typeId") {
 				a = "type";
 			};
@@ -1683,15 +1683,15 @@ Ext.define ("$o", {
 		return o;
 	},
 	createView: function (options) {
-		var me = this;
+		let me = this;
 		/*
 		// send to server
-		var fields = ["parent", "name", "code", "description", "layout", "key", "parentKey", "class", "unrelated", "query", "type", "system", "materialized", "order", "schema", "record", "iconCls"];
-		var values = [];
-		for (var i = 0; i < fields.length; i ++) {
+		let fields = ["parent", "name", "code", "description", "layout", "key", "parentKey", "class", "unrelated", "query", "type", "system", "materialized", "order", "schema", "record", "iconCls"];
+		let values = [];
+		for (let i = 0; i < fields.length; i ++) {
 			values.push (Ext.encode (options [fields [i]] || null));
 		};
-		var r = Ext.Ajax.request ({
+		let r = Ext.Ajax.request ({
 			async: false,
 			url: "?sessionId=" + me.sessionId,
 			params: me.code + ".View.create(" + values.join (",") + ")"
@@ -1699,28 +1699,28 @@ Ext.define ("$o", {
 		// create client objects
 		r = eval ("(" + r.responseText + ")");
 		if (r.data) {
-			var o = Ext.create ("$o.View.Model", r.data [0]);
+			let o = Ext.create ("$o.View.Model", r.data [0]);
 			me.store.views.add (o);
 			me.initViews ();
 			me.initViewAttrs ();
 		};
 		*/
-		var o = Ext.create ("$o.View.Model");
-		for (var attr in options) {
+		let o = Ext.create ("$o.View.Model");
+		for (let attr in options) {
 			o.set (attr, options [attr]);
 		};
 		return o;
 	},
 	createViewAttr: function (options) {
-		var me = this;
+		let me = this;
 		/*
 		// send to server
-		var fields = ["view", "name", "code", "class", "classAttr", "subject", "order", "sort", "sortOrder", "operation", "value", "area", "width", "totalType", "readOnly", "group", "notNull"];
-		var values = [];
-		for (var i = 0; i < fields.length; i ++) {
+		let fields = ["view", "name", "code", "class", "classAttr", "subject", "order", "sort", "sortOrder", "operation", "value", "area", "width", "totalType", "readOnly", "group", "notNull"];
+		let values = [];
+		for (let i = 0; i < fields.length; i ++) {
 			values.push (Ext.encode (options [fields [i]] || null));
 		};
-		var r = Ext.Ajax.request ({
+		let r = Ext.Ajax.request ({
 			async: false,
 			url: "?sessionId=" + me.sessionId,
 			params: me.code + ".ViewAttr.create(" + values.join (",") + ")"
@@ -1728,22 +1728,22 @@ Ext.define ("$o", {
 		// create client objects
 		r = eval ("(" + r.responseText + ")");
 		if (r.data) {
-			var o = Ext.create ("$o.ViewAttr.Model", r.data [0]);
+			let o = Ext.create ("$o.ViewAttr.Model", r.data [0]);
 			me.store.viewAttrs.add (o);
 			me.initViews ();
 			me.initViewAttrs ();
 		};
 		*/
-		var o = Ext.create ("$o.ViewAttr.Model");
-		for (var attr in options) {
+		let o = Ext.create ("$o.ViewAttr.Model");
+		for (let attr in options) {
 			o.set (attr, options [attr]);
 		};
 		return o;
 	},
 	createAction: function (options) {
-		var me = this;
-		var o = Ext.create ("$o.Action.Model");
-		for (var attr in options) {
+		let me = this;
+		let o = Ext.create ("$o.Action.Model");
+		for (let attr in options) {
 			o.set (attr, options [attr]);
 		};
 		return o;
@@ -1752,8 +1752,8 @@ Ext.define ("$o", {
 		Представление по умолчанию
 	*/
 	updateDefaultView: function () {
-		var me = this;
-		var v;
+		let me = this;
+		let v;
 		if (me.get ("view")) {
 			try {
 				v = $o.getView (me.get ("view"));
@@ -1771,13 +1771,13 @@ Ext.define ("$o", {
 			me.sync ();
 		};
 		// class attrs -> view attrs
-		var npp = 1;
-		for (var attr in v.attrs) {
+		let npp = 1;
+		for (let attr in v.attrs) {
 			if (v.attrs [attr].order && v.attrs [attr].order >= npp) {
 				npp = v.attrs [attr].order + 1;
 			};
 		};
-		var attrs = ["id"], query = {
+		let attrs = ["id"], query = {
 			select: [
 				{"a": "id"}, "id"
 			], 
@@ -1789,7 +1789,7 @@ Ext.define ("$o", {
 			]
 		};
 		if (!v.attrs ["id"]) {
-			var va = $o.createViewAttr ({
+			let va = $o.createViewAttr ({
 	    		name: "id",
 	    		code: "id",
 	    		view: v.get ("id"),
@@ -1801,12 +1801,12 @@ Ext.define ("$o", {
 			});
 			va.sync ();
 		};
-		var aliasIdx = 0, aliasStr = "bcdefghijklmnopqrstuvwxyz";
-		for (var attr in me.attrs) {
-			var ca = me.attrs [attr];
+		let aliasIdx = 0, aliasStr = "bcdefghijklmnopqrstuvwxyz";
+		for (let attr in me.attrs) {
+			let ca = me.attrs [attr];
 			attrs.push (attr);
 			if (!v.attrs [attr]) {
-				var va = $o.createViewAttr ({
+				let va = $o.createViewAttr ({
 		    		name: ca.get ("name"),
 		    		code: attr,
 		    		view: v.get ("id"),
@@ -1820,16 +1820,16 @@ Ext.define ("$o", {
 			};
 			/*
 			if (ca.get ("type") >= 1000) {
-				var cls = $o.getClass (ca.get ("type"));
-				var alias = aliasStr [aliasIdx];
+				let cls = $o.getClass (ca.get ("type"));
+				let alias = aliasStr [aliasIdx];
 				aliasIdx ++;
-				var o = {};
+				let o = {};
 				o [alias] = cls.attrs ["name"] ? "name" : "id";
 				query.select.push (o);
 				query.select.push (attr);
-				var oc = {};
+				let oc = {};
 				oc [alias] = cls.getFullCode ();
-				var oca = {};
+				let oca = {};
 				oca [alias] = "id";
 				query.from = query.from.concat ("left-join", oc, "on");
 				query.from.push ([{"a": attr}, "=", oca]);
@@ -1839,7 +1839,7 @@ Ext.define ("$o", {
 				query.select.push (attr);
 			//};
 		};
-		var layout = {
+		let layout = {
 			olap: {
 				id: "cmp-1",
 				classView: me.getFullCode ()
@@ -1853,9 +1853,9 @@ Ext.define ("$o", {
 			v.sync ();
 		};
 		// remove view attrs
-		for (var attr in v.attrs) {
+		for (let attr in v.attrs) {
 			if (attrs.indexOf (attr) == -1) {
-				var va = v.attrs [attr];
+				let va = v.attrs [attr];
 				va.remove ();
 				va.sync ();
 			};
@@ -1865,8 +1865,8 @@ Ext.define ("$o", {
 		Обновляет действия: Создать, Удалить, Карточка
 	*/
 	updateDefaultActions: function () {
-		var me = this;
-		var r = common.execSQL ({
+		let me = this;
+		let r = common.execSQL ({
 		    "select": [
 		        {"a":"___fid"}, "id",
 		        {"a":"___fcode"}, "code"
@@ -1881,15 +1881,15 @@ Ext.define ("$o", {
 		        {"a":"___fid"}
 		    ]
 		});
-		var actions = {};
-		for (var i = 0; i < r.length; i ++) {
+		let actions = {};
+		for (let i = 0; i < r.length; i ++) {
 			actions [r.get (i, "code")] = r.get (i, "id");
 		};
 	    // card
-	    var aCard;
-    	var cardBody =
-    		'var me = this;\n' +
-    		'var id = options.id || me.getValue ("id");\n' +
+	    let aCard;
+    	let cardBody =
+    		'let me = this;\n' +
+    		'let id = options.id || me.getValue ("id");\n' +
     		'common.tpl.show.call (this, {\n' +
     		'\tid: id,\n' +
     		'\tasWindow: 1,\n' +
@@ -1902,7 +1902,7 @@ Ext.define ("$o", {
     		'});\n'
     	;
     	if (!actions.card) {
-	    	var aCard = $o.createAction ();
+	    	let aCard = $o.createAction ();
 	    	aCard.set ("class", me.get ("id"));
 	    	aCard.set ("name", $o.getString ("Open"));
 	    	aCard.set ("code", "card");
@@ -1926,8 +1926,8 @@ Ext.define ("$o", {
 	    	aCard.initAction ();
 	    };
 		// create
-    	var aCreate;
-    	var createBody =
+    	let aCreate;
+    	let createBody =
     		'common.tpl.create.call (this, {\n' +
     		'\tasWindow: 1,\n' +
     		'\tclassCode: "' + me.getFullCode () + '",\n' +
@@ -1951,8 +1951,8 @@ Ext.define ("$o", {
 	    	aCreate.initAction ();
     	};
     	// remove
-    	var aRemove;
-    	var removeBody =
+    	let aRemove;
+    	let removeBody =
     		'common.tpl.remove.call (this);\n'
     	;
     	if (!actions.remove) {
@@ -1967,7 +1967,7 @@ Ext.define ("$o", {
 	    };
 	},
 	getConfObject: function (conf, id) {
-		var o;
+		let o;
 		switch (conf) {
 		case "class":
 			o = $o.getClass (id);
@@ -1988,7 +1988,7 @@ Ext.define ("$o", {
 		return o;
 	},
 	getRevisions: function () {
-		var r = Ext.Ajax.request ({
+		let r = Ext.Ajax.request ({
 			async: false,
 			url: "get_revisions?sessionId=" + $sessionId,
 			params: "getRevisions ()"
@@ -1998,7 +1998,7 @@ Ext.define ("$o", {
 	},
 	setRevision: function (revisionId) {
 		revisionId = revisionId || "";
-		var r = Ext.Ajax.request ({
+		let r = Ext.Ajax.request ({
 			async: false,
 			url: "set_revision?sessionId=" + $sessionId + "&id=" + revisionId,
 			params: "setRevision (" + revisionId + ")"
@@ -2011,7 +2011,7 @@ Ext.define ("$o", {
 		return r;
 	},
 	copyFile: function (opts) {
-		var r = Ext.Ajax.request ({
+		let r = Ext.Ajax.request ({
 			async: false,
 			url: 
 				"copy_file?sessionId=" + $sessionId + 
@@ -2021,7 +2021,7 @@ Ext.define ("$o", {
 		});
 	},
 	saveToFile: function (opts) {
-		var r = Ext.Ajax.request ({
+		let r = Ext.Ajax.request ({
 			async: false,
 			params: opts.data,
 			url: 
@@ -2032,7 +2032,7 @@ Ext.define ("$o", {
 	},
 	isReadOnly: function () {
 		if ($o.userId) {
-			var o = $o.getObject ($o.userId);
+			let o = $o.getObject ($o.userId);
 			return o.get ("readOnly");
 		} else {
 			return false;
@@ -2043,14 +2043,14 @@ Ext.define ("$o", {
 	},
 	queueFn: [],
 	pushFn: function (f) {
-		var me = this;
+		let me = this;
 		me.queueFn.push (f);
 	},
 	/*
 		Выполняет функции из очереди. Ext.define, ...
 	*/
 	executeQueueFunctions: function (options) {
-		var me = this;
+		let me = this;
 		_.each (me.queueFn, function (f) {
 			f ();
 		});

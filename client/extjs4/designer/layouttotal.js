@@ -7,7 +7,7 @@ Ext.define ("$o.LayoutTotal.Widget", {
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || {};
     	me.tbar = [{
     		text: $o.getString ("Clear"),
@@ -33,7 +33,7 @@ Ext.define ("$o.LayoutTotal.Widget", {
 	        	scope: me
 	        }
 	    });
-		var cellEditing = new Ext.grid.plugin.CellEditing ({
+		let cellEditing = new Ext.grid.plugin.CellEditing ({
 	        clicksToEdit: 1
 	    });
 		me.grid = Ext.create ("Ext.grid.Panel", {
@@ -86,10 +86,10 @@ Ext.define ("$o.LayoutTotal.Widget", {
 		this.callParent (arguments);
 	},
 	datachanged: function () {
-		var me = this;
+		let me = this;
 		if (me.store) {
 			me.value = {};
-			for (var i = 0; i < me.store.getCount (); i ++) {
+			for (let i = 0; i < me.store.getCount (); i ++) {
 				if (me.store.getAt (i).get ("total")) {
 					me.value [me.store.getAt (i).get ("attr")] = me.store.getAt (i).get ("total");
 				};
@@ -98,7 +98,7 @@ Ext.define ("$o.LayoutTotal.Widget", {
 		};
 	},
 	setViewId: function (viewId) {
-		var me = this;
+		let me = this;
 		if (me.viewId != viewId) {
 			me.value = {};
 		};
@@ -106,11 +106,11 @@ Ext.define ("$o.LayoutTotal.Widget", {
 		me.build ();
 	},
 	build: function () {
-		var me = this;
-		var view = $o.getView (me.viewId) || {};
-		var data = [];
-		for (var attr in view.attrs) {
-			var va = view.attrs [attr];
+		let me = this;
+		let view = $o.getView (me.viewId) || {};
+		let data = [];
+		for (let attr in view.attrs) {
+			let va = view.attrs [attr];
 			if (!va.get ("classAttr") || $o.getClassAttr (va.get ("classAttr")).get ("type") == 2) {
 				data.push ([attr, me.value [attr]]);
 			};

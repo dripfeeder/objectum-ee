@@ -7,7 +7,7 @@ Ext.define ("$o.ActionArgs.Widget", {
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || {};
 		me.tbar = [{
 			text: $o.getString ("Add"),
@@ -56,9 +56,9 @@ Ext.define ("$o.ActionArgs.Widget", {
 		this.callParent (arguments);
 	},
 	getData: function () {
-		var me = this;
-		var data = [];
-		for (var arg in me.value) {
+		let me = this;
+		let data = [];
+		for (let arg in me.value) {
 			data.push ({
 				arg: arg, value: me.value [arg]
 			});
@@ -66,17 +66,17 @@ Ext.define ("$o.ActionArgs.Widget", {
 		return data;
 	},
     cellRenderer: function (value, metaData, record, rowIndex, colIndex, store) {
-    	var me = this;
-    	var field = metaData.column.dataIndex;
+    	let me = this;
+    	let field = metaData.column.dataIndex;
 		metaData.tdAttr += ' style=";border: 1px gray solid;"';
 		return value;
     },
 	datachanged: function () {
-		var me = this;
+		let me = this;
 		if (me.store) {
-			var v = {};
-			for (var i = 0; i < me.store.getCount (); i ++) {
-				var rec = me.store.getAt (i);
+			let v = {};
+			for (let i = 0; i < me.store.getCount (); i ++) {
+				let rec = me.store.getAt (i);
 				if (rec.get ("arg") && rec.get ("value")) {
 					v [rec.get ("arg")] = rec.get ("value");
 				};
@@ -86,15 +86,15 @@ Ext.define ("$o.ActionArgs.Widget", {
 		};
 	},
 	create: function () {
-		var me = this;
+		let me = this;
 		me.store.insert (me.store.getCount (), {});
 	},
 	remove: function () {
-		var me = this;
+		let me = this;
 		if (me.grid.getSelectionModel ().hasSelection ()) {
-			var rec = me.grid.getSelectionModel ().getSelection ()[0];
+			let rec = me.grid.getSelectionModel ().getSelection ()[0];
 			me.store.remove (rec);
-			var arg = rec.get ("arg");
+			let arg = rec.get ("arg");
 			delete me.value [arg];
 		};
 	}

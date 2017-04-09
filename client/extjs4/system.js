@@ -31,8 +31,8 @@ system.init = function () {
 	$zp.application.on ('ready', function () {
 		// hash navigation
 		function getHash () {
-			var dlh = document.location.href;
-			var h = dlh.split ('#');
+			let dlh = document.location.href;
+			let h = dlh.split ('#');
 			if (h.length == 2) {
 				h = h [1];
 				return h;
@@ -47,9 +47,9 @@ system.init = function () {
 			};
 		};
 		function activatePage (h) {
-			var items = $zp.application.mainPanel.items;
-			for (var i = 0; i < items.getCount (); i ++) {
-				var item = items.getAt (i);
+			let items = $zp.application.mainPanel.items;
+			for (let i = 0; i < items.getCount (); i ++) {
+				let item = items.getAt (i);
 				if (item.id == h) {
 					$zp.application.mainPanel.setActiveTab (item.id);
 					return true;
@@ -59,7 +59,7 @@ system.init = function () {
 		};
 		function addPage (h) {
 			if (h [0] == 'v') {
-				var record = $zs.viewsMap [h.substr (1)];
+				let record = $zs.viewsMap [h.substr (1)];
 				if (record) {
 					try {
 				    	$zp.application.onClickMenuItem.call ($zp.application, {
@@ -72,15 +72,15 @@ system.init = function () {
 			    };
 			} else
 			if (h [0] == 'o') {
-				var id = h.substr (1);
-				var o = $zs.getObject (id);
+				let id = h.substr (1);
+				let o = $zs.getObject (id);
 				if (o) {
 					system.object.show ({id: id});
 				};
 			};
 		};
 		function onHashChange () {
-			var h = getHash ();
+			let h = getHash ();
 			if (h != $zp.hash) {
 				if (!activatePage (h)) {
 					addPage (h);
@@ -104,12 +104,12 @@ system.init = function () {
 // options: {(id), (olap, attr), (objectId, classAttrId)}
 system.object_attr.history = function (options) {
 	options = options || {};
-	var id;
+	let id;
 	if (options.id) {
 		id = options.id;
 	} else 
 	if (options.objectId) {
-		var r = common.execSQL ({
+		let r = common.execSQL ({
 			select: [
 				{"a":"___fid"}, "id"
 			],
@@ -138,7 +138,7 @@ system.object_attr.history = function (options) {
 		title: $zr.getString ("History of changes"),
 		iconCls: "event-log",
 		cardFn: function (options) {
-			var result = {
+			let result = {
 				olap: {
 					id: "olap",
 					view: "ser.system.objectAttrHistory",
@@ -160,13 +160,13 @@ system.object.registerClass = function (options) {
 // Показать карточку объекта
 // options: {id}
 system.object.show = function (options) {
-	var id = options.id;
+	let id = options.id;
 	if (!id && options.olap && options.attr) {
 		id = this.zview.getCurrentValue (options.olap, options.attr);
 	}
-	var o = $zs.getObject (id);
-	var classObj = $o.getClass (o.get ("classId"));
-	var classId = classObj.get ("id");
+	let o = $zs.getObject (id);
+	let classObj = $o.getClass (o.get ("classId"));
+	let classId = classObj.get ("id");
 	if (system.object.classes [classId]) {
 		system.object.classes [classId].showFunc.call (this, {id: id});
 	} else {
@@ -179,15 +179,15 @@ system.object.show = function (options) {
 			width: 800,
 			height: 600,
 			cardFn: function (options) {
-				var o = $zs.getObject (options.id);
-				var card = {
+				let o = $zs.getObject (options.id);
+				let card = {
 					card: {
 						id: "objectCard",
 						readOnly: true,
 						fields: []
 					}
 				};
-				for (var key in o.data) {
+				for (let key in o.data) {
 					if (key == "classId" || key == "id") {
 						continue;
 					}
@@ -205,16 +205,16 @@ system.view.chooseAll = function (options) {
 	Выбор запроса
 */
 system.view.selectQuery = function (options) {
-	var me = this;
-	var success = options.success;
+	let me = this;
+	let success = options.success;
 	function getTreeRecord (view) {
-		var rec = {
+		let rec = {
 			text: view.toString ()
 		};
 		if (view.childs) {
 			rec.expanded = 0;
 			rec.children = [];
-			for (var i = 0; i < view.childs.length; i ++) {
+			for (let i = 0; i < view.childs.length; i ++) {
 				rec.children.push (getTreeRecord ($o.viewsMap [view.childs [i]]));
 			};
 		} else {
@@ -222,14 +222,14 @@ system.view.selectQuery = function (options) {
 		}
 		return rec;
 	};
-	var root = [];
-	for (var id in $o.viewsMap) {
-		var v = $o.viewsMap [id];
+	let root = [];
+	for (let id in $o.viewsMap) {
+		let v = $o.viewsMap [id];
 		if (!v.get ("parent") && !v.get ("system")) {
 			root.push (getTreeRecord ($o.viewsMap [id]));
 		};
 	};
-	var treeStore = Ext.create ('Ext.data.TreeStore', {
+	let treeStore = Ext.create ('Ext.data.TreeStore', {
 	    root: {
 	        expanded: true,
 	        children: root
@@ -239,8 +239,8 @@ system.view.selectQuery = function (options) {
 			direction: "ASC"
 		}]	        
 	});
-	var viewId;
-	var win = Ext.create ("Ext.Window", {
+	let viewId;
+	let win = Ext.create ("Ext.Window", {
 		width: 800,
 		height: 600,
 		layout: "border",
@@ -282,10 +282,10 @@ system.view.selectQuery = function (options) {
 		    	border: 0,
 		    	listeners: {
 		    		select: function (srm, record, index, eOpts) {
-		    			var hasQuery = 0;
+		    			let hasQuery = 0;
 		    			if (record) {
-							var id = record.get ("text").split (":")[1].split (")")[0];
-							var v = $o.getView (Number (id));
+							let id = record.get ("text").split (":")[1].split (")")[0];
+							let v = $o.getView (Number (id));
 	    					win.down ("*[name=query]").setValue (v.get ("query") ? v.get ("query") : "");
 	    					if (v.get ("query")) {
 	    						hasQuery = 1;
@@ -318,17 +318,17 @@ system.view.selectQuery = function (options) {
 // Открывает представление в закладке
 // {id}
 system.view.showPanel = function (options) {
-	var app = $zp.application;
-	var record = $zs.views.get (options.id, {async: false});
-	var pageId = 'View-' + record.stub.get ("id");
-	var view = new objectum.ui.layout.ViewLayout ({
+	let app = $zp.application;
+	let record = $zs.views.get (options.id, {async: false});
+	let pageId = 'View-' + record.stub.get ("id");
+	let view = new objectum.ui.layout.ViewLayout ({
 		border: false,
 		record: record,
 		bodyStyle: 'background-color: ' + $zu.getThemeBGColor () + ';'
 	});
-	var layoutName = 'zviewlayout'; 
+	let layoutName = 'zviewlayout'; 
 	if (!(pageId in app.openPages)) {
-		var iconCls = record.iconCls;
+		let iconCls = record.iconCls;
 		if (!iconCls && record.stub && record.stub.get ("iconCls")) {
 			iconCls = record.stub.get ("iconCls");
 		}
@@ -351,17 +351,17 @@ system.view.showPanel = function (options) {
 	app.mainPanel.activate (app.openPages [pageId]);
 }
 system.class_.create = function (options) {
-	var name = options.name;
-	var code = options.code;
-	var parent = options.parent;
+	let name = options.name;
+	let code = options.code;
+	let parent = options.parent;
 	if (common.extMajorVersion () == 3) {
-		var nodes = $zs.classesMap;
-		for (var key in nodes) {
+		let nodes = $zs.classesMap;
+		for (let key in nodes) {
 			if (parent == nodes [key].stub.get ("parent") && code == nodes [key].stub.get ("code")) {
 				throw 'class with code "' + code + '" already exists';
 			};
 		};
-		var stub = new objectum.server.Class ({
+		let stub = new objectum.server.Class ({
 			code: code,
 			name: name
 		});
@@ -369,13 +369,13 @@ system.class_.create = function (options) {
 			stub.set ('parent', parent);
 		};
 		stub.commit ();
-		var fields = [];
-		var node = objectum.server.Object.create (fields);
+		let fields = [];
+		let node = objectum.server.Object.create (fields);
 		node.stub = stub;
 		node.storage = $zs;
 		node.storage.registerClass (node);
 	} else {
-		var c = $o.createClass ({
+		let c = $o.createClass ({
 			name: name,
 			code: code,
 			parent: parent ? parent : null
@@ -388,7 +388,7 @@ system.class_.create = function (options) {
 system.class_attr.create = function (options) {
 	function createAttr (options) {
 		if (common.extMajorVersion () == 3) {
-			var a = new objectum.server.ClassAttr ({
+			let a = new objectum.server.ClassAttr ({
 				name: options.name,
 				code: options.code,
 				"class": options.classId,
@@ -397,11 +397,11 @@ system.class_attr.create = function (options) {
 			a.commit ();
 			a.storage = $zs;
 			$zs.classAttrs [a.get ('id')] = a;
-			var cls = $zs.classAttrsMap [a.get ('class')] || [];
+			let cls = $zs.classAttrsMap [a.get ('class')] || [];
 			cls.push (a);
 			$zs.classAttrsMap [a.get ('class')] = cls;
 		} else {
-			var ca = $o.createClassAttr ({
+			let ca = $o.createClassAttr ({
 				name: options.name,
 				code: options.code,
 				"class": options.classId,
@@ -420,7 +420,7 @@ system.class_attr.create = function (options) {
 		});
 	} else {
 		// many attrs
-		for (var attr in options) {
+		for (let attr in options) {
 			createAttr ({
 				name: options [attr].name,
 				code: attr,
@@ -433,8 +433,8 @@ system.class_attr.create = function (options) {
 // Получение атрибутов класса
 // options: {classCode or classId}}
 system.class_attr.get = function (options) {
-	var classId = options.classId || $zs.getClass (options.classCode).stub.get ("id");
-	var r = common.execSQL ({
+	let classId = options.classId || $zs.getClass (options.classCode).stub.get ("id");
+	let r = common.execSQL ({
 		select: [
 			{"a":"___fid"}, "id",
 			{"a":"___fcode"}, "code",
@@ -452,17 +452,17 @@ system.class_attr.get = function (options) {
 	return r;
 };
 system.view.create = function (options) {
-	var name = options.name;
-	var code = options.code;
-	var parent = options.parent;
+	let name = options.name;
+	let code = options.code;
+	let parent = options.parent;
 	if (common.extMajorVersion () == 3) {
-		var nodes = $zs.viewsMap;
-		for (var key in nodes) {
+		let nodes = $zs.viewsMap;
+		for (let key in nodes) {
 			if (parent == nodes [key].stub.get ("parent") && code == nodes [key].stub.get ("code")) {
 				throw 'view with code "' + code + '" already exists';
 			};
 		};
-		var stub = new objectum.server.View ({
+		let stub = new objectum.server.View ({
 			code: code,
 			name: name
 		});
@@ -471,13 +471,13 @@ system.view.create = function (options) {
 			stub.set ('parent', parent);
 		};
 		stub.commit ();
-		var fields = [];
-		var node = objectum.server.View.create (fields);
+		let fields = [];
+		let node = objectum.server.View.create (fields);
 		node.stub = stub;
 		node.storage = $zs;
 		node.storage.registerView (node);
 	} else {
-		var v = $o.createView ({
+		let v = $o.createView ({
 			name: name,
 			code: code,
 			materialized: 0,
@@ -491,7 +491,7 @@ system.view.create = function (options) {
 system.view_attr.create = function (options) {
 	function createAttr (options) {
 		if (common.extMajorVersion () == 3) {
-	    	var a = new objectum.server.ViewAttr ({
+	    	let a = new objectum.server.ViewAttr ({
 	    		name: options.name,
 	    		code: options.code,
 	    		view: options.viewId,
@@ -502,11 +502,11 @@ system.view_attr.create = function (options) {
 	    	a.commit ();
 			a.storage = $zs;
 			$zs.viewAttrs [a.get ('id')] = a;
-			var view = $zs.viewAttrsMap [options.viewId] || [];
+			let view = $zs.viewAttrsMap [options.viewId] || [];
 			view.push (a);
 			$zs.viewAttrsMap [options.viewId] = view;
 		} else {
-			var va = $o.createViewAttr ({
+			let va = $o.createViewAttr ({
 	    		name: options.name,
 	    		code: options.code,
 	    		view: options.viewId,
@@ -528,7 +528,7 @@ system.view_attr.create = function (options) {
 		});
     } else {
     	// many attrs
-		for (var attr in options) {
+		for (let attr in options) {
 			createAttr ({
 	    		name: options [attr].name,
 	    		code: attr,
@@ -542,8 +542,8 @@ system.view_attr.create = function (options) {
 // Получение атрибутов представления
 // options: {viewCode or viewId}}
 system.view_attr.get = function (options) {
-	var viewId = options.viewId || $zs.getView (options.viewCode).stub.get ("id");
-	var r = common.execSQL ({
+	let viewId = options.viewId || $zs.getView (options.viewCode).stub.get ("id");
+	let r = common.execSQL ({
 		select: [
 			{"a":"___fid"}, "id",
 			{"a":"___fcode"}, "code",
@@ -562,8 +562,8 @@ system.view_attr.get = function (options) {
 }
 // Создает
 spr.conf.create = function (options) {
-	var parent = this.getCurrentValue ('id') || null;
-    var id = obj.create.call (this, {
+	let parent = this.getCurrentValue ('id') || null;
+    let id = obj.create.call (this, {
     	classCode: "spr.conf",
     	attrs: {
     		parent: parent
@@ -583,14 +583,14 @@ spr.conf.remove = function () {
 }
 // Карточка
 spr.conf.card = function (options) {
-	var id = options.id;
-    var card = {
+	let id = options.id;
+    let card = {
 		card: {
 			id: "confCard",
 			listeners: {
 				afterSave: function () {
 					if (common.data.hasOwnProperty ("spr.conf")) {
-						var o = $zs.getObject (id);
+						let o = $zs.getObject (id);
 						common.data ["spr.conf"][o.get ("code")] = {
 							id: o.get ("id"),
 							used: o.get ("used"),
@@ -622,7 +622,7 @@ spr.conf.show = function (options) {
 	}));
 }
 spr.conf.get = function (options) {
-	var r = common.execSQL ({
+	let r = common.execSQL ({
 		select: [
 			{"a":"value"}, "value"
 		],
@@ -643,7 +643,7 @@ common.data = common.data || {};
 common.data ["spr.conf"] = {};
 common.loadConf = function (subject) {
 	common.data ["spr.conf"][subject] = {};
-	var r = common.execSQL ({
+	let r = common.execSQL ({
 		select: [
 			{"a":"id"}, "id",
 			{"a":"code"}, "code",
@@ -661,7 +661,7 @@ common.loadConf = function (subject) {
 			{"a":"subject"}, "is null"
 		]
 	});
-	for (var i = 0; i < r.length; i ++) {
+	for (let i = 0; i < r.length; i ++) {
 		common.data ["spr.conf"][subject][r.get (i, "code")] = {
 			id: r.get (i, "id"),
 			used: r.get (i, "used"),
@@ -673,12 +673,12 @@ common.loadConf = function (subject) {
 // Получить объект параметра через код
 // options: {code}
 common.getConf = function (options) {
-	var subject = options.subject || null;
+	let subject = options.subject || null;
 	if (!common.data ["spr.conf"][subject]) {
 		common.loadConf (subject);
 	};
-	var code = typeof (options) == "string" ? options : options.code;
-	var result = common.data ["spr.conf"][subject][code];
+	let code = typeof (options) == "string" ? options : options.code;
+	let result = common.data ["spr.conf"][subject][code];
 	if (result == null) {
 		//console.log ("spr.conf.code:" + code + " not exist");
 		result = {};
@@ -689,13 +689,13 @@ common.setConf = function (code, options) {
 	if (!code) {
 		return;
 	};
-	var subject = options.subject || null;
-	var inTransaction = $o.inTransaction;
-	var tr;
+	let subject = options.subject || null;
+	let inTransaction = $o.inTransaction;
+	let tr;
 	if (!inTransaction) {
 		tr = $o.startTransaction ({description: "setConf"});
 	};
-	var r = common.execSQL ({
+	let r = common.execSQL ({
 		select: [
 			{"a":"id"}, "id"
 		],
@@ -708,14 +708,14 @@ common.setConf = function (code, options) {
 			{"a":"subject"}, "is null"
 		]).concat ("and", {"a":"code"}, "=", code)
 	});
-	var o;
+	let o;
 	if (r.length) {
 		o = $o.getObject (r.get (0, "id"));
 	} else {
 		o = $o.createObject ("spr.conf");
 	};
 	o.set ("code", code);
-	for (var attr in options) {
+	for (let attr in options) {
 		o.set (attr, options [attr]);
 	};
 	o.commit ();
@@ -733,17 +733,17 @@ common.setConf = function (code, options) {
 		common.loadConf (subject);
 	};
 };
-// user var
+// user let
 common.setVar = function (name, value) {
 	if (!name) {
 		return;
 	};
-	var inTransaction = $o.inTransaction;
-	var tr;
+	let inTransaction = $o.inTransaction;
+	let tr;
 	if (!inTransaction) {
 		tr = $o.startTransaction ({description: "setVar"});
 	};
-	var r = common.execSQL ({
+	let r = common.execSQL ({
 		select: [
 			{"a":"id"}, "id"
 		],
@@ -754,7 +754,7 @@ common.setVar = function (name, value) {
 			{"a":"subject"}, "=", $userId ? $userId : 0, "and", {"a":"name"}, "=", name
 		]
 	});
-	var o;
+	let o;
 	if (r.length) {
 		o = $zs.getObject (r.get (0, "id"));
 	} else {
@@ -768,12 +768,12 @@ common.setVar = function (name, value) {
 		$o.commitTransaction (tr);
 	};
 };
-// user var
+// user let
 common.getVar = function (name) {
 	if (!name) {
 		return null;
 	};
-	var r = common.execSQL ({
+	let r = common.execSQL ({
 		select: [
 			{"a":"value"}, "value"
 		],
@@ -794,14 +794,14 @@ common.getVar = function (name) {
 // {subjectId, classId, comma, read, write}
 system.access.getObjects = function (options) {
 	options = options || {};
-	var result = [];
-	var where;
+	let result = [];
+	let where;
 	if (options.subjects) {
 		where = [{"a":"subjectId"}, "in", options.subjects];
 	} else {
 		where = [{"a":"subjectId"}, "=", options.subjectId];
 	}
-	var sql = {
+	let sql = {
 		select: [
 			{"a":"objectId"}, "objectId",
 			{"a":"read"}, "read",
@@ -817,8 +817,8 @@ system.access.getObjects = function (options) {
 		],
 		where: where
 	};
-	var r = common.execSQL (sql);
-	for (var i = 0; i < r.length; i ++) {
+	let r = common.execSQL (sql);
+	for (let i = 0; i < r.length; i ++) {
 		if ((options.read == true && !r.get (i, "read")) ||
 			(options.read == false && r.get (i, "read")) ||
 			(options.write == true && !r.get (i, "write")) ||
@@ -856,7 +856,7 @@ system.getObjNews = function (revision) {
 					common.message ($o.getString ("Session not authorized. Please, reload browser page"));
 				} else
 				if (system.xmlObj.responseText) {
-					var r = eval ("(" + system.xmlObj.responseText + ")");
+					let r = eval ("(" + system.xmlObj.responseText + ")");
 					if (r.header.error == 'session removed') {
 						Ext.Msg.alert ($ptitle, $zr.getString ('Session disabled'), function () {
 							location.reload ();
@@ -864,8 +864,8 @@ system.getObjNews = function (revision) {
 					};
 					if (r.revision) {
 						revision = r.revision;
-						var objects = r.objects;
-						for (var i = 0; i < objects.length; i ++) {
+						let objects = r.objects;
+						for (let i = 0; i < objects.length; i ++) {
 							delete $zs.objectsMap [objects [i]];
 							$zp.application.fireEvent ('objectChanged', {id: objects [i]});
 						}
@@ -921,16 +921,16 @@ Ext.extend (Ext.ux.state.LocalStorage, Ext.state.Provider, {
 if (window.localStorage) {
     Ext.state.Manager.setProvider (new Ext.ux.state.LocalStorage ())
 } else {
-    var thirtyDays = new Date (new Date ().getTime () + (1000*60*60*24*30))
+    let thirtyDays = new Date (new Date ().getTime () + (1000*60*60*24*30))
     Ext.state.Manager.setProvider (new Ext.state.CookieProvider ({expires: thirtyDays}))
 }
 system.LoginPassword.create = function () {
-	var o = $o.createObject ("system.LoginPassword");
+	let o = $o.createObject ("system.LoginPassword");
 	o.commit ();
 	this.refresh ();
 };
 system.LoginPassword.remove = function () {
-	var id = this.getCurrentValue ("id");
+	let id = this.getCurrentValue ("id");
 	common.confirm ({message: $zr.getString ("Are you sure?"), scope: this, fn: function (btn) {
 		if (btn == "yes") {
 			$o.startTransaction ({description: 'Remove ' + id});
@@ -940,8 +940,8 @@ system.LoginPassword.remove = function () {
 	}});
 };
 ose.role.card = function (options) {
-	var id = options.id;
-    var card = {
+	let id = options.id;
+    let card = {
 		card: {
 			id: "ose.role.card",
 			items: [{
@@ -965,8 +965,8 @@ ose.role.card = function (options) {
 	return card;
 };
 ose.srole.card = function (options) {
-	var id = options.id;
-    var card = {
+	let id = options.id;
+    let card = {
 		card: {
 			id: "ose.srole.card",
 			items: [{
@@ -986,8 +986,8 @@ ose.srole.card = function (options) {
 	return card;
 };
 ose.ext.card = function (options) {
-	var id = options.id;
-    var card = {
+	let id = options.id;
+    let card = {
 		card: {
 			id: "ose.ext.card",
 			items: [{
@@ -1004,8 +1004,8 @@ ose.ext.card = function (options) {
 	return card;
 };
 ose.object.card = function (options) {
-	var id = options.id;
-    var card = {
+	let id = options.id;
+    let card = {
 		card: {
 			id: "ose.object.card",
 			items: [{
@@ -1026,8 +1026,8 @@ ose.object.card = function (options) {
 	return card;
 };
 system.vo.menu.card = function (options) {
-	var id = options.id;
-    var card = {
+	let id = options.id;
+    let card = {
 		card: {
 			id: "system.vo.menu.card",
 			items: [{
@@ -1066,9 +1066,9 @@ system.vo.menu.card = function (options) {
 	return card;
 };
 system.vo.menuItems.card = function (options) {
-	var id = options.id;
-	var o = $o.getObject (id);
-    var card = {
+	let id = options.id;
+	let o = $o.getObject (id);
+    let card = {
     	tab: {
     		items: [{
 				card: {
@@ -1085,7 +1085,7 @@ system.vo.menuItems.card = function (options) {
 						confRef: "view",
 						choose: {
 							type: "custom", fn: function () {
-								var me = this;
+								let me = this;
 								dialog.getView ({success: function (options) {
 									me.setValue (options.id);
 								}});
@@ -1096,7 +1096,7 @@ system.vo.menuItems.card = function (options) {
 								this.up ("*[objectumCmp=card]").down ("*[attr=view]").setValue (this.getValue ());
 								if (this.getValue ()) {
 									this.up ("*[objectumCmp=card]").down ("*[name=action]").setValue (null);
-									var view = $o.getView (this.getValue ());
+									let view = $o.getView (this.getValue ());
 									this.up ("*[objectumCmp=card]").down ("*[attr=name]").setValue (view.get ("name"));
 									this.up ("*[objectumCmp=card]").down ("*[attr=iconCls]").setValue (view.get ("iconCls"));
 								};
@@ -1113,7 +1113,7 @@ system.vo.menuItems.card = function (options) {
 						confRef: "action",
 						choose: {
 							type: "custom", fn: function () {
-								var me = this;
+								let me = this;
 								dialog.getAction ({success: function (options) {
 									me.setValue (options.id);
 								}});
@@ -1124,7 +1124,7 @@ system.vo.menuItems.card = function (options) {
 								this.up ("*[objectumCmp=card]").down ("*[attr=action]").setValue (this.getValue ());
 								if (this.getValue ()) {
 									this.up ("*[objectumCmp=card]").down ("*[name=view]").setValue (null);
-									var action = $o.getAction (this.getValue ());
+									let action = $o.getAction (this.getValue ());
 									this.up ("*[objectumCmp=card]").down ("*[attr=name]").setValue (action.get ("name"));
 								};
 							}
@@ -1230,9 +1230,9 @@ subject.human.create = function (options) {
 	}));
 };
 subject.human.card = function (options) {
-	var me = this;
-	var id = options.id;
-	var r = common.execSQL ({
+	let me = this;
+	let id = options.id;
+	let r = common.execSQL ({
 		select: [
 			{"a":"id"}, "id",
 			{"a":"role"}, "role"
@@ -1244,17 +1244,17 @@ subject.human.card = function (options) {
 			{"a":"subject"}, "=", id
 		]
 	});
-	var roleId = null;
+	let roleId = null;
 	if (r.length) {
 		roleId = r.get (0, "role");
 	};
-    var card = {
+    let card = {
 		card: {
 			id: "subject.human.card",
 			listeners: {
 				afterSave: function () {
 					roleId = this.down ("*[name=role]").getValue ();
-					var os;
+					let os;
 					if (r.length) {
 						os = $o.getObject (r.get (0, "id"));
 					} else {
@@ -1293,8 +1293,8 @@ subject.human.card = function (options) {
 	return card;
 };
 system.vo.chooseAdminMenu = function () {
-	var me = this;
-	var win = Ext.create ("Ext.Window", {
+	let me = this;
+	let win = Ext.create ("Ext.Window", {
 		width: 400,
 		height: 100,
 		layout: "form",
@@ -1339,7 +1339,7 @@ system.vo.chooseAdminMenu = function () {
 	win.show ();
 };
 system.vo.buildMenu = function () {
-	var menuId;
+	let menuId;
 	if ($o.currentUser == "admin") {
 		menuId = common.getConf ("adminMenu").value;
 	} else
@@ -1349,7 +1349,7 @@ system.vo.buildMenu = function () {
 			return;
 		};
 	} else {
-		var oUser = $o.getObject ($o.userId);
+		let oUser = $o.getObject ($o.userId);
 		if ($o.getClass (oUser.get ("classId")).getFullCode () == "subject.human.vo_adm") {
 			menuId = common.getConf ("adminMenu").value;
 		} else {
@@ -1358,7 +1358,7 @@ system.vo.buildMenu = function () {
 	};
 	if (!menuId) {
 		if (oUser.get ("voRole")) {
-			var oRole = $o.getObject (oUser.get ("voRole"));
+			let oRole = $o.getObject (oUser.get ("voRole"));
 			if (oRole && oRole.get ("menu")) {
 				menuId = oRole.get ("menu");
 			} else {
@@ -1368,7 +1368,7 @@ system.vo.buildMenu = function () {
 			return common.message ($o.getString ("User has no role"));
 		}
 	};
-	var m = common.execSQL ({
+	let m = common.execSQL ({
 		select: [
 			{"a":"id"}, "id",
 			{"a":"position"}, "position",
@@ -1387,7 +1387,7 @@ system.vo.buildMenu = function () {
 	if (!m.length) {
 		return;
 	};
-	var r = common.execSQL ({
+	let r = common.execSQL ({
 		select: [
 			{"a":"id"}, "id",
 			{"a":"menu"}, "menu",
@@ -1409,13 +1409,13 @@ system.vo.buildMenu = function () {
 		]
 	});
 	// preload actions
-	var actions = [];
-	for (var i = 0; i < r.length; i ++) {
+	let actions = [];
+	for (let i = 0; i < r.length; i ++) {
 		if (r.get (i, "action")) {
 			actions.push (r.get (i, "action"));
 		};
 	};
-	var actionRecs = [];
+	let actionRecs = [];
 	if (actions.length) {
 		actionRecs = $o.execute ({
 			asArray: true,
@@ -1432,14 +1432,14 @@ system.vo.buildMenu = function () {
 			]
 		});
 	};
-	var menu = [];
-	for (var i = 0; i < r.length; i ++) {
+	let menu = [];
+	for (let i = 0; i < r.length; i ++) {
 		if (r.get (i, "menu") == menuId && !r.get (i, "parent")) {
-			var iconCls = r.get (i, "iconCls");
+			let iconCls = r.get (i, "iconCls");
 			if (iconCls && m.get (0, "large")) {
 				iconCls = "gib" + iconCls.substr (2);
 			};
-			var o = {
+			let o = {
 				id: r.get (i, "id"),
 				text: r.get (i, "name"),
 				iconCls: iconCls,
@@ -1455,10 +1455,10 @@ system.vo.buildMenu = function () {
 						});
 					} else
 					if (this.actionId) {
-						var actionRec = _.findWhere (actionRecs, {id: this.actionId});
+						let actionRec = _.findWhere (actionRecs, {id: this.actionId});
 						if (actionRec) {
-							var cls = $o.getClass (actionRec.classId);
-							var _fn = (cls ? (cls.getFullCode () + ".") : "") + actionRec.code;
+							let cls = $o.getClass (actionRec.classId);
+							let _fn = (cls ? (cls.getFullCode () + ".") : "") + actionRec.code;
 							_fn = eval (_fn);
 							if (typeof (_fn) == "function") {
 								_fn ({readOnly: this.viewReadOnly});
@@ -1480,15 +1480,15 @@ system.vo.buildMenu = function () {
 		};
 	};
 	function getMenuElements (menu, parentId) {
-		var items = [];
-		for (var i = 0; i < r.length; i ++) {
+		let items = [];
+		for (let i = 0; i < r.length; i ++) {
 			if (parentId == r.get (i, "parent")) {
 				try {
 					$o.getView (r.get (i, "view"));
 				} catch (e) {
 					console.log (r.get (i, "id"));
 				};
-				var o = {
+				let o = {
 					text: r.get (i, "name"),
 					iconCls: r.get (i, "iconCls"),
 					viewRecord: $o.getView (r.get (i, "view")),
@@ -1508,10 +1508,10 @@ system.vo.buildMenu = function () {
 						};
 						*/
 						if (this.actionId) {
-							var actionRec = _.findWhere (actionRecs, {id: this.actionId});
+							let actionRec = _.findWhere (actionRecs, {id: this.actionId});
 							if (actionRec) {
-								var cls = $o.getClass (actionRec.classId);
-								var _fn = (cls ? (cls.getFullCode () + ".") : "") + actionRec.code;
+								let cls = $o.getClass (actionRec.classId);
+								let _fn = (cls ? (cls.getFullCode () + ".") : "") + actionRec.code;
 								_fn = eval (_fn);
 								if (typeof (_fn) == "function") {
 									_fn ({readOnly: this.viewReadOnly});
@@ -1528,16 +1528,16 @@ system.vo.buildMenu = function () {
 			menu.menu = {items: items};
 		};
 	};
-	for (var j = 0; j < menu.length; j ++) {
+	for (let j = 0; j < menu.length; j ++) {
 		getMenuElements (menu [j], menu [j].id);
 	};
-	var o = {
+	let o = {
 		text: $o.getString ("Exit"),
 		iconCls: "gi_exit",
 		handler: function () {
 			if ($o.userId) {
 				$o.startTransaction ();
-				var o = $o.getObject ($o.userId);
+				let o = $o.getObject ($o.userId);
 				o.set ("lastLogout", new Date ());
 				o.sync ();
 				$o.commitTransaction ();
@@ -1554,10 +1554,10 @@ system.vo.buildMenu = function () {
 	};
 	menu.push (o);
 	if ($o.visualObjectum.timeMachine && $o.visualObjectum.timeMachine.showDates) {
-		var date1 = new Date ();
+		let date1 = new Date ();
 		$o.visualObjectum.timeMachine.dates = $o.visualObjectum.timeMachine.dates || [];
-		for (var i = 0; i < $o.visualObjectum.timeMachine.dates.length; i ++) {
-			var d = $o.visualObjectum.timeMachine.dates [i].date;
+		for (let i = 0; i < $o.visualObjectum.timeMachine.dates.length; i ++) {
+			let d = $o.visualObjectum.timeMachine.dates [i].date;
 			if (d.getTime () < date1.getTime ()) {
 				date1 = d;
 			};
@@ -1581,14 +1581,14 @@ system.vo.buildMenu = function () {
 					});			
 				},
 				change: function (f, nv) {
-					var revisionId;
-					var nJul = common.getJulianDay (nv);
-					var cJul = common.getJulianDay (new Date ());
+					let revisionId;
+					let nJul = common.getJulianDay (nv);
+					let cJul = common.getJulianDay (new Date ());
 					if (nJul == cJul) {
 						$o.setRevision ();
 					} else {
-						for (var i = $o.visualObjectum.timeMachine.dates.length - 1; i >= 0; i --) {
-							var dJul = common.getJulianDay ($o.visualObjectum.timeMachine.dates [i].date);
+						for (let i = $o.visualObjectum.timeMachine.dates.length - 1; i >= 0; i --) {
+							let dJul = common.getJulianDay ($o.visualObjectum.timeMachine.dates [i].date);
 							if (dJul <= nJul) {
 								revisionId = $o.visualObjectum.timeMachine.dates [i].id;
 							};
@@ -1624,9 +1624,9 @@ system.vo.buildMenu = function () {
 };
 Ext.override (Ext.menu.Menu, {
     onMouseLeave: function (e) {
-	    var me = this;
+	    let me = this;
 	    // BEGIN FIX
-	    var visibleSubmenu = false;
+	    let visibleSubmenu = false;
 	    me.items.each (function (item) { 
 	        if (item.menu && item.menu.isVisible ()) { 
 	            visibleSubmenu = true;
@@ -1655,8 +1655,8 @@ subject.human.vo_adm.create = function (options) {
 	});
 };
 subject.human.vo_adm.card = function (options) {
-	var me = this;
-	var id = me.getValue ("id") || me.getValue ("a_id");
+	let me = this;
+	let id = me.getValue ("id") || me.getValue ("a_id");
 	common.tpl.show.call (this, {
 		id: id,
 		asWindow: 1,
@@ -1664,7 +1664,7 @@ subject.human.vo_adm.card = function (options) {
 	});
 };
 subject.human.vo_adm.card.layout = function (id) {
-	var l = {
+	let l = {
 		"card": {
 			"id": "card",
 			"items": [

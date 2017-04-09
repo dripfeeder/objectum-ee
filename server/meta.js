@@ -1,7 +1,7 @@
 /*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
-var meta = {};
+global.meta = {};
 meta.fields = {
 	tclass: ["fid", "fparent_id", "fname", "fcode", "fdescription", "fformat", "fview_id", "ftype", "fsystem"],
 	tclass_attr: ["fid", "fclass_id", "fname", "fcode", "ftype_id", "forder", "fnot_null", "fvalid_func", "fformat_func", "fdescription", "fsecure", "fmax_str", "fmin_str", "fmax_number", "fmin_number", "fmax_ts", "fmin_ts", "funique", "fformat_number", "fformat_ts", "fremove_rule"],
@@ -10,17 +10,17 @@ meta.fields = {
 	taction: ["fid", "fclass_id", "fname", "fcode", "fdescription", "forder", "fbody", "flayout"]
 };
 meta.tableCreate = function (options) {
-	var request = options.request;
-	var response = options.response;
-	var session = request.session;
-	var table = options.table;
-	var fields = meta.fields [table];
-	var values = options.values;
-	var storage = options.storage;
-	var revision = storage.revision [session.id];
-	var inTransaction = revision ? true : false;
-	var success = options.success;
-	var newId;
+	let request = options.request;
+	let response = options.response;
+	let session = request.session;
+	let table = options.table;
+	let fields = meta.fields [table];
+	let values = options.values;
+	let storage = options.storage;
+	let revision = storage.revision [session.id];
+	let inTransaction = revision ? true : false;
+	let success = options.success;
+	let newId;
 	async.series ([
 		function (cb) {
 			if (!inTransaction) {
@@ -41,7 +41,7 @@ meta.tableCreate = function (options) {
 			}
 		},
 		function (cb) {
-			var client = storage.getClient ({session: session});
+			let client = storage.getClient ({session: session});
 			client.getNextId ({table: table, success: function (options) {
 				newId = options.id;
 				cb ();
@@ -51,8 +51,8 @@ meta.tableCreate = function (options) {
 			fields = fields.concat (["fstart_id", "fend_id"]);
 			values = values.concat ([revision, storage.maxRevision]);
 			values = [newId].concat (values);
-			var valuesN = [];
-			for (var i = 0; i < values.length; i ++) {
+			let valuesN = [];
+			for (let i = 0; i < values.length; i ++) {
 				valuesN.push ("$" + (i + 1));
 			};
 			storage.query ({session: session, sql:
@@ -105,16 +105,16 @@ meta.tableCreate = function (options) {
 	});
 };
 meta.tableRemove = function (options) {
-	var request = options.request;
-	var response = options.response;
-	var session = request.session;
-	var table = options.table;
-	var values = options.values;
-	var storage = options.storage;
-	var revision = storage.revision [session.id];
-	var inTransaction = revision ? true : false;
-	var success = options.success;
-	var newId;
+	let request = options.request;
+	let response = options.response;
+	let session = request.session;
+	let table = options.table;
+	let values = options.values;
+	let storage = options.storage;
+	let revision = storage.revision [session.id];
+	let inTransaction = revision ? true : false;
+	let success = options.success;
+	let newId;
 	async.series ([
 		function (cb) {
 			if (!inTransaction) {
@@ -169,16 +169,16 @@ meta.tableRemove = function (options) {
 	});
 };
 meta.tableUpdate = function (options) {
-	var request = options.request;
-	var response = options.response;
-	var session = request.session;
-	var table = options.table;
-	var fields = meta.fields [table];
-	var values = options.values;
-	var storage = options.storage;
-	var revision = storage.revision [session.id];
-	var success = options.success;
-	var inTransaction = revision ? true : false;
+	let request = options.request;
+	let response = options.response;
+	let session = request.session;
+	let table = options.table;
+	let fields = meta.fields [table];
+	let values = options.values;
+	let storage = options.storage;
+	let revision = storage.revision [session.id];
+	let success = options.success;
+	let inTransaction = revision ? true : false;
 	async.series ([
 		function (cb) {
 			if (!inTransaction) {
@@ -208,8 +208,8 @@ meta.tableUpdate = function (options) {
 		function (cb) {
 			fields = fields.concat (["fstart_id", "fend_id"]);
 			values = values.concat ([revision, storage.maxRevision]);
-			var valuesN = [];
-			for (var i = 0; i < values.length; i ++) {
+			let valuesN = [];
+			for (let i = 0; i < values.length; i ++) {
 				valuesN.push ("$" + (i + 1));
 			};
 			storage.query ({session: session, sql:
@@ -262,34 +262,34 @@ meta.tableUpdate = function (options) {
 	});
 };
 meta.tableGet = function (options) {
-	var request = options.request;
-	var response = options.response;
-	var session = request.session;
-	var table = options.table;
-	var fields = meta.fields [table];
-	var values = options.values;
-	var storage = options.storage;
-	var success = options.success;
-	var sql = "select " + fields.join (",") + " from " + table + " where fid=" + values [0] + " and fend_id=" + storage.maxRevision;
+	let request = options.request;
+	let response = options.response;
+	let session = request.session;
+	let table = options.table;
+	let fields = meta.fields [table];
+	let values = options.values;
+	let storage = options.storage;
+	let success = options.success;
+	let sql = "select " + fields.join (",") + " from " + table + " where fid=" + values [0] + " and fend_id=" + storage.maxRevision;
 	if (table == "taction" && typeof (values [0]) == "string" && values [0].indexOf (".") > -1) {
-		var tokens = values [0].split (".");
-		var actionCode = tokens [tokens.length - 1];
-		var clsCode = tokens.slice (0, tokens.length - 1).join (".");
-		var clsId = storage.getClass (clsCode).get ("fid");
+		let tokens = values [0].split (".");
+		let actionCode = tokens [tokens.length - 1];
+		let clsCode = tokens.slice (0, tokens.length - 1).join (".");
+		let clsId = storage.getClass (clsCode).get ("fid");
 		sql = 
 			"select " + fields.join (",") + " from taction\n" +
 			"where fclass_id=" + clsId + " and fcode='" + actionCode + "'" + " and fend_id=" + storage.maxRevision
 		;
 	};
 	storage.query ({session: session, sql: sql, success: function (options) {
-		var rows = options.result.rows, row;
+		let rows = options.result.rows, row;
 		if (rows.length) {
 			row = rows [0]
 		} else {
 			row = {};
 		};
-		var data = [];
-		for (var i = 0; i < fields.length; i ++) {
+		let data = [];
+		for (let i = 0; i < fields.length; i ++) {
 			data.push (row [fields [i]]);
 		};
 		projects.send ({request: request, response: response, msg: "{header: {error: ''},data: " + JSON.stringify (data) + "}"});
@@ -301,7 +301,7 @@ meta.fnView = function (request, response, next) {
 			projects.send ({request: request, response: response, msg: "{header: {error: 'forbidden'}}"});
 			return;
    		};
-		var tableOptions = {
+		let tableOptions = {
    			request: request,
    			response: response,
    			storageCode: request.storageCode,
@@ -309,10 +309,10 @@ meta.fnView = function (request, response, next) {
 			values: JSON.parse ("[" + request.storageParam + "]")
 		};
 		projects.getStorage ({request: request, response: response, storageCode: request.storageCode, success: function (options) {
-			var storage = tableOptions.storage = options.storage;
+			let storage = tableOptions.storage = options.storage;
 	   		if (request.storageFn == "create") {
 	   			tableOptions.success = function (options) {
-	   				var values = options.values;
+	   				let values = options.values;
 					projects.send ({request: request, response: response, msg: "{header: {error: ''},data: [" + JSON.stringify (values) + "]}"});
 	   			};
 		   		meta.tableCreate (tableOptions);
@@ -342,7 +342,7 @@ meta.fnViewAttr = function (request, response, next) {
 			projects.send ({request: request, response: response, msg: "{header: {error: 'forbidden'}}"});
 			return;
    		};
-		var tableOptions = {
+		let tableOptions = {
    			request: request,
    			response: response,
    			storageCode: request.storageCode,
@@ -350,10 +350,10 @@ meta.fnViewAttr = function (request, response, next) {
 			values: JSON.parse ("[" + request.storageParam + "]")
 		};
 		projects.getStorage ({request: request, response: response, storageCode: request.storageCode, success: function (options) {
-			var storage = tableOptions.storage = options.storage;
+			let storage = tableOptions.storage = options.storage;
 	   		if (request.storageFn == "create") {
 	   			tableOptions.success = function (options) {
-	   				var values = options.values;
+	   				let values = options.values;
 					projects.send ({request: request, response: response, msg: "{header: {error: ''},data: [" + JSON.stringify (values) + "]}"});
 	   			};
 		   		meta.tableCreate (tableOptions);
@@ -383,25 +383,25 @@ meta.fnClass = function (request, response, next) {
 			projects.send ({request: request, response: response, msg: "{header: {error: 'forbidden'}}"});
 			return;
    		};
-		var tableOptions = {
+		let tableOptions = {
    			request: request,
    			response: response,
    			storageCode: request.storageCode,
    			table: "tclass",
 			values: JSON.parse ("[" + request.storageParam + "]")
 		};
-		var code = tableOptions.values [2];
-		var id = tableOptions.values [0];
+		let code = tableOptions.values [2];
+		let id = tableOptions.values [0];
 		projects.getStorage ({request: request, response: response, storageCode: request.storageCode, success: function (options) {
-			var storage = tableOptions.storage = options.storage;
-			var session = request.session;
-			var revision = storage.revision [session.id];
-			var inTransaction = revision ? true : false;
+			let storage = tableOptions.storage = options.storage;
+			let session = request.session;
+			let revision = storage.revision [session.id];
+			let inTransaction = revision ? true : false;
 	   		if (request.storageFn == "create") {
 	   			tableOptions.success = function (options) {
-	   				var values = options.values;
+	   				let values = options.values;
 	   				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
-		   				var toc = code + "_" + values [0];
+		   				let toc = code + "_" + values [0];
 						storage.query ({sql: "create table " + toc + " ($tocObjectId$)", success: function () {
 							projects.send ({request: request, response: response, msg: "{header: {error: ''},data: [" + JSON.stringify (values) + "]}"});
 						}});
@@ -412,8 +412,8 @@ meta.fnClass = function (request, response, next) {
 		   		meta.tableCreate (tableOptions);
 			};
 	   		if (request.storageFn == "set") {
-   				var toc = storage.getClass (id).toc;
-   				var tocNew = tableOptions.values [3] + "_" + id;
+   				let toc = storage.getClass (id).toc;
+   				let tocNew = tableOptions.values [3] + "_" + id;
 				async.series ([
 					function (cb) {
 						if (!inTransaction) {
@@ -505,7 +505,7 @@ meta.fnClass = function (request, response, next) {
 				   		meta.tableRemove (tableOptions);
 					},
 					function (cb) {
-		   				var toc = storage.getClass (id).toc;
+		   				let toc = storage.getClass (id).toc;
 						storage.client.isTableExists ({table: toc, success: function (exists) {
 							if (exists) {
 								storage.query ({session: session, sql: "drop table " + toc, success: function () {
@@ -551,7 +551,7 @@ meta.fnClassAttr = function (request, response, next) {
 			projects.send ({request: request, response: response, msg: "{header: {error: 'forbidden'}}"});
 			return;
    		};
-		var tableOptions = {
+		let tableOptions = {
    			request: request,
    			response: response,
    			storageCode: request.storageCode,
@@ -559,15 +559,15 @@ meta.fnClassAttr = function (request, response, next) {
 			values: JSON.parse ("[" + request.storageParam + "]")
 		};
 		projects.getStorage ({request: request, response: response, storageCode: request.storageCode, success: function (options) {
-			var storage = tableOptions.storage = options.storage;
-			var session = request.session;
-			var revision = storage.revision [session.id];
-			var inTransaction = revision ? true : false;
+			let storage = tableOptions.storage = options.storage;
+			let session = request.session;
+			let revision = storage.revision [session.id];
+			let inTransaction = revision ? true : false;
 	   		if (request.storageFn == "create") {
 	   			tableOptions.success = function (options) {
-	   				var values = options.values;
+	   				let values = options.values;
 	   				if (!storage.connection.dbEngine || !storage.connection.dbEngine.enabled) {
-						var type = "$tnumber$";
+						let type = "$tnumber$";
 						switch (values [4]) {
 						case 2:
 							type = "$tnumber_value$";
@@ -580,8 +580,8 @@ meta.fnClassAttr = function (request, response, next) {
 							type = "$ttimestamp$";
 							break;
 						};
-						var tocField = tableOptions.values [2] + "_" + values [0];
-						var toc = storage.getClass (values [1]).toc;
+						let tocField = tableOptions.values [2] + "_" + values [0];
+						let toc = storage.getClass (values [1]).toc;
 						storage.client.createField ({toc: toc, tocField: tocField, caId: values [0], type: type, success: function () {
 							projects.send ({request: request, response: response, msg: "{header: {error: ''},data: [" + JSON.stringify (values) + "]}"});
 						}});
@@ -592,11 +592,11 @@ meta.fnClassAttr = function (request, response, next) {
 		   		meta.tableCreate (tableOptions);
 			};
 	   		if (request.storageFn == "set") {
-   				var caId = tableOptions.values [0];
-				var ca = storage.getClassAttr (caId);
-				var c = storage.getClass (ca.get ("fclass_id"));
-   				var toc = ca.toc;
-   				var tocNew = tableOptions.values [3] + "_" + caId;
+   				let caId = tableOptions.values [0];
+				let ca = storage.getClassAttr (caId);
+				let c = storage.getClass (ca.get ("fclass_id"));
+   				let toc = ca.toc;
+   				let tocNew = tableOptions.values [3] + "_" + caId;
 				async.series ([
 					function (cb) {
 						if (!inTransaction) {
@@ -662,9 +662,9 @@ meta.fnClassAttr = function (request, response, next) {
 				});
 			};
 	   		if (request.storageFn == "remove") {
-   				var caId = tableOptions.values [0];
-				var ca = storage.getClassAttr (caId);
-				var c = storage.getClass (ca.get ("fclass_id"));
+   				let caId = tableOptions.values [0];
+				let ca = storage.getClassAttr (caId);
+				let c = storage.getClass (ca.get ("fclass_id"));
 				async.series ([
 					function (cb) {
 						if (!inTransaction) {
@@ -753,14 +753,14 @@ meta.fnAction = function (request, response, next) {
 			projects.send ({request: request, response: response, msg: "{header: {error: 'forbidden'}}"});
 			return;
    		};
-   		var values;
+   		let values;
    		try {
    			values = JSON.parse ("[" + request.storageParam + "]");
    		} catch (e) {
 			projects.send ({request: request, response: response, msg: "{header: {error: ''},data: []}"});
 			return;
    		};
-		var tableOptions = {
+		let tableOptions = {
    			request: request,
    			response: response,
    			storageCode: request.storageCode,
@@ -768,10 +768,10 @@ meta.fnAction = function (request, response, next) {
 			values: values
 		};
 		projects.getStorage ({request: request, response: response, storageCode: request.storageCode, success: function (options) {
-			var storage = tableOptions.storage = options.storage;
+			let storage = tableOptions.storage = options.storage;
 	   		if (request.storageFn == "create") {
 	   			tableOptions.success = function (options) {
-	   				var values = options.values;
+	   				let values = options.values;
 					projects.send ({request: request, response: response, msg: "{header: {error: ''},data: [" + JSON.stringify (values) + "]}"});
 	   			};
 		   		meta.tableCreate (tableOptions);

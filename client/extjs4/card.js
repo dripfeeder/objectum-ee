@@ -17,7 +17,7 @@ Ext.define ("$o.Card.Widget", {
 	bodyPadding: 5,
 	autoScroll: true,
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.items = me.items || me.fields;
 //		me.setFieldValues ();
 		me.on ("beforerender", me.beforeRenderListener, me);
@@ -39,7 +39,7 @@ Ext.define ("$o.Card.Widget", {
 		me.callParent (arguments);
 	},
 	setFieldValues: function () {
-		var me = this;
+		let me = this;
 		_.each (me.items, function (item) {
 			if (item.objectId && item.attr && !item.value) {
 				try {
@@ -50,14 +50,14 @@ Ext.define ("$o.Card.Widget", {
 		});
 	},
 	processListeners: function () {
-		var me = this;
+		let me = this;
 		me.listeners = me.listeners || {};
 		me.listeners.scope = me.listeners.scope || me;
-		for (var i in me.listeners) {
+		for (let i in me.listeners) {
 			if (i == "scope") {
 				continue;
 			};
-			var l = me.listeners [i];
+			let l = me.listeners [i];
 			if (typeof (l) == "string") {
 				try {
 					l = me.listeners [i] = eval (l);
@@ -71,8 +71,8 @@ Ext.define ("$o.Card.Widget", {
 					if (typeof (l.fn) == "string") {
 						// vo
 						try {
-							var fn = eval (l.fn);
-							var args = l.arguments || {};
+							let fn = eval (l.fn);
+							let args = l.arguments || {};
 							args.card = me;
 							l.fn = _.bind (fn, me, args);
 							/*
@@ -84,10 +84,10 @@ Ext.define ("$o.Card.Widget", {
 							console.error (l.fn, e);
 						};
 						/*
-						var args = l.arguments || {};
+						let args = l.arguments || {};
 						l.fn = eval (
 							"function () {\n" + 
-							"\tvar args = " + JSON.stringify (args) + ";\n" +
+							"\tlet args = " + JSON.stringify (args) + ";\n" +
 							"\targs.card = this;\n" +
 							"\t" + l.fn + ".call (args);\n" +
 							"}"
@@ -105,7 +105,7 @@ Ext.define ("$o.Card.Widget", {
 		this.createFields ();
 	},
 	afterRenderListener: function () {
-		var me = this;
+		let me = this;
 		_.each (me.getItems (), function (item) {
 			item.on ("change", function () {
 				if (!me.autoSave) {
@@ -116,9 +116,9 @@ Ext.define ("$o.Card.Widget", {
 			});
 		});
 		me.refresh ();
-		var container = me.up ("window") || me.up ("*[isTab=1]");
+		let container = me.up ("window") || me.up ("*[isTab=1]");
 		if (container) {
-			var onBeforeClose = function () {
+			let onBeforeClose = function () {
 				if (me.enabledUnloadMessage) {
 					common.confirm ({message: $o.getString ("Data is not saved. Close?"), scope: this, fn: function (btn) {
 						if (btn == "yes") {
@@ -138,10 +138,10 @@ Ext.define ("$o.Card.Widget", {
 		};
 	},
 	getClassAttr: function (item) {
-		var me = this;
-		var r;
+		let me = this;
+		let r;
 		if (item.objectId) {
-			var o = $o.getObject (item.objectId);
+			let o = $o.getObject (item.objectId);
 			if (!o) {
 				console.error ("bad objectId", item);
 			};
@@ -154,17 +154,17 @@ Ext.define ("$o.Card.Widget", {
 			};
 		} else 
 		if (item.id && item.attr) {
-			var objAttr = item.attr.split (".")[0];
-			var attr = item.attr.split (".")[1];
+			let objAttr = item.attr.split (".")[0];
+			let attr = item.attr.split (".")[1];
 			me.$source = me.relatives [item.id];
 			me.relatives [item.id].targets [me.zid] = me;
-//			var viewId = me.relatives [item.id].viewId;
-//			var attrs = $o.viewsMap [viewId].attrs;
-			var attrs = me.relatives [item.id].$view.attrs;
-			var cls;
+//			let viewId = me.relatives [item.id].viewId;
+//			let attrs = $o.viewsMap [viewId].attrs;
+			let attrs = me.relatives [item.id].$view.attrs;
+			let cls;
 			if (attrs [objAttr].get ("classAttr")) {
-				var caId = attrs [objAttr].get ("classAttr");
-				var ca = $o.classAttrsMap [caId];
+				let caId = attrs [objAttr].get ("classAttr");
+				let ca = $o.classAttrsMap [caId];
 				cls = $o.classesMap [ca.get ("type")];
 			} else {
 				cls = $o.classesMap [attrs [objAttr].get ("class")];
@@ -183,9 +183,9 @@ Ext.define ("$o.Card.Widget", {
 		return r;
 	},
 	updateItem: function (item, ca, parentItem) {
-		var me = this;
-		var fieldType = ca.getFieldType ();
-		var n = {
+		let me = this;
+		let fieldType = ca.getFieldType ();
+		let n = {
 			fieldLabel: item.caption || item.fieldLabel || ca.get ("name"),
 			xtype: fieldType,
 			card: this,
@@ -201,7 +201,7 @@ Ext.define ("$o.Card.Widget", {
 			item.allowBlank = false;
 		};
 		if (item.objectId) {
-			var o = $o.getObject (item.objectId);
+			let o = $o.getObject (item.objectId);
 			n.value = n.originalValue = o.get (item.attr);
 		};
 		if (fieldType == "textfield" || fieldType == "objectfield" || fieldType == "$filefield") {
@@ -254,12 +254,12 @@ Ext.define ("$o.Card.Widget", {
 		item.fieldLabel = $o.getString (item.fieldLabel);
 	},
 	createFields: function () {
-		var me = this;
-		var processItem = function (item, parentItem) {
+		let me = this;
+		let processItem = function (item, parentItem) {
 			if (!item) {
 				console.log (item, parentItem);
 			};
-			var ca = me.getClassAttr (item);
+			let ca = me.getClassAttr (item);
 			if (ca == -1) {
 				Ext.apply (item, {
 					xtype: "textfield",
@@ -275,43 +275,43 @@ Ext.define ("$o.Card.Widget", {
 				me.updateItem (item, ca, parentItem);
 			};
 			if (item.items) {
-				for (var i = 0; i < item.items.length; i ++) {
+				for (let i = 0; i < item.items.length; i ++) {
 					processItem (item.items.getAt ? item.items.getAt (i) : item.items [i], item);
 				};
 			};
 		};
-		for (var i = 0; i < me.$items.length; i ++) {
+		for (let i = 0; i < me.$items.length; i ++) {
 			processItem (me.$items [i], null);
 		};
 		me.add (me.$items);
 		me.doLayout ();
 	},
 	getItems: function (options) {
-		var me = this;
-		var items = [];
-		var get = function (item) {
+		let me = this;
+		let items = [];
+		let get = function (item) {
 			if (item.$attr && (
 				(options && options.hidden) || (item.isVisible && item.isVisible ())
 			)) {
 				items.push (item);
 			};
 			if (item.items) {
-				for (var i = 0; i < item.items.getCount (); i ++) {
+				for (let i = 0; i < item.items.getCount (); i ++) {
 					get (item.items.getAt (i));
 				};
 			};
 		};
-		for (var i = 0; i < me.items.getCount (); i ++) {
+		for (let i = 0; i < me.items.getCount (); i ++) {
 			get (me.items.getAt (i));
 		};
 		return items;
 	},
 	getFields: function (options) {
-		var me = this;
-		var fields = {};
-		var items = me.getItems (options);
-		for (var i = 0; i < items.length; i ++) {
-			var item = items [i];
+		let me = this;
+		let fields = {};
+		let items = me.getItems (options);
+		for (let i = 0; i < items.length; i ++) {
+			let item = items [i];
 			if (item.$attr) {
 				fields [item.$attr] = item;
 			};
@@ -319,15 +319,15 @@ Ext.define ("$o.Card.Widget", {
 		return fields;
 	},
 	updateFields: function () {
-		var me = this;
-		var items = me.getItems ();
-		for (var i = 0; i < items.length; i ++) {
-			var item = items [i];
+		let me = this;
+		let items = me.getItems ();
+		for (let i = 0; i < items.length; i ++) {
+			let item = items [i];
 			if (!item.$attr) {
 				continue;
 			};
-			var objectId = item.objectId = item.$relative ? item.$relative.getCurrentValue (item.$objAttr) : item.objectId;
-			var o = $o.getObject (objectId);
+			let objectId = item.objectId = item.$relative ? item.$relative.getCurrentValue (item.$objAttr) : item.objectId;
+			let o = $o.getObject (objectId);
 			if (!item.setValue) {
 				console.log (item);
 			};
@@ -336,19 +336,19 @@ Ext.define ("$o.Card.Widget", {
 		};
 	},
 	activeCondition: function () {
-		var me = this;
+		let me = this;
 		if (me.active) {
-			var active = me.active.fn.call (me, me.active.arguments);
-			var items = me.getItems ();
+			let active = me.active.fn.call (me, me.active.arguments);
+			let items = me.getItems ();
 			for (i = 0; i < items.length; i ++) {
-				var item = items [i];
+				let item = items [i];
 				if (item.readOnly) {
 					continue;
 				};
 				item.setReadOnly (!active);
 			}
 			if (!me.readOnly && !me.hideToolbar && !me.autoSave) {
-				var tb = me.getDockedItems ("toolbar[dock='top']");
+				let tb = me.getDockedItems ("toolbar[dock='top']");
 				if (tb && tb.length) {
 					tb [0].setDisabled (!active);
 				};
@@ -356,8 +356,8 @@ Ext.define ("$o.Card.Widget", {
 		};
 	},
 	refresh: function () {
-		var me = this;
-		var src = me.$source;
+		let me = this;
+		let src = me.$source;
 		if (src) {
 			if (src.getSelectionModel ().hasSelection ()) {
 				me.setDisabled (false);
@@ -369,8 +369,8 @@ Ext.define ("$o.Card.Widget", {
 			me.updateFields ();
 		};
 		me.activeCondition ();
-		for (var id in this.targets) {
-			var w = this.targets [id];
+		for (let id in this.targets) {
+			let w = this.targets [id];
 			if (w.refresh) {
 				w.refresh ({moveFirst: 1});
 			};
@@ -380,26 +380,26 @@ Ext.define ("$o.Card.Widget", {
 	},
 	save: function (options) {
 		options = options || {};
-		var me = this;
-		var saveFn = function () {
-			var items = me.getItems ();
-			var objects = {};
-			var changed = false;
-			for (var i = 0; i < items.length; i ++) {
-				var item = items [i];
+		let me = this;
+		let saveFn = function () {
+			let items = me.getItems ();
+			let objects = {};
+			let changed = false;
+			for (let i = 0; i < items.length; i ++) {
+				let item = items [i];
 				if (options.filefield && item.xtype != "$filefield") {
 					continue;
 				};
-				var objectId = item.objectId;
+				let objectId = item.objectId;
 				if (!objectId) {
 					continue;
 				};
-				var o = $o.getObject (objectId);
+				let o = $o.getObject (objectId);
 				if (!o) {
 					continue;
 				};
 				objects [objectId] = o;
-				var v = item.getValue ();
+				let v = item.getValue ();
 				if (o.get (item.$attr) != v) {
 					if (o.getClassAttr (item.$attr).get ("secure")) {
 						v = $o.util.sha1 (v);
@@ -416,8 +416,8 @@ Ext.define ("$o.Card.Widget", {
 					} catch (e) {
 						console.error (e);
 					};
-					for (var objectId in objects) {
-						var o = objects [objectId];
+					for (let objectId in objects) {
+						let o = objects [objectId];
 						o.commit ("local");
 						if (objectId < 0) {
 							_.each (items, function (item) {
@@ -452,8 +452,8 @@ Ext.define ("$o.Card.Widget", {
 				};
 				me.disableUnloadMessage ();
 			};
-			for (var id in me.targets) {
-				var w = me.targets [id];
+			for (let id in me.targets) {
+				let w = me.targets [id];
 				if (w.refresh) {
 					w.refresh ({moveFirst: 1});
 				};
@@ -469,12 +469,12 @@ Ext.define ("$o.Card.Widget", {
 		if (options.autoSave) {
 			saveFn ();
 		} else {
-			var items = me.getItems ();
-			var msg = "";
-			for (var i = 0; i < items.length; i ++) {
-				var item = items [i];
+			let items = me.getItems ();
+			let msg = "";
+			for (let i = 0; i < items.length; i ++) {
+				let item = items [i];
 				if (item.getActiveError && item.getActiveError ()) {
-					var name = item.fieldLabel;
+					let name = item.fieldLabel;
 					if (!name && item.ownerCt && item.ownerCt.fieldLabel)  {
 						name = item.ownerCt.fieldLabel;
 					};
@@ -492,15 +492,15 @@ Ext.define ("$o.Card.Widget", {
 		};
 	},
 	onHighlight: function () {
-		var me = this;
-		var objectId = [];
+		let me = this;
+		let objectId = [];
 		_.each (me.query ("*"), function (c) {
 			if (c.objectId) {
 				objectId.push (c.objectId);
 			}
 		});
 		objectId = _.uniq (objectId);
-		var rows = $o.execute ({
+		let rows = $o.execute ({
 			asArray: true,
 			"select": [
 				{"a":"___fobject_id"}, "objectId",
@@ -514,7 +514,7 @@ Ext.define ("$o.Card.Widget", {
 				{"a":"___fobject_id"}, "in", objectId.join (".,.").split (".")
 			]
 		});
-		var changeNum = {};
+		let changeNum = {};
 		_.each (rows, function (row) {
 			changeNum [row.objectId] = changeNum [row.objectId] || {};
 			changeNum [row.objectId][row.classAttrCode] = changeNum [row.objectId][row.classAttrCode] || 0;
@@ -527,13 +527,13 @@ Ext.define ("$o.Card.Widget", {
 		});
 	},
 	onFieldChanges: function (_objectId, _attr) {
-		var me = this;
-		var objectId = typeof (_objectId) == "number" ? _objectId : me.focusedField.objectId;
-		var attr = typeof (_objectId) == "number" ? _attr : me.focusedField.$attr;
-		var o = $o.getObject (objectId);
-		var cls = $o.getClass (o.get ("classId"));
-		var ca = cls.attrs [attr];
-		var r = $o.execute ({
+		let me = this;
+		let objectId = typeof (_objectId) == "number" ? _objectId : me.focusedField.objectId;
+		let attr = typeof (_objectId) == "number" ? _attr : me.focusedField.$attr;
+		let o = $o.getObject (objectId);
+		let cls = $o.getClass (o.get ("classId"));
+		let ca = cls.attrs [attr];
+		let r = $o.execute ({
 			"select": [
 				{"a":"___fid"}, "fid",
 				{"a":"___fstring"}, "fstring",
@@ -557,12 +557,12 @@ Ext.define ("$o.Card.Widget", {
 				{"b":"___fdate"}, "desc"
 			]
 		});
-		var data = [];
-		for (var i = 0; i < r.length; i ++) {
-			var subject;
+		let data = [];
+		for (let i = 0; i < r.length; i ++) {
+			let subject;
 			if (r.get (i, "fsubject_id")) {
-				var oSubject = $o.getObject (r.get (i, "fsubject_id"));
-				var subject = _.filter (_.map (["login", "surname", "forename", "patronymic", "email", "phone"], function (s) {
+				let oSubject = $o.getObject (r.get (i, "fsubject_id"));
+				let subject = _.filter (_.map (["login", "surname", "forename", "patronymic", "email", "phone"], function (s) {
 					return oSubject.get (s);
 				}), function (s) {
 					if (s) {
@@ -572,13 +572,13 @@ Ext.define ("$o.Card.Widget", {
 			} else {
 				subject = "admin";
 			};
-			var o = {
+			let o = {
 				date: r.get (i, "fdate"),
 				subject: subject,
 				ip: r.get (i, "fremote_addr"),
 				description: r.get (i, "fdescription")
 			};
-			var value = "";
+			let value = "";
 			if (r.get (i, "fstring")) {
 				value = r.get (i, "fstring");
 			} else
@@ -588,14 +588,14 @@ Ext.define ("$o.Card.Widget", {
 			if (r.get (i, "fnumber")) {
 				value = r.get (i, "fnumber");
 				if (ca.get ("type") >= 1000) {
-					var oValue = $o.getObject (r.get (i, "fnumber"));
+					let oValue = $o.getObject (r.get (i, "fnumber"));
 					value = oValue.toString ();
 				};
 			};
 			o.value = value;
 			data.push (o);
 		};
-	    var store = Ext.create ("Ext.data.Store", {
+	    let store = Ext.create ("Ext.data.Store", {
 	        data: data,
 	        fields: [{
 	        	name: "date", type: "string"
@@ -609,16 +609,16 @@ Ext.define ("$o.Card.Widget", {
 	        	name: "description", type: "string"
 	        }]
 	    });
-		var cellRenderer = function (value, metaData, record, rowIndex, colIndex, store) {
+		let cellRenderer = function (value, metaData, record, rowIndex, colIndex, store) {
 			if (value) {
-				var tip = value;
+				let tip = value;
 				tip = tip.split ('"').join ("'");
 				metaData.tdAttr = 'data-qtip="' + tip + '"';
 			};
 			metaData.style = "white-space: normal;";
 			return value;
 		};
-		var grid = Ext.create ("Ext.grid.Panel", {
+		let grid = Ext.create ("Ext.grid.Panel", {
 			store: store,
 			columns: [{
 				header: $o.getString ("Date"), width: 100, dataIndex: "date", renderer: cellRenderer
@@ -635,7 +635,7 @@ Ext.define ("$o.Card.Widget", {
 			frame: false,
 			deferRowRender: false
 		});
-		var win = new Ext.Window ({
+		let win = new Ext.Window ({
 			title: $o.getString ("Revision History"),
 			resizable: true,
 			closable: true,
@@ -650,7 +650,7 @@ Ext.define ("$o.Card.Widget", {
 		win.show ();
 	},
 	buildToolbar: function () {
-		var me = this;
+		let me = this;
 		me.tbarUser = me.tbar || [];
 		me.tbar = [];
 		if (!me.hideToolbar && !me.readOnly && !me.autoSave && !$o.isReadOnly ()) {
@@ -708,7 +708,7 @@ Ext.define ("$o.Card.Widget", {
 				}
 			};
 		};
-		for (var i = 0; i < me.tbarUser.length; i ++) {
+		for (let i = 0; i < me.tbarUser.length; i ++) {
 			me.tbar.push (me.tbarUser [i]);
 		};
 	},
@@ -716,17 +716,17 @@ Ext.define ("$o.Card.Widget", {
 		Возвращает массив с измененными полями (attr, oldValue, newValue).
 	*/
 	getChanged: function () {
-		var me = this;
-		var result = [];
-		var items = me.getItems ();
+		let me = this;
+		let result = [];
+		let items = me.getItems ();
 		for (i = 0; i < items.length; i ++) {
-			var item = items [i];
+			let item = items [i];
 			if (item.isDirty ()) {
-				var value = item.getValue ();
+				let value = item.getValue ();
 				if (item.ca.get ("secure")) {
 					value = $o.util.sha1 (value);
 				};
-				var o = {};
+				let o = {};
 				o.attr = item.$attr;
 				o.oldValue = item.originalValue;
 				o.newValue = value;
@@ -740,7 +740,7 @@ Ext.define ("$o.Card.Widget", {
 	enableUnloadMessage: function () {
 		this.enabledUnloadMessage = true;
 		window.onbeforeunload = function (evt) {
-		    var message = $o.getString ("Data is not saved. You will lose changes if you leave the page");
+		    let message = $o.getString ("Data is not saved. You will lose changes if you leave the page");
 		    if (typeof evt == "undefined") {
 		        evt = window.event;
 		    };

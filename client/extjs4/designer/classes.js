@@ -2,7 +2,7 @@ Ext.define ("$o.Classes.Widget", {
 	extend: "$o.Layout.Widget",
 	alias: ["widget.$o.classes", "widget.$classes"],
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.$layout = {
 			split: {
 				orientation: "horizontal",
@@ -23,12 +23,12 @@ Ext.define ("$o.Classes.Widget", {
 				    	},
 					    actions: [{
 					        fn: function () {
-					        	var grid = this;
+					        	let grid = this;
 								$zu.dialog.getNameAndCode ({title: $o.getString ("Class", ":", "Adding"), success: function (name, code) {
-									var createSpr = false;
+									let createSpr = false;
 									async.series ([
 										function (cb) {
-											var clsParent = $o.getClass (grid.getCurrentValue ("id"));
+											let clsParent = $o.getClass (grid.getCurrentValue ("id"));
 											if (clsParent && clsParent.getFullCode ().split (".")[0] == "spr") {
 												common.confirm ({message: $o.getString ("Create standard dictionary (card, view)?"), scope: this, fn: function (btn) {
 													if (btn == "yes") {
@@ -41,8 +41,8 @@ Ext.define ("$o.Classes.Widget", {
 											}
 										}
 									], function (err) {
-										var tr = $o.startTransaction ({description: 'Create class '});
-							        	var o = $o.createClass ();
+										let tr = $o.startTransaction ({description: 'Create class '});
+							        	let o = $o.createClass ();
 							        	o.set ("parent", grid.getCurrentValue ("id"));
 							        	o.set ("name", name);
 							        	o.set ("code", code);
@@ -69,9 +69,9 @@ Ext.define ("$o.Classes.Widget", {
 					        fn: function () {
 								common.confirm ({message: $zr.getString ("Are you sure?"), scope: this, fn: function (btn) {
 									if (btn == "yes") {
-										var id = this.getCurrentValue ("id");
-										var tr = $o.startTransaction ({description: 'Remove class ' + id});
-							        	var o = $o.getClass (id);
+										let id = this.getCurrentValue ("id");
+										let tr = $o.startTransaction ({description: 'Remove class ' + id});
+							        	let o = $o.getClass (id);
 							        	o.remove ();
 							        	o.sync ();
 										$o.commitTransaction (tr);
@@ -81,7 +81,7 @@ Ext.define ("$o.Classes.Widget", {
 					        },
 					        active: {
 					            fn: function () {
-					            	var r = this.getCurrentValue ("id") && !this.getCurrentValue ("schema_id");
+					            	let r = this.getCurrentValue ("id") && !this.getCurrentValue ("schema_id");
 					            	return r;
 					            }
 					        },
@@ -93,7 +93,7 @@ Ext.define ("$o.Classes.Widget", {
 					        },
 					        active: {
 					            fn: function () {
-					            	var r = this.getCurrentValue ("id");// && !this.getCurrentValue ("schema_id");
+					            	let r = this.getCurrentValue ("id");// && !this.getCurrentValue ("schema_id");
 					            	return r;
 					            }
 					        },
@@ -142,14 +142,14 @@ Ext.define ("$o.Classes.Widget", {
 									    actions: [{
 									        fn: function () {
 												$zu.dialog.getNameAndCodeAndType ({title: $o.getString ("Class attribute", ":", "Adding"), success: function (name, code, type) {
-													var cls = $o.getClass (this.relatives ["olap"].getCurrentValue ("id"));
-													var cls2 = cls.hasAttrInHierarchy (code);
+													let cls = $o.getClass (this.relatives ["olap"].getCurrentValue ("id"));
+													let cls2 = cls.hasAttrInHierarchy (code);
 													if (cls2) {
 														common.message ($o.getString ("Attribute already exists in class") + ": " + cls2.toString ());
 														return;
 													};
-													var tr = $o.startTransaction ({description: 'Create class attr'});
-										        	var o = $o.createClassAttr ();
+													let tr = $o.startTransaction ({description: 'Create class attr'});
+										        	let o = $o.createClassAttr ();
 										        	o.set ("class", this.relatives ["olap"].getCurrentValue ("id"));
 										        	o.set ("name", name);
 										        	o.set ("code", code);
@@ -182,10 +182,10 @@ Ext.define ("$o.Classes.Widget", {
 									        fn: function () {
 												common.confirm ({message: $zr.getString ("Are you sure?"), scope: this, fn: function (btn) {
 													if (btn == "yes") {
-														var id = this.getCurrentValue ("id");
-														var tr = $o.startTransaction ({description: 'Remove class attr ' + id});
-											        	var o = $o.getClassAttr (id);
-											        	var clsId = o.get ("class");
+														let id = this.getCurrentValue ("id");
+														let tr = $o.startTransaction ({description: 'Remove class attr ' + id});
+											        	let o = $o.getClassAttr (id);
+											        	let clsId = o.get ("class");
 											        	o.remove ();
 											        	o.sync ();
 											        	$o.getClass (clsId).updateDefault ();
@@ -205,7 +205,7 @@ Ext.define ("$o.Classes.Widget", {
 							    		cellRenderer: function (value, metaData, record, rowIndex, colIndex, store) {
 								        	if (metaData.column.dataIndex == "type") {
 												if (record.get ("type_id")) {
-													var cls = $o.getClass (record.get ("type_id"));
+													let cls = $o.getClass (record.get ("type_id"));
 													if (cls) {
 								        				value = cls.toString ();
 								        			}
@@ -267,7 +267,7 @@ Ext.define ("$o.Classes.Widget", {
 										active: {
 											fn: function () {
 												if (this.relatives ["olapAttrs"].getValue ("id")) {
-													var ca = $o.getClassAttr (this.relatives ["olapAttrs"].getValue ("id"));
+													let ca = $o.getClassAttr (this.relatives ["olapAttrs"].getValue ("id"));
 													if (ca.get ("type") >= 1000) {
 														this.down ("*[attr=id.removeRule]").enable ();
 													} else {
@@ -299,8 +299,8 @@ Ext.define ("$o.Classes.Widget", {
 									    actions: [{
 									        fn: function () {
 												$zu.dialog.getNameAndCode ({title: $o.getString ("Action", ":", "Adding"), success: function (name, code) {
-													var tr = $o.startTransaction ({description: 'Create action'});
-										        	var o = $o.createAction ();
+													let tr = $o.startTransaction ({description: 'Create action'});
+										        	let o = $o.createAction ();
 										        	o.set ("class", this.relatives ["olap"].getCurrentValue ("id"));
 										        	o.set ("name", name);
 										        	o.set ("code", code);
@@ -327,9 +327,9 @@ Ext.define ("$o.Classes.Widget", {
 									        fn: function () {
 												common.confirm ({message: $zr.getString ("Are you sure?"), scope: this, fn: function (btn) {
 													if (btn == "yes") {
-														var id = this.getCurrentValue ("id");
-														var tr = $o.startTransaction ({description: 'Remove action ' + id});
-											        	var o = $o.getAction (id);
+														let id = this.getCurrentValue ("id");
+														let tr = $o.startTransaction ({description: 'Remove action ' + id});
+											        	let o = $o.getAction (id);
 											        	o.remove ();
 											        	o.sync ();
 														$o.commitTransaction (tr);
@@ -346,9 +346,9 @@ Ext.define ("$o.Classes.Widget", {
 									        icon: "delete"
 									    }, {
 									    	fn: function () {
-												var a = $o.getAction (this.getCurrentValue ("id"));
-												var body = a.get ("body");
-												var win = Ext.create ("Ext.Window", {
+												let a = $o.getAction (this.getCurrentValue ("id"));
+												let body = a.get ("body");
+												let win = Ext.create ("Ext.Window", {
 													width: 800, height: 600, layout: "fit",
 													frame: false, border: false, bodyPadding: 1,
 													modal: false,
@@ -393,13 +393,13 @@ Ext.define ("$o.Classes.Widget", {
 									        iconCls: "gi_notes"
 									    }, {
 									    	fn: function () {
-									    		var classId = this.getCurrentValue ("class_id");
-												var a = $o.getAction (this.getCurrentValue ("id"));
-												var l = a.get ("layout");
+									    		let classId = this.getCurrentValue ("class_id");
+												let a = $o.getAction (this.getCurrentValue ("id"));
+												let l = a.get ("layout");
 												l = l || "{}";
 												l = JSON.parse (l);
-												var layout = l.layout;
-												var win = Ext.create ("Ext.Window", {
+												let layout = l.layout;
+												let win = Ext.create ("Ext.Window", {
 													width: 800, height: 600, layout: "fit",
 													frame: false, border: false, bodyPadding: 1,
 													modal: false,
@@ -421,7 +421,7 @@ Ext.define ("$o.Classes.Widget", {
 														iconCls: "gi_floppy_save",
 										            	disabled: this.relatives ["olap"].getCurrentValue ("schema_id"),
 														handler: function () {
-															var layout = win.down ("*[name=layout]").getValue ();
+															let layout = win.down ("*[name=layout]").getValue ();
 															if (layout) {
 																if (typeof (layout) == "string") {
 																	try {
@@ -466,8 +466,8 @@ Ext.define ("$o.Classes.Widget", {
 									    	text: "Обновить действия по умолчанию",
 									    	iconCls: "gi_refresh",
 									    	handler: function () {
-									    		var clsId = this.up ("grid").relatives ["olap"].getValue ("id");
-									    		var cls = $o.getClass (clsId);
+									    		let clsId = this.up ("grid").relatives ["olap"].getValue ("id");
+									    		let cls = $o.getClass (clsId);
 								    			cls.updateDefault ();
 									    	}
 									    	*/
@@ -486,10 +486,10 @@ Ext.define ("$o.Classes.Widget", {
 												me.actionCard = this;
 											},
 											afterSave: function () {
-												var actionId = this.relatives ["olapActions"].getValue ("id");
-												var a = $o.getAction (actionId);
-												var layoutField = me.actionCard.down ("*[attr=id.layout]");
-												var v = layoutField.originalValue;
+												let actionId = this.relatives ["olapActions"].getValue ("id");
+												let a = $o.getAction (actionId);
+												let layoutField = me.actionCard.down ("*[attr=id.layout]");
+												let v = layoutField.originalValue;
 												v = JSON.parse (v);
 												if (!v || typeof (v) != "object") {
 													v = {};
@@ -534,7 +534,7 @@ Ext.define ("$o.Classes.Widget", {
 													);
 													/*
 													if (this.getValue () == "create") {
-														var cls = $o.getClass (me.olapClasses.getValue ("id"));
+														let cls = $o.getClass (me.olapClasses.getValue ("id"));
 														this.up ("*[name=attrCard]").down ("*[name=body]").setValue (
 												    		'common.tpl.create.call (this, {\n' +
 												    		'\tasWindow: 1,\n' +
@@ -550,10 +550,10 @@ Ext.define ("$o.Classes.Widget", {
 														);
 													};
 													if (this.getValue () == "card") {
-														var action = $o.getAction (me.olapActions.getValue ("id"));
+														let action = $o.getAction (me.olapActions.getValue ("id"));
 														this.up ("*[name=attrCard]").down ("*[name=body]").setValue (
-												    		'var me = this;\n' +
-												    		'var id = me.getValue ("id") || me.getValue ("a_id");\n' +
+												    		'let me = this;\n' +
+												    		'let id = me.getValue ("id") || me.getValue ("a_id");\n' +
 												    		'common.tpl.show.call (this, {\n' +
 												    		'\tid: id,\n' +
 												    		'\tasWindow: 1,\n' +
@@ -614,8 +614,8 @@ Ext.define ("$o.Classes.Widget", {
 										active: {
 											fn: function () {
 												if (this.relatives ["olapActions"].getValue ("id")) {
-													var a = $o.getAction (this.relatives ["olapActions"].getValue ("id"));
-													var l = a.get ("layout");
+													let a = $o.getAction (this.relatives ["olapActions"].getValue ("id"));
+													let l = a.get ("layout");
 													l = l || "{}";
 													l = JSON.parse (l);
 													this.down ("*[name=type]").setValue (l ["type"]);
@@ -652,7 +652,7 @@ Ext.define ("$o.Classes.Widget", {
 								filter: ["type_id", "=", {id: "olap", attr: "id"}],
 					    		cellRenderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						        	if (metaData.column.dataIndex == "classCode") {
-										var cls = $o.getClass (record.get ("class_id"));
+										let cls = $o.getClass (record.get ("class_id"));
 										if (cls) {
 					        				value = cls.getFullCode ();
 					        			}
@@ -668,12 +668,12 @@ Ext.define ("$o.Classes.Widget", {
 		me.callParent (arguments);
 	},
 	showObjects: function (options) {
-		var cls = $o.getClass (options.classId);
+		let cls = $o.getClass (options.classId);
 		if (!cls.attrsArray.length) {
 			common.message ($o.getString ("Class has no attributes"));
 			return;
 		};
-		var win = Ext.create ("Ext.Window", {
+		let win = Ext.create ("Ext.Window", {
 			title: $o.getString ("Class objects") + ": " + cls.toString (),
 			iconCls: "gi_file",
 			width: 800,
@@ -705,7 +705,7 @@ Ext.define ("$o.Classes.Widget", {
 						*/
 						actions: [{
 							fn: function () {
-								var me = this;
+								let me = this;
 								common.confirm ({message: $o.getString ("Are you sure?"), fn: function (btn) {
 									if (btn == "yes") {
 										$o.startTransaction ({description: "Remove by admin"});
@@ -722,12 +722,12 @@ Ext.define ("$o.Classes.Widget", {
 							active: "common.recordSelected"
 						}, {
 							fn: function () {
-								var me = this;
-								var sql = JSON.parse (me.$view.get ("query"));
-								var filter = me.getFilter ();
+								let me = this;
+								let sql = JSON.parse (me.$view.get ("query"));
+								let filter = me.getFilter ();
 								if (filter && filter.length) {
 									_.each (filter, function (f, i) {
-										var index = sql.select.indexOf (f);
+										let index = sql.select.indexOf (f);
 										if (index > -1) {
 											filter [i] = sql.select [index - 1];
 										}
@@ -739,7 +739,7 @@ Ext.define ("$o.Classes.Widget", {
 									sql.where.push (filter);
 								}
 								sql.asArray = true;
-								var recs = $o.execute (sql);
+								let recs = $o.execute (sql);
 								common.confirm ({message: $o.getString ("Entries will be deleted") + ": " + recs.length + ". " + $o.getString ("Are you sure?"), fn: function (btn) {
 									if (btn == "yes") {
 										Ext.MessageBox.show ({
@@ -771,12 +771,12 @@ Ext.define ("$o.Classes.Widget", {
 							iconCls: "gi_circle_minus"
 						}, {
 							fn: function () {
-								var me = this;
-								var sql = JSON.parse (me.$view.get ("query"));
-								var filter = me.getFilter ();
+								let me = this;
+								let sql = JSON.parse (me.$view.get ("query"));
+								let filter = me.getFilter ();
 								if (filter && filter.length) {
 									_.each (filter, function (f, i) {
-										var index = sql.select.indexOf (f);
+										let index = sql.select.indexOf (f);
 										if (index > -1) {
 											filter [i] = sql.select [index - 1];
 										}
@@ -788,8 +788,8 @@ Ext.define ("$o.Classes.Widget", {
 									sql.where.push (filter);
 								}
 								sql.asArray = true;
-								var recs = $o.execute (sql);
-								var win = Ext.create ("Ext.window.Window", {
+								let recs = $o.execute (sql);
+								let win = Ext.create ("Ext.window.Window", {
 									title: $o.getString ("Changing the value of"),
 									iconCls: "edit",
 									closable: true,
@@ -834,8 +834,8 @@ Ext.define ("$o.Classes.Widget", {
 										text: $o.getString ("Change"),
 										iconCls: "ok",
 										handler: function () {
-											var attr = win.down ("*[name=attr]").getValue ();
-											var value = win.down ("*[name=value]").getValue () || null;
+											let attr = win.down ("*[name=attr]").getValue ();
+											let value = win.down ("*[name=value]").getValue () || null;
 											if (!attr) {
 												return common.message ($o.getString ("Choose attribute"));
 											}
@@ -851,7 +851,7 @@ Ext.define ("$o.Classes.Widget", {
 												$o.startTransaction ();
 												async.reduce (recs, 0, function (i, rec, cb) {
 													Ext.MessageBox.updateProgress (i / recs.length, i + " / " + recs.length);
-													var o = $o.getObject (rec.id);
+													let o = $o.getObject (rec.id);
 													o.set (attr, value);
 													o.sync ();
 											        setTimeout (function () {
@@ -875,8 +875,8 @@ Ext.define ("$o.Classes.Widget", {
 							text: $o.getString ("Import") + " CSV",
 							iconCls: "gi_disk_import",
 							fn: function () {
-								var olap = this;
-								var win = Ext.create ("Ext.window.Window", {
+								let olap = this;
+								let win = Ext.create ("Ext.window.Window", {
 									title: $o.getString ("import") + " CSV",
 									iconCls: "gi_disk_import",
 									closable: true,
@@ -910,9 +910,9 @@ Ext.define ("$o.Classes.Widget", {
 		Создает справочник
 	*/
 	createSpr: function (cls) {
-		var me = this;
+		let me = this;
 		// card layout
-		var l = {
+		let l = {
 			"type": "card",
 			"layout": {
 				"designer": 1,
@@ -943,7 +943,7 @@ Ext.define ("$o.Classes.Widget", {
 				}
 			}
 		};
-		var recs = $o.execute ({
+		let recs = $o.execute ({
 			asArray: true,
 		    select: [
 		        {"a":"___fid"}, "id"
@@ -956,16 +956,16 @@ Ext.define ("$o.Classes.Widget", {
 		        {"a":"___fcode"}, "=", "card"
 		    ]
 		});
-		var action = $o.getAction (recs [0].id);
+		let action = $o.getAction (recs [0].id);
 		action.set ("layout", JSON.stringify (l, null, "\t"));
 		action.sync ();
 		// view
-		var viewParent = null;
-		var tokens = cls.getFullCode ().split (".");
-		for (var i = 0; i < tokens.length - 1; i ++) {
-			var code = tokens.slice (0, i + 1).join (".");
-			var clsParent = $o.getClass (code);
-			var parentId = viewParent ? viewParent.get ("id") : null;
+		let viewParent = null;
+		let tokens = cls.getFullCode ().split (".");
+		for (let i = 0; i < tokens.length - 1; i ++) {
+			let code = tokens.slice (0, i + 1).join (".");
+			let clsParent = $o.getClass (code);
+			let parentId = viewParent ? viewParent.get ("id") : null;
 			try {
 				viewParent = $o.getView (code);
 			} catch (e) {
@@ -976,12 +976,12 @@ Ext.define ("$o.Classes.Widget", {
 				viewParent.sync ();
 			};
 		};
-		var codeView = cls.getFullCode ();
+		let codeView = cls.getFullCode ();
 		/*
-		var codeParent = cls.getFullCode ().split (".");
+		let codeParent = cls.getFullCode ().split (".");
 		codeParent.splice (codeParent.length - 1, 1);
 		codeParent = codeParent.join (".");
-		var viewParent;
+		let viewParent;
 		try {
 			viewParent = $o.getView (codeParent);
 		} catch (e) {
@@ -990,9 +990,9 @@ Ext.define ("$o.Classes.Widget", {
 		if (!viewParent) {
 			return common.message ($o.getString ("base view not exists") + " " + codeParent);
 		}
-		var codeView = codeParent + "." + cls.get ("code");
+		let codeView = codeParent + "." + cls.get ("code");
 		*/
-		var view = $o.createView ();
+		let view = $o.createView ();
 		view.set ("parent", viewParent.get ("id"));
 		view.set ("name", cls.get ("name"));
 		view.set ("code", cls.get ("code"));
@@ -1049,7 +1049,7 @@ Ext.define ("$o.Classes.Widget", {
 		}, {
 			code: "npp", name: $o.getString ("N"), width: 75, area: 0
 		}], function (o, i) {
-			var va = $o.createViewAttr ();
+			let va = $o.createViewAttr ();
 			va.set ("view", view.get ("id"));
 			va.set ("code", o.code);
 			va.set ("name", o.name);

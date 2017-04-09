@@ -10,15 +10,15 @@ Ext.define ("$o.Chart.Widget", {
     shadow: true,
     overflowY: "auto",
 	initComponent: function () {		
-		var me = this;
-		var view = me.$view = me.queryId ? $o.viewsMap [me.queryId] : $o.getView ({code: me.$query});
-		var viewId = me.viewId = view.get ("id");
-		var query = view.get ("query");
+		let me = this;
+		let view = me.$view = me.queryId ? $o.viewsMap [me.queryId] : $o.getView ({code: me.$query});
+		let viewId = me.viewId = view.get ("id");
+		let query = view.get ("query");
 		delete me.query;
 
-		var nameFields = [me.attrMark];
-		var dataFields = [me.attrValue];
-		var data = me.getData ();
+		let nameFields = [me.attrMark];
+		let dataFields = [me.attrValue];
+		let data = me.getData ();
 		me.store = Ext.create ("Ext.data.Store", {
 			fields: ["___name", me.attrMark, me.attrValue],
 			data: data
@@ -64,17 +64,17 @@ Ext.define ("$o.Chart.Widget", {
         me.callParent (arguments);
     },
     getData: function () {
-        var me = this;
-        var query = me.$view.get ("query");
+        let me = this;
+        let query = me.$view.get ("query");
         query = JSON.parse (query);
         if (me.filter) {
             query.where = query.where || [];
             if (query.where.length) {
                 query.where.push ("and");
             };
-            var f = $o.util.clone (me.filter);
-            for (var i = 0; i < f.length; i ++) {
-                for (var j = 1; j < query.select.length; j += 2) {
+            let f = $o.util.clone (me.filter);
+            for (let i = 0; i < f.length; i ++) {
+                for (let j = 1; j < query.select.length; j += 2) {
                     if (f [i] == query.select [j]) {
                         f [i] = query.select [j - 1];
                     };
@@ -92,10 +92,10 @@ Ext.define ("$o.Chart.Widget", {
             };
             query.where.push (f);
         };
-        var r = $o.execute ({sql: query});
-        var data = [];
-        for (var i = 0; i < r.length; i ++) {
-            var o = {};
+        let r = $o.execute ({sql: query});
+        let data = [];
+        for (let i = 0; i < r.length; i ++) {
+            let o = {};
             o [me.attrMark] = r.get (i, me.attrMark);
             o [me.attrValue] = r.get (i, me.attrValue);
             o.___name = "";
@@ -104,12 +104,11 @@ Ext.define ("$o.Chart.Widget", {
         return data;
     },
 	refresh: function (options) {
-        var me = this;
+        let me = this;
         if (me.refreshing) {
             return;
         };
         me.refreshing = 1;
-		var me = this;
 		options = options || {};
         me.store.loadData (me.getData ());
         me.redraw ();

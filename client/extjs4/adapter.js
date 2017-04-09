@@ -16,7 +16,7 @@ $o.initAdapter = function () {
 	$zp.application.mainPanel = $o.app.tp;
 	$zs.views = $o.viewsTree;
 	$zs.views.get = function (code) {
-		var r = $o.getView ({code: code});
+		let r = $o.getView ({code: code});
 		return r;
 	};
 	objectum.ui.layout = {};
@@ -25,7 +25,7 @@ $o.initAdapter = function () {
 	$zs.viewAttrs = $o.viewAttrsMap;
 	$zp.currentUser = $o.currentUser;
 	$zp.application.onClickMenuItem = function (item) {
-		var record = $o.viewsMap [item.record.stub.get ("id")];
+		let record = $o.viewsMap [item.record.stub.get ("id")];
 		$o.app.show ({record: record});
 	};
 	$VERSION_MAJOR = $o.serverVersion;
@@ -40,7 +40,7 @@ $o.initAdapter = function () {
 };
 Ext.override (Ext.Component, {
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		if (me.code) {
 			me.iconCls = me.iconCls ? me.iconCls : me.code;
 			me.text = me.text ? $o.locale.getString (me.text) : $o.locale.getString (me.code);
@@ -49,8 +49,8 @@ Ext.override (Ext.Component, {
 			me.handler = eval (me.handler);
 		};
 		if (me.listeners) {
-			for (var event in me.listeners) {
-				var ef = me.listeners [event];
+			for (let event in me.listeners) {
+				let ef = me.listeners [event];
 				if (typeof (ef) == "string") {
 					try {
 						me.listeners [event] = eval (ef);
@@ -141,19 +141,19 @@ Ext.define ("Ext.fix.util.AbstractMixedCollection", {
 });
 Date.prototype.toStringOriginal = Date.prototype.toString;
 Date.prototype.toString = function (format) {
-	var dd = this.getDate ();
-	var mm = this.getMonth () + 1;
-	var yyyy = this.getFullYear ();
-	var h = this.getHours ();
-	var m = this.getMinutes ();
-	var s = this.getSeconds ();
+	let dd = this.getDate ();
+	let mm = this.getMonth () + 1;
+	let yyyy = this.getFullYear ();
+	let h = this.getHours ();
+	let m = this.getMinutes ();
+	let s = this.getSeconds ();
 	if (dd < 10) {
 		dd = "0" + dd;
 	};
 	if (mm < 10) {
 		mm = "0" + mm;
 	};
-	var v = dd + "." + mm + "." + yyyy;
+	let v = dd + "." + mm + "." + yyyy;
 	if (h || m || s) {
 		if (h < 10) {
 			h = "0" + h;
@@ -169,8 +169,8 @@ Date.prototype.toString = function (format) {
 	return v;
 };
 Date.prototype.toUTCString = function () {
-	var o = this;
-    var pad = function (n) {
+	let o = this;
+    let pad = function (n) {
         return n < 10 ? "0" + n : n;
     };
     if (o.getHours () == 0 && o.getMinutes () == 0 && o.getSeconds () == 0) {
@@ -195,7 +195,7 @@ Ext.define ("$o.locale", {
 	singleton: true,
 	strings: {},
 	load: function (url) {
-		var r = Ext.Ajax.request ({
+		let r = Ext.Ajax.request ({
 			url: url,
 			async: false
 		});
@@ -204,24 +204,24 @@ Ext.define ("$o.locale", {
 				$o.locale.strings [id.toLowerCase ()] = v;
 			});
 		} catch (e) {
-			var r = Ext.Ajax.request ({
+			let r = Ext.Ajax.request ({
 				url: url,
 				async: false
 			}).responseXML;
-			var nodes = Ext.DomQuery.select ("string", r.documentElement);
-			for (var i = 0; i < nodes.length; i ++) {
-				var id = nodes [i].attributes [0].value;
-				var text = nodes [i].textContent || nodes [i].text;
+			let nodes = Ext.DomQuery.select ("string", r.documentElement);
+			for (let i = 0; i < nodes.length; i ++) {
+				let id = nodes [i].attributes [0].value;
+				let text = nodes [i].textContent || nodes [i].text;
 				$o.locale.strings [id] = text;
 			};
 		};
 	},
 	getString: function () {
-		var r = _.map (_.toArray (arguments), function (s) {
+		let r = _.map (_.toArray (arguments), function (s) {
 			if (!s) {
 				return s;
 			};
-			var n = _.has ($o.locale.strings, s.toLowerCase ()) ? $o.locale.strings [s.toLowerCase ()] : s;
+			let n = _.has ($o.locale.strings, s.toLowerCase ()) ? $o.locale.strings [s.toLowerCase ()] : s;
 			if (s && n) {
 				if (s [0].toUpperCase () == s [0] || ["create", "remove", "delete", "open", "choose", "cancel"].indexOf (s) > -1) {
 					n = n [0].toUpperCase () + n.substr (1);
@@ -239,7 +239,7 @@ Ext.define ("$o.locale", {
 			s = "Извините. Сервер в данный момент перегружен. Пожалуйста, повторите запрос позднее.";
 		};
 		if (s.indexOf ("value exists") > -1) {
-			var tokens = s.split (":");
+			let tokens = s.split (":");
 			s = "Значение '" + tokens [1].trim () + "' используется. Пожалуйста введите другое.";
 		};
 		return s;
@@ -250,10 +250,10 @@ Ext.define ("$o.locale", {
 //
 $zu.dialog = {};
 $zu.dialog.getNameAndCode = function (options) {
-	var title = options.title;
-	var success = options.success;
-	var scope = options.scope || this;
-	var okBtn = new Ext.Button ({
+	let title = options.title;
+	let success = options.success;
+	let scope = options.scope || this;
+	let okBtn = new Ext.Button ({
 		code: 'Ok',
 		formBind: true,
 		scope: this,
@@ -262,14 +262,14 @@ $zu.dialog.getNameAndCode = function (options) {
 			win.close ();
 		}
 	});
-	var cancelBtn = new Ext.Button ({
+	let cancelBtn = new Ext.Button ({
 		code: 'Cancel',
 		scope: this,
 		handler: function () {
 			win.close ();
 		}
 	});
-	var fieldName = new Ext.form.TextField ({
+	let fieldName = new Ext.form.TextField ({
 		selectOnFocus: true,
 		fieldLabel: $zr.getString ("Name"),
 		allowBlank: false,
@@ -288,7 +288,7 @@ $zu.dialog.getNameAndCode = function (options) {
 			scope: this
 		}
 	});
-	var fieldCode = new Ext.form.TextField ({
+	let fieldCode = new Ext.form.TextField ({
 		selectOnFocus: true,
 		fieldLabel: $zr.getString ("Code"),
 		allowBlank: false,
@@ -305,7 +305,7 @@ $zu.dialog.getNameAndCode = function (options) {
 			scope: this
 		}
 	});
-	var form = new Ext.FormPanel({
+	let form = new Ext.FormPanel({
 		frame: false,
 		border: false,
 		defaultType: 'textfield',
@@ -323,7 +323,7 @@ $zu.dialog.getNameAndCode = function (options) {
 			cancelBtn
 		]
 	});
-    var win = new Ext.Window ({
+    let win = new Ext.Window ({
 		width: 400,
 		height: 150,
         layout: 'fit',
@@ -341,10 +341,10 @@ $zu.dialog.getNameAndCode = function (options) {
 //  Диалог получения мнемокода и типа
 //
 $zu.dialog.getNameAndCodeAndType = function (options) {
-	var title = options.title;
-	var success = options.success;
-	var scope = options.scope || this;
-	var okBtn = new Ext.Button ({
+	let title = options.title;
+	let success = options.success;
+	let scope = options.scope || this;
+	let okBtn = new Ext.Button ({
 		code: 'Ok',
 		formBind: true,
 		scope: this,
@@ -353,14 +353,14 @@ $zu.dialog.getNameAndCodeAndType = function (options) {
 			win.close ();
 		}
 	});
-	var cancelBtn = new Ext.Button ({
+	let cancelBtn = new Ext.Button ({
 		code: 'Cancel',
 		scope: this,
 		handler: function () {
 			win.close ();
 		}
 	});
-	var fieldName = new Ext.form.TextField ({
+	let fieldName = new Ext.form.TextField ({
 		selectOnFocus: true,
 		fieldLabel: $zr.getString ("Name"),
 		allowBlank: false,
@@ -379,7 +379,7 @@ $zu.dialog.getNameAndCodeAndType = function (options) {
 			scope: this
 		}
 	});
-	var fieldCode = new Ext.form.TextField ({
+	let fieldCode = new Ext.form.TextField ({
 		selectOnFocus: true,
 		fieldLabel: $zr.getString ("Code"),
 		allowBlank: false,
@@ -396,7 +396,7 @@ $zu.dialog.getNameAndCodeAndType = function (options) {
 			scope: this
 		}
 	});
-	var fieldType = new Ext.create ("$o.ConfField.Widget", {
+	let fieldType = new Ext.create ("$o.ConfField.Widget", {
 		conf: "classAttr", 
 		confRef: "class", 
 		choose: {
@@ -410,14 +410,14 @@ $zu.dialog.getNameAndCodeAndType = function (options) {
 		listeners: {
 			change: function (value) {
 				if (value >= 1000) {
-					var cls = $o.getClass (value);
+					let cls = $o.getClass (value);
 					fieldName.setValue (cls.get ("name"));
 					fieldCode.setValue (cls.get ("code"));
 				};
 			}
 		}
 	});
-	var form = new Ext.FormPanel({
+	let form = new Ext.FormPanel({
 		frame: false,
 		border: false,
 		defaultType: 'textfield',
@@ -436,7 +436,7 @@ $zu.dialog.getNameAndCodeAndType = function (options) {
 			cancelBtn
 		]
 	});
-    var win = new Ext.Window ({
+    let win = new Ext.Window ({
 		width: 400,
 		height: 200,
         layout: 'fit',

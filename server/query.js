@@ -2,22 +2,22 @@
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
 // storage, session, sql
-var Query = function (options) {
-	var query = this;
-	var mainOptions = options;
-	var success = options.success;
-	var storage = options.storage;
-	var session = options.session || {userId: null};
-	var revision = session.revision;
-	var select = options.sql.select;
-	var from = options.sql.from;
-	var where = options.sql.where;
-	var order = options.sql.order;
-	var orderAfter = options.sql.orderAfter;
-	var attrs = {};
-	var fields = [];
-	var fieldNames = [];
-	var fieldTypeId = {};
+global.Query = function (options) {
+	let query = this;
+	let mainOptions = options;
+	let success = options.success;
+	let storage = options.storage;
+	let session = options.session || {userId: null};
+	let revision = session.revision;
+	let select = options.sql.select;
+	let from = options.sql.from;
+	let where = options.sql.where;
+	let order = options.sql.order;
+	let orderAfter = options.sql.orderAfter;
+	let attrs = {};
+	let fields = [];
+	let fieldNames = [];
+	let fieldTypeId = {};
 	query.generate = function () {
 		getAttrs ();
 		processJoins (from);
@@ -34,11 +34,11 @@ var Query = function (options) {
 			query.orderSQL += "\n) orderAfter " + processOrderAfter (orderAfter);
 		};
 	};
-	var getAttrs = function () {
-		for (var i = 0; i < from.length; i ++) {
-			var o = from [i];
+	let getAttrs = function () {
+		for (let i = 0; i < from.length; i ++) {
+			let o = from [i];
 			if (typeof (o) == "object" && Object.prototype.toString.call (o) !== "[object Array]") {
-				for (var key in o) {
+				for (let key in o) {
 					attrs [key] = attrs [key] || {};
 					attrs [key].cls = o [key];
 					attrs [key].toc = {};
@@ -47,13 +47,13 @@ var Query = function (options) {
 			}
 		}
 	};
-	var processJoin = function (arr) {
-		for (var i = 0; i < arr.length; i ++) {
-			var o = arr [i];
+	let processJoin = function (arr) {
+		for (let i = 0; i < arr.length; i ++) {
+			let o = arr [i];
 			if (typeof (o) =="object") {
-				for (var a in o) {
+				for (let a in o) {
 					if (o [a] == "id") {
-						var toc = storage.classesCode [attrs [a].cls].toc;
+						let toc = storage.classesCode [attrs [a].cls].toc;
 						if (revision) {
 							toc = "tm_" + toc;
 						};
@@ -65,7 +65,7 @@ var Query = function (options) {
 						if (!attrs [a]) {
 							console.error ("unknown attr: " + a);
 						};
-						var toc, ca, pos = query.sysCls.indexOf (attrs [a].cls);
+						let toc, ca, pos = query.sysCls.indexOf (attrs [a].cls);
 						if (pos > -1) {
 							toc = query.tables [pos];
 							ca = {toc: o [a].substr (3)};
@@ -86,20 +86,20 @@ var Query = function (options) {
 			}
 		}				
 	};
-	var processJoins = function (arr) {
-		for (var i = 0; i < arr.length; i ++) {
-			var o = arr [i];
+	let processJoins = function (arr) {
+		for (let i = 0; i < arr.length; i ++) {
+			let o = arr [i];
 			if (o == "left-join" || o == "inner-join") {
 				processJoin (arr [i + 3]);
 				i += 3;
 			}
 		}
 	};
-	var lastTypeId = 1;
-	var fieldToSQL = function (o) {
-		var r = "";
-		var distinct = o.distinct;
-		for (var a in o) {
+	let lastTypeId = 1;
+	let fieldToSQL = function (o) {
+		let r = "";
+		let distinct = o.distinct;
+		for (let a in o) {
 			if (a == "distinct") {
 				continue;
 			};
@@ -109,11 +109,11 @@ var Query = function (options) {
 				} else {
 					r = a + ".fobject_id";
 				};
-				var c = storage.getClass ({classCode: attrs [a].cls});
+				let c = storage.getClass ({classCode: attrs [a].cls});
 				if (!c) {
 					throw "query.fieldToSQL - unknown class: " + attrs [a].cls;
 				};
-				var toc = c.toc;
+				let toc = c.toc;
 				if (revision) {
 					toc = "tm_" + toc;
 				};
@@ -126,8 +126,8 @@ var Query = function (options) {
 				if (!attrs [a]) {
 					throw new VError ("Unknown attr: " + a);
 				}
-				var toc, pos = query.sysCls.indexOf (attrs [a].cls);
-				var ca = storage.getClassAttr ({classCode: attrs [a].cls, attrCode: o [a]});
+				let toc, pos = query.sysCls.indexOf (attrs [a].cls);
+				let ca = storage.getClassAttr ({classCode: attrs [a].cls, attrCode: o [a]});
 				if (pos > -1) {
 					toc = query.tables [pos];
 					ca.toc = o [a].substr (3);
@@ -152,13 +152,13 @@ var Query = function (options) {
 		};
 		return r;
 	};
-	var getExpressionStr = function (arr) {
-		var r = "";
-		for (var i = 0; i < arr.length; i ++) {
+	let getExpressionStr = function (arr) {
+		let r = "";
+		for (let i = 0; i < arr.length; i ++) {
 			if (r) {
 				r += " ";
 			}
-			var o = arr [i];
+			let o = arr [i];
 			if (typeof (o) == "object") {
 				if (common.isArray (o)) {
 					r += "(" + getExpressionStr (o) + ")";
@@ -170,7 +170,7 @@ var Query = function (options) {
 				r += o;
 			} else
 			if (typeof (o) == "string") {
-				var pos = fields.indexOf (o.toLowerCase () + "_");
+				let pos = fields.indexOf (o.toLowerCase () + "_");
 				if (query.keywords.indexOf (o) > -1) {
 					r += o;
 				} else
@@ -191,10 +191,10 @@ var Query = function (options) {
 		}
 		return r;
 	};
-	var processSelect = function (arr) {
-		var r = "";
-		for (var i = 0; i < arr.length; i ++) {
-			var o = arr [i], name;
+	let processSelect = function (arr) {
+		let r = "", name;
+		for (let i = 0; i < arr.length; i ++) {
+			let o = arr [i];
 			if (common.isArray (o)) {
 				if (r) {
 					r += ",\n\t";
@@ -212,7 +212,7 @@ var Query = function (options) {
 				name = fieldToSQL (o);
 				r += name;
 			} else {
-				var s = o.toLowerCase () + "_";
+				let s = o.toLowerCase () + "_";
 				r += " as " + s;
 				if (i && !common.isArray (arr [i - 1])) {
 					fields.push (s);
@@ -226,29 +226,29 @@ var Query = function (options) {
 		}
 		return storage.client.database == "mssql" ? "select top 9223372036854775807\n" + r + "\n" : "select\n" + r + "\n";
 	};
-	var processFrom = function (arr) {
+	let processFrom = function (arr) {
 		if (!arr) {
 			return "";
 		}
-		var getBlock = function (o) {
-			var alias, classCode, fields = [], tables = [], where = [];
+		let getBlock = function (o) {
+			let alias, classCode, fields = [], tables = [], where = [];
 			for (alias in o) {
 				classCode = o [alias];
 				break;
 			}
-			var objectField;
-			for (var t in attrs [alias].toc) {
-				var f = attrs [alias].toc [t];
-				for (var i = 0; i < f.length; i ++) {
+			let objectField;
+			for (let t in attrs [alias].toc) {
+				let f = attrs [alias].toc [t];
+				for (let i = 0; i < f.length; i ++) {
 					fields.push (t + "." + f [i]);
 				}
 				if (query.tables.indexOf (t) == -1) {
 					objectField = t + ".fobject_id";
 				}
 			};
-			var cls = storage.getClass (classCode);
+			let cls = storage.getClass (classCode);
 			while (1) {
-				var pos = query.sysCls.indexOf (classCode);
+				let pos = query.sysCls.indexOf (classCode);
 				if (pos > -1) {
 					tables.push (query.tables [pos]);
 					break;
@@ -263,11 +263,11 @@ var Query = function (options) {
 				};
 				cls = storage.classesMap [cls.get ("fparent_id")];
 			};
-			for (var i = 1; i < tables.length; i ++) {
+			for (let i = 1; i < tables.length; i ++) {
 				where.push (tables [i - 1] + ".fobject_id=" + tables [i] + ".fobject_id");
 			}
 			if (revision) {
-				for (var i = 0; i < tables.length; i ++) {
+				for (let i = 0; i < tables.length; i ++) {
 					if (query.tables.indexOf (tables [i]) == -1) {
 						where.push (tables [i] + ".frevision_id=" + revision);
 					};
@@ -291,12 +291,12 @@ var Query = function (options) {
 				"(select " + fields.join (",") + " from " + tables.join (",") + where + ") " + alias
 			;
 		};
-		var r = "";
-		for (var i = 0; i < arr.length; i ++) {
+		let r = "";
+		for (let i = 0; i < arr.length; i ++) {
 			if (!i) {
 				r += "\t" + getBlock (arr [0]);
 			} else {
-				var o = arr [i];
+				let o = arr [i];
 				if (o == "left-join" || o == "inner-join") {
 					r += "\n\t" + o.split ("-").join (" ");
 					r += " " + getBlock (arr [i + 1]);
@@ -307,28 +307,28 @@ var Query = function (options) {
 		}
 		return "from\n" + r + "\n";
 	};
-	var processWhere = function (arr) {
+	let processWhere = function (arr) {
 		if (!arr || !arr.length) {
 			return "";
 		}
 		return "where\n\t" + getExpressionStr (arr) + "\n";
 	};
-	var processOrder = function (arr) {
+	let processOrder = function (arr) {
 		if (!arr || !arr.length) {
 			return "";
 		}
 		return "order by\n\t" + getExpressionStr (arr) + "\n";
 	};
-	var processOrderAfter = function (arr) {
+	let processOrderAfter = function (arr) {
 		if (!arr || !arr.length) {
 			return "";
 		};
-		var s = "";
-		for (var j = 0; j < arr.length; j ++) {
+		let s = "";
+		for (let j = 0; j < arr.length; j ++) {
 			if (_.isObject (arr [j])) {
-				var has = false;
-				for (var i = 0; i < select.length; i ++) {
-					var o = select [i];
+				let has = false;
+				for (let i = 0; i < select.length; i ++) {
+					let o = select [i];
 					if (_.isObject (o) && _.keys (o)[0] == _.keys (arr [j])[0] && _.values (o)[0] == _.values (arr [j])[0]) {
 						s += "orderAfter." + select [i + 1] + "_ ";
 						has = true;
@@ -338,7 +338,7 @@ var Query = function (options) {
 					s += "orderAfter." + _.values (arr [j])[0] + "_ ";
 				}
 			} else {
-				var pos = fields.indexOf (arr [j].toLowerCase () + "_");
+				let pos = fields.indexOf (arr [j].toLowerCase () + "_");
 				if (pos > -1) {
 					s += "orderAfter." + arr [j] + "_ ";
 				} else {

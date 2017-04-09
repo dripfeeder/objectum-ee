@@ -8,7 +8,7 @@ Ext.define ("$o.ActionCard.Widget", {
 	},
 	bodyPadding: 1,
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.value = me.value || {};
 		me.tbar = [{
 			text: "Ок",
@@ -62,10 +62,10 @@ Ext.define ("$o.ActionCard.Widget", {
 			listeners: {
 				change: function () {
 					if (this.getValue ()) {
-						var a = $o.getAction (this.getValue ());
-						var cls = $o.getClass (a.get ("class"));
+						let a = $o.getAction (this.getValue ());
+						let cls = $o.getClass (a.get ("class"));
 						/*
-						var fn = cls.getFullCode () + "." + a.get ("code");
+						let fn = cls.getFullCode () + "." + a.get ("code");
 						try {
 							fn = eval (fn);
 						} catch (e) {
@@ -80,7 +80,7 @@ Ext.define ("$o.ActionCard.Widget", {
 //						me.down ("*[name=class]").setValue (cls.toString ());
 						me.down ("*[name=name]").setValue (a.get ("name"));
 						if (a.get ("layout")) {
-							var l = JSON.parse (a.get ("layout"));
+							let l = JSON.parse (a.get ("layout"));
 							if (l ["type"] == "create") {
 								me.down ("*[name=iconCls]").setValue ("gi_circle_plus");
 							};
@@ -141,7 +141,7 @@ Ext.define ("$o.ActionCard.Widget", {
 		this.callParent (arguments);
 	},
 	validator: function () {
-		var panel = this.up ("panel");
+		let panel = this.up ("panel");
 		if (panel.down ("*[name=action]").getValue () || panel.down ("*[name=fn]").getValue ()) {
 			panel.down ("*[name=save]").enable ();
 		} else {
@@ -150,14 +150,14 @@ Ext.define ("$o.ActionCard.Widget", {
 		return true;
 	},
 	save: function () {
-		var me = this;
-		var actionId = me.down ("*[name=action]").getValue ();
-		var fn;
-		var v = me.value;
+		let me = this;
+		let actionId = me.down ("*[name=action]").getValue ();
+		let fn;
+		let v = me.value;
 		if (actionId) {
 			v.actionId = actionId;
-			var action = $o.getAction (actionId);
-			var cls = $o.getClass (action.get ("class"));
+			let action = $o.getAction (actionId);
+			let cls = $o.getClass (action.get ("class"));
 			fn = cls.getFullCode () + "." + action.get ("code"); 
 		} else {
 			fn = me.down ("*[name=fn]").getValue ();

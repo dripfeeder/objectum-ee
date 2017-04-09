@@ -6,14 +6,14 @@
 	* Создает только для последней ревизии
 	* Машина времени работает только для данных (tobject, tobject_attr, toc)
 */
-var tm = {};
+global.tm = {};
 tm.remove = function (options) {
-	var me = this;
-	var success = options.success;
-	var session = options.session;
-	var storage = options.storage;
-	var revision = options.revision;
-	var s = 
+	let me = this;
+	let success = options.success;
+	let session = options.session;
+	let storage = options.storage;
+	let revision = options.revision;
+	let s = 
 		"select fid, fcode from tclass\n" +
 		"where\n" +
 		"\t" + storage.getCurrentFilter () + "\n" +
@@ -21,9 +21,9 @@ tm.remove = function (options) {
 		"order by fid\n"
 	;
 	storage.query ({session: session, sql: s, success: function (options) {
-		var classes = options.result.rows;
+		let classes = options.result.rows;
 		async.eachSeries (classes, function (cls, cb) {
-			var name = "tm_" + cls.fcode + "_" + cls.fid;
+			let name = "tm_" + cls.fcode + "_" + cls.fid;
 			storage.client.isTableExists ({session: session, table: name, success: function (result) {
 				if (result) {
 					storage.query ({session: session, sql: "delete from " + name + " where frevision_id=" + revision, success: function () {
@@ -37,12 +37,12 @@ tm.remove = function (options) {
 	}});
 };
 tm.create = function (options) {
-	var storageCode = options.storageCode;
-	var success = options.success;
-	var revision;
-	var storage;
-	var session;
-	var classes;
+	let storageCode = options.storageCode;
+	let success = options.success;
+	let revision;
+	let storage;
+	let session;
+	let classes;
 	log.info ({cls: "tm", fn: "create (" + storageCode + ")"});
 	async.series ([
 		function (cb) {
@@ -74,7 +74,7 @@ tm.create = function (options) {
 		},
 		function (cb) {
 			log.info ({cls: "tm"}, "classes");
-			var s = 
+			let s = 
 				"select\n" +
 				"\tfid, fcode\n" +
 				"from\n" +
@@ -92,10 +92,10 @@ tm.create = function (options) {
 		function (cb) {
 			log.info ({cls: "tm"}, "process");
 			async.eachSeries (classes, function (cls, cb) {
-				var classId = cls.fid;
-				var classCode = cls.fcode;
-				var tmName = "tm_" + classCode + "_" + classId;
-				var classAttrs;
+				let classId = cls.fid;
+				let classCode = cls.fcode;
+				let tmName = "tm_" + classCode + "_" + classId;
+				let classAttrs;
 				async.series ([
 					function (cb) {
 						storage.client.isTableExists ({session: session, table: tmName, success: function (result) {
@@ -129,14 +129,14 @@ tm.create = function (options) {
 					},
 					function (cb) {
 						async.eachSeries (classAttrs, function (classAttr, cb) {
-							var classAttrId = classAttr.fid;
-							var tmFieldName = classAttr.fcode + "_" + classAttrId;
+							let classAttrId = classAttr.fid;
+							let tmFieldName = classAttr.fcode + "_" + classAttrId;
 							storage.client.isFieldExists ({session: session, table: tmName, field: tmFieldName, success: function (result) {
 								if (result) {
 									cb ();
 								} else {
-									var type = "$tnumber$";
-									var ftype = "fnumber";	    
+									let type = "$tnumber$";
+									let ftype = "fnumber";	    
 									switch (classAttr.ftype_id) {
 										case 2:
 											type = "$tnumber_value$";
@@ -164,14 +164,14 @@ tm.create = function (options) {
 					function (cb) {
 						storage.client.isTableExists ({session: session, table: classCode + "_" + classId, success: function (result) {
 							if (result) {
-								var caFields = [];
-								for (var i = 0; i < classAttrs.length; i ++) {
-									var field = classAttrs [i].fcode + "_" + classAttrs [i].fid;
+								let caFields = [];
+								for (let i = 0; i < classAttrs.length; i ++) {
+									let field = classAttrs [i].fcode + "_" + classAttrs [i].fid;
 									if (caFields.indexOf (field) == -1) {
 										caFields.push (field);
 									};
 								};
-								var s = 
+								let s = 
 									"insert into " + tmName + " (fobject_id, frevision_id" + (caFields.length ? ", " : "") + caFields.join (", ") + ")\n" +
 									"select fobject_id, " + revision + (caFields.length ? ", " : "") + caFields.join (", ") + " from " + classCode + "_" + classId
 								;
@@ -211,12 +211,12 @@ tm.create = function (options) {
 };
 tm.getRevisions = function (req, res, next) {
 	if (req.url.indexOf ("/get_revisions?") > -1) {
-		var session = req.session;
-		var storage = session.storage;
+		let session = req.session;
+		let storage = session.storage;
 		storage.query ({session: session, sql: "select fid, fdate from trevision where ftoc=1 order by fdate desc", success: function (options) {
-			var r = [];
-			for (var i = 0; i < options.result.rows.length; i ++) {
-				var row = options.result.rows [i];
+			let r = [];
+			for (let i = 0; i < options.result.rows.length; i ++) {
+				let row = options.result.rows [i];
 				r.push ({id: row.fid, date: row.fdate});
 			};
 			res.send (common.ToJSONString (r));
@@ -227,7 +227,7 @@ tm.getRevisions = function (req, res, next) {
 };
 tm.setRevision = function (req, res, next) {
 	if (req.url.indexOf ("/set_revision?") > -1) {
-		var session = req.session;
+		let session = req.session;
 		session.revision = req.query.id;
 		res.send ({ok: 1});
 	} else {
@@ -239,7 +239,7 @@ tm.build = function (storage) {
 	if (!storage.config.visualObjectum) {
 		return;
 	};
-	var buildTime = storage.config.visualObjectum.timeMachine ? storage.config.visualObjectum.timeMachine.buildTime : null;
+	let buildTime = storage.config.visualObjectum.timeMachine ? storage.config.visualObjectum.timeMachine.buildTime : null;
 	if (!buildTime) {
 		return;
 	};
@@ -247,15 +247,15 @@ tm.build = function (storage) {
 		log.info ({cls: "tm"}, "start build");
 		tm.create ({storageCode: storage.code, success: function (revision) {
 			storage.query ({sql: "select fid, fdate from trevision where fid=" + revision, success: function (options) {
-				var row = options.result.rows [0];
+				let row = options.result.rows [0];
 				storage.visualObjectum.timeMachine.dates.push ({id: row.fid, date: row.fdate});
 			}});
 		}});
 		setTimeout (build, 24 * 60 * 60 * 1000);
 	};
-	var bt = buildTime.split (":");
-	var cd = new Date ();
-	var bd = new Date ();
+	let bt = buildTime.split (":");
+	let cd = new Date ();
+	let bd = new Date ();
 	if (Number (bt [0]) < cd.getHours ()) {
 		bd.setDate (cd.getDate () + 1);
 	};

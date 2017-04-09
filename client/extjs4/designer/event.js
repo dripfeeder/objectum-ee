@@ -7,7 +7,7 @@ Ext.define ("$o.EventDesigner.Widget", {
 		border: false
 	},
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.tbar = [{
 			text: $o.getString ("Open"),
 			iconCls: "gi_edit",
@@ -55,8 +55,8 @@ Ext.define ("$o.EventDesigner.Widget", {
 		this.callParent (arguments);
 	},
 	create: function () {
-		var me = this;
-		var win = Ext.create ("Ext.Window", {
+		let me = this;
+		let win = Ext.create ("Ext.Window", {
 			width: 600,
 			height: 400,
 			layout: "fit",
@@ -84,16 +84,16 @@ Ext.define ("$o.EventDesigner.Widget", {
 		win.show ();
 	},
 	edit: function () {
-		var me = this;
-		var v;
+		let me = this;
+		let v;
 		if (me.grid.getSelectionModel ().hasSelection ()) {
-			var rec = me.grid.getSelectionModel ().getSelection ()[0];
+			let rec = me.grid.getSelectionModel ().getSelection ()[0];
 			v = me.value [rec.get ("event")];
 			v.event = rec.get ("event");
 		} else {
 			return;
 		};
-		var win = Ext.create ("Ext.Window", {
+		let win = Ext.create ("Ext.Window", {
 			width: 600,
 			height: 400,
 			layout: "fit",
@@ -122,19 +122,19 @@ Ext.define ("$o.EventDesigner.Widget", {
 		win.show ();
 	},
 	remove: function () {
-		var me = this;
+		let me = this;
 		if (me.grid.getSelectionModel ().hasSelection ()) {
-			var rec = me.grid.getSelectionModel ().getSelection ()[0];
+			let rec = me.grid.getSelectionModel ().getSelection ()[0];
 			delete me.value [rec.get ("event")];
 			me.build ();
 			me.fireEvent ("changeevent", me.value);
 		};
 	},
 	build: function () {
-		var me = this;
-		var data = [];
-		for (var event in me.value) {
-			var action = $o.getAction (me.value [event].fn);
+		let me = this;
+		let data = [];
+		for (let event in me.value) {
+			let action = $o.getAction (me.value [event].fn);
 			data.push ({
 				event: event,
 				action: action ? action.toString () : me.value [event].fn,
@@ -144,9 +144,9 @@ Ext.define ("$o.EventDesigner.Widget", {
 		me.store.loadData (data);
 	},
 	setValue: function (value) {
-		var me = this;
+		let me = this;
 		value = value || {};
-		for (var event in value) {
+		for (let event in value) {
 			if (typeof (value [event]) == "string") {
 				value [event] = {
 					fn: value [event]
@@ -157,7 +157,7 @@ Ext.define ("$o.EventDesigner.Widget", {
 		me.build ();
 	},
 	getValue: function () {
-		var me = this;
+		let me = this;
 		return me.value;
 	}
 });

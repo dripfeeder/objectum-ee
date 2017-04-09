@@ -2,7 +2,7 @@ Ext.define ("$o.Views.Widget", {
 	extend: "$o.Layout.Widget",
 	alias: ["widget.$o.views", "widget.$views"],
 	initComponent: function () {
-		var me = this;
+		let me = this;
 		me.$layout = {
 			split: {
 				orientation: "horizontal",
@@ -24,8 +24,8 @@ Ext.define ("$o.Views.Widget", {
 						actions: [{
 							fn: function () {
 								$zu.dialog.getNameAndCode ({title: $o.getString ("View", ":", "Adding"), success: function (name, code) {
-									var tr = $o.startTransaction ({description: 'Create view'});
-									var o = $o.createView ();
+									let tr = $o.startTransaction ({description: 'Create view'});
+									let o = $o.createView ();
 									o.set ("parent", this.getCurrentValue ("id"));
 									o.set ("name", name);
 									o.set ("code", code);
@@ -47,9 +47,9 @@ Ext.define ("$o.Views.Widget", {
 							fn: function () {
 								common.confirm ({message: $zr.getString ("Are you sure?"), scope: this, fn: function (btn) {
 									if (btn == "yes") {
-										var id = this.getCurrentValue ("id");
-										var tr = $o.startTransaction ({description: 'Remove view ' + id});
-										var o = $o.getView (id);
+										let id = this.getCurrentValue ("id");
+										let tr = $o.startTransaction ({description: 'Remove view ' + id});
+										let o = $o.getView (id);
 										o.remove ();
 										o.sync ();
 										$o.commitTransaction (tr);
@@ -59,7 +59,7 @@ Ext.define ("$o.Views.Widget", {
 							},
 							active: {
 								fn: function () {
-									var r = this.getCurrentValue ("id") && !this.getCurrentValue ("schema_id");
+									let r = this.getCurrentValue ("id") && !this.getCurrentValue ("schema_id");
 									return r;
 								}
 							},
@@ -67,12 +67,12 @@ Ext.define ("$o.Views.Widget", {
 							icon: "delete"
 						}, {
 							fn: function () {
-								var record = $o.viewsMap [this.getCurrentValue ("id")];
+								let record = $o.viewsMap [this.getCurrentValue ("id")];
 								$o.app.show.call ($o.app, {record: record});
 							},  
 							active: {
 								fn: function () {
-									var r = this.getCurrentValue ("id");
+									let r = this.getCurrentValue ("id");
 									return r;
 								}
 							},
@@ -84,15 +84,15 @@ Ext.define ("$o.Views.Widget", {
 					tab: {
 						listeners: {
 							tabchangeTODO: function (tabPanel, panel) {	
-								var me = this;
+								let me = this;
 								if (panel.title == $o.getString ("Query") || panel.title == $o.getString ("Layout")) {
-									var field = panel.getItems () [0];
-									var value = field.getValue ();
-									var dom = Ext.getDom (field.inputEl);
+									let field = panel.getItems () [0];
+									let value = field.getValue ();
+									let dom = Ext.getDom (field.inputEl);
 									if (me.editor) {
 										me.editor.toTextArea ();
 									};
-									var height = panel.getHeight (true);
+									let height = panel.getHeight (true);
 									Ext.util.CSS.updateRule (".CodeMirror-scroll", "height", height + "px");
 									me.editor = CodeMirror.fromTextArea (dom, {
 										lineNumbers: true,
@@ -116,9 +116,9 @@ Ext.define ("$o.Views.Widget", {
 									text: $o.getString ("Dependencies"),
 									iconCls: "gi_link",
 									handler: function () {
-										var viewId = this.up ("*[name=views]").relatives ["olap"].getValue ("id");
-										var path = $o.getView (viewId).getFullCode ();
-										var data = [];
+										let viewId = this.up ("*[name=views]").relatives ["olap"].getValue ("id");
+										let path = $o.getView (viewId).getFullCode ();
+										let data = [];
 										_.each ($o.viewsMap, function (o, id) {
 											if (o.get ("layout") && o.get ("layout").indexOf (path) > -1) {
 												data.push ({
@@ -126,7 +126,7 @@ Ext.define ("$o.Views.Widget", {
 												});
 											};
 										});
-										var win = Ext.create ("Ext.Window", {
+										let win = Ext.create ("Ext.Window", {
 											width: 600,
 											height: 600,
 											layout: "fit",
@@ -191,7 +191,7 @@ Ext.define ("$o.Views.Widget", {
 									text: $o.getString ("Setting the table columns"),
 									iconCls: "gi_table",
 									handler: function () {
-										var win = Ext.create ("Ext.Window", {
+										let win = Ext.create ("Ext.Window", {
 											width: 800,
 											height: 600,
 											layout: "fit",
@@ -214,11 +214,11 @@ Ext.define ("$o.Views.Widget", {
 								}],
 								listeners: {
 									beforeSave: function () {
-										var me = this;
-										var query = me.down ("*[attr=id.query]").getValue ();
+										let me = this;
+										let query = me.down ("*[attr=id.query]").getValue ();
 										query = eval ("(" + query + ")");
 										query.limit = 1;
-										var r = $o.execute ({sql: query, noException: 1});
+										let r = $o.execute ({sql: query, noException: 1});
 										if (r.error) {
 											common.message ($o.getString ("Error in query") + ":\n" + r.error);
 										};
@@ -285,8 +285,8 @@ Ext.define ("$o.Views.Widget", {
 										actions: [{
 											fn: function () {
 												$zu.dialog.getNameAndCode ({title: "Добавление атрибута представления", success: function (name, code) {
-													var tr = $o.startTransaction ({description: 'Create view attr'});
-													var o = $o.createViewAttr ();
+													let tr = $o.startTransaction ({description: 'Create view attr'});
+													let o = $o.createViewAttr ();
 													o.set ("view", this.relatives ["olap"].getCurrentValue ("id"));
 													o.set ("name", name);
 													o.set ("code", code);
@@ -315,9 +315,9 @@ Ext.define ("$o.Views.Widget", {
 											fn: function () {
 												common.confirm ({message: $zr.getString ("Are you sure?"), scope: this, fn: function (btn) {
 													if (btn == "yes") {
-														var id = this.getCurrentValue ("id");
-														var tr = $o.startTransaction ({description: 'Remove view attr ' + id});
-														var o = $o.getViewAttr (id);
+														let id = this.getCurrentValue ("id");
+														let tr = $o.startTransaction ({description: 'Remove view attr ' + id});
+														let o = $o.getViewAttr (id);
 														o.remove ();
 														o.sync ();
 														$o.commitTransaction (tr);
