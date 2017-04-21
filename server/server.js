@@ -1,6 +1,7 @@
 /*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
+"use strict"
 process.env.TZ = "UTC"
 process.maxTickDepth = Infinity;
 if (config.uncaughtException) {

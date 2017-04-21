@@ -1,6 +1,7 @@
 //
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 //
+"use strict"
 global.db = {};
 global.dbTablesSQL = fs.readFileSync (__dirname + "/tables.sql", "utf8");
 global.dbIndexesSQL = fs.readFileSync (__dirname + "/indexes.sql", "utf8");

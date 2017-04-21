@@ -2,6 +2,7 @@
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
 // storage, session, sql
+"use strict"
 global.Query = function (options) {
 	let query = this;
 	let mainOptions = options;

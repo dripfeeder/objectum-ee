@@ -1,6 +1,7 @@
 /*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
+"use strict"
 global.projects = {};
 projects.init = function (options) {
 	redisClient = redis.createClient (config.redis.port, config.redis.host);

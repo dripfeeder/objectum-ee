@@ -1888,8 +1888,8 @@ Ext.define ("$o", {
 	    // card
 	    let aCard;
     	let cardBody =
-    		'let me = this;\n' +
-    		'let id = options.id || me.getValue ("id");\n' +
+    		'var me = this;\n' +
+    		'var id = options.id || me.getValue ("id");\n' +
     		'common.tpl.show.call (this, {\n' +
     		'\tid: id,\n' +
     		'\tasWindow: 1,\n' +

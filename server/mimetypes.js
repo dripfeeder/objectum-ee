@@ -1,3 +1,4 @@
+"use strict"
 global.mimetypes = {};
 mimetypes.types = {
 	"3gp":"video/3gpp",

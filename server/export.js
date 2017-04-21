@@ -1,7 +1,8 @@
 ﻿/*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
-let ifields = {
+"use strict"
+global.ifields = {
 	tclass: ["fid", "fparent_id", "fname", "fcode", "fdescription", "fformat", "fview_id", "ftype", "fsystem", "fschema_id", "frecord_id", "fstart_id", "fend_id"],
 	tclass_attr: ["fid", "fclass_id", "fname", "fcode", "ftype_id", "forder", "fnot_null", "fvalid_func", "fformat_func", "fdescription", "fsecure", "fmax_str", "fmin_str", "fmax_number", "fmin_number", "fmax_ts", "fmin_ts", "funique", "fformat_number", "fformat_ts", "fremove_rule", "fschema_id", "frecord_id", "fstart_id", "fend_id"],
 	tview: ["fid", "fparent_id", "fname", "fcode", "fdescription", "flayout", "fkey", "fparent_key", "fclass_id", "funrelated", "fquery", "ftype", "fsystem", "fmaterialized", "forder", "fschema_id", "frecord_id", "ficon_cls", "fstart_id", "fend_id"],
@@ -372,7 +373,7 @@ global.Export = function () {
 					"	a.fid, a.fstart_id\n"
 				, success: function (options) {
 					let data = options.result.rows;
-					for (k = 0; k < data.length; k ++) {
+					for (let k = 0; k < data.length; k ++) {
 						let values = [];
 						for (let i = 0; i < ifields.tview.length; i ++) {
 							let field = ifields.tview [i];

@@ -1,4 +1,5 @@
-﻿let smtpTransport = nodemailer.createTransport ("SMTP", config.mail.smtp);
+﻿"use strict"
+let smtpTransport = nodemailer.createTransport ("SMTP", config.mail.smtp);
 global.mailSender = {
 	smtpTransport: {}
 };

@@ -1,6 +1,7 @@
 /*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
+"use strict"
 global.Storage = function (options) {
 	let storage = this;
 	// postgresql main client object
@@ -1070,7 +1071,8 @@ global.Storage = function (options) {
 			, success: function (options) {
 				let rows = options.result.rows;
 				for (let i = 0; i < rows.length; i ++) {
-					let removeRule = storage.classAttrsMap [rows [i].fclass_attr_id].get ("fremove_rule");
+					let ca = storage.classAttrsMap [rows [i].fclass_attr_id];
+					let removeRule = ca.get ("fremove_rule");
 					if (removeRule == "cascade") {
 						cascade.push (rows [i].fobject_id);
 					} else {

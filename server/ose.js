@@ -2,6 +2,7 @@
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.
 	deprecated. Events disabled
 */
+"use strict"
 global.Ose = function (options) {
 	let storage = options.storage;
 	let success = options.success;

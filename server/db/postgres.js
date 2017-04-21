@@ -1,6 +1,7 @@
 //
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.
 //
+"use strict"
 let pgTypes = pg.types;
 // types: select typname, oid, typarray from pg_type where typtype = 'b' order by oid
 if (pgTypes) {

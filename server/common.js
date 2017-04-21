@@ -1,6 +1,7 @@
 /*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
+"use strict"
 global.common = {};
 // DD.MM.YYYY
 common.getDate = function (d) {

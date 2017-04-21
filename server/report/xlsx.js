@@ -2,6 +2,7 @@
 	Генератор XLSX
 	Только текст, объединение ячеек, рамки, выравнивание (вертикаль, горизонталь)
 */
+"use strict"
 let XLSX = require ("xlsx");
 let ReportXSLX = Backbone.Model.extend ({
 	addStyle: function (name, style) {

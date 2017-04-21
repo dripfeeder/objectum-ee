@@ -1,6 +1,7 @@
 //
 //	Copyright (C) 2011-2013 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.
 //
+"use strict"
 db.MSSQL = function (options) {
 	let me = this;
 	me.storage = options;

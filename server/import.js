@@ -1,6 +1,7 @@
 ﻿/*
 	Copyright (C) 2011-2016 Samortsev Dmitry (samortsev@gmail.com). All Rights Reserved.	
 */
+"use strict"
 global.Import = function () {
 	let storage, session;
 	// Здесь импортируемые данные
@@ -673,7 +674,7 @@ global.Import = function () {
 			} else {
 				fields ["fstart_id"] = me.newId ["trevision"][fields ["fstart_id"]];
 				fields ["fend_id"] = me.newId ["trevision"][fields ["fend_id"]];
-				s = me.generateInsert ({table: "tclass", fields: fields});
+				let s = me.generateInsert ({table: "tclass", fields: fields});
 				storage.query ({session: session, sql: s, success: function (options) {
 					me.incCount ("tclass", fields ["fid"]);
 					cb ();
@@ -739,7 +740,7 @@ global.Import = function () {
 			} else {
 				fields ["fstart_id"] = me.newId ["trevision"][fields ["fstart_id"]];
 				fields ["fend_id"] = me.newId ["trevision"][fields ["fend_id"]];
-				s = me.generateInsert ({table: "tclass_attr", fields: fields});
+				let s = me.generateInsert ({table: "tclass_attr", fields: fields});
 				storage.query ({session: session, sql: s, success: function (options) {
 					me.incCount ("tclass_attr", fields ["fid"]);
 					cb ();
@@ -795,7 +796,7 @@ global.Import = function () {
 			} else {
 				fields ["fstart_id"] = me.newId ["trevision"][fields ["fstart_id"]];
 				fields ["fend_id"] = me.newId ["trevision"][fields ["fend_id"]];
-				s = me.generateInsert ({table: "taction", fields: fields});
+				let s = me.generateInsert ({table: "taction", fields: fields});
 				storage.query ({session: session, sql: s, success: function (options) {
 					me.incCount ("taction", fields ["fid"]);
 					cb ();
@@ -853,7 +854,7 @@ global.Import = function () {
 				} else {
 					fields ["fstart_id"] = me.newId ["trevision"][fields ["fstart_id"]];
 					fields ["fend_id"] = me.newId ["trevision"][fields ["fend_id"]];
-					s = me.generateInsert ({table: "tobject", fields: fields});
+					let s = me.generateInsert ({table: "tobject", fields: fields});
 					storage.query ({session: session, sql: s, success: function (options) {
 						me.incCount ("tobject", fields ["fid"]);
 						// count
@@ -958,7 +959,7 @@ global.Import = function () {
 					if (storage.client.database == "mssql" && fields.ftime) {
 						fields.ftime = new Date (fields.ftime);
 					};
-					s = me.generateInsert ({table: "tobject_attr", fields: fields});
+					let s = me.generateInsert ({table: "tobject_attr", fields: fields});
 					storage.query ({session: session, sql: s, success: function (options) {
 						me.incCount ("tobject_attr", fields ["fid"]);
 						// count
@@ -1111,7 +1112,7 @@ global.Import = function () {
 				if (storage.client.database == "mssql" && fields.fdate) {
 					fields.fdate = new Date (fields.fdate);
 				};
-				s = me.generateInsert ({table: "trevision", fields: fields});
+				let s = me.generateInsert ({table: "trevision", fields: fields});
 				storage.query ({session: session, sql: s, success: function (options) {
 					me.incCount ("trevision", fields ["fid"]);
 					me.newId ["trevision"][id] = me.tableId ["trevision"];

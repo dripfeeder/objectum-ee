@@ -72,16 +72,15 @@ const js = [
     "./www/third-party/extjs4/examples/ux/grid/menu/RangeMenu.js"
 ];
 gulp.task ("bundle", function () {
-    gulp.src (js)
-        .pipe (concat ("all-debug.js"))
-        .pipe (gulp.dest ("./www/client/extjs4"))
+	gulp.src (js)
+		.pipe (concat ("all-debug.js"))
+		.pipe (gulp.dest ("./www/client/extjs4"))
 		.pipe (babel ({
-			compact: true,
-			presets: ["es2015"]
+			presets: ["babili"]
 		}))
-        .pipe (uglify ("all.js"))
-        .pipe (gulp.dest ("./www/client/extjs4"))
-    ;
+		.pipe (concat ("all.js"))
+		.pipe (gulp.dest ("./www/client/extjs4"))
+	;
 });
 gulp.task ("debug", function () {
     gulp.src (js)

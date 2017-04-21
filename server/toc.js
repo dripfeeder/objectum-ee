@@ -6,6 +6,7 @@
 	* Создает только для последней ревизии
 	* Машина времени работает только для данных (tobject, tobject_attr, toc)
 */
+"use strict"
 global.tm = {};
 tm.remove = function (options) {
 	let me = this;
