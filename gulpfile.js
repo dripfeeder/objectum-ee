@@ -1,13 +1,13 @@
 "use strict"
 const gulp = require ("gulp");
 const concat = require ("gulp-concat");
-const uglify = require ("gulp-uglifyjs");
-const fs = require ("fs");
-const babel = require ("gulp-babel");
 const js = [
+    "./client/api/check.js",
+    "./www/third-party/js/core.min.js",
     "./www/third-party/js/async.js",
     "./www/third-party/js/sha1.js",
     "./www/third-party/js/lodash.min.js",
+	"./www/third-party/js/jquery-2.1.1.min.js",
     "./www/third-party/js/backbone.js",
     "./client/api/api.js",
     "./client/api/util.js",
@@ -75,16 +75,9 @@ gulp.task ("bundle", function () {
 	gulp.src (js)
 		.pipe (concat ("all-debug.js"))
 		.pipe (gulp.dest ("./www/client/extjs4"))
-		.pipe (babel ({
-			presets: ["babili"]
-		}))
-		.pipe (concat ("all.js"))
-		.pipe (gulp.dest ("./www/client/extjs4"))
 	;
-});
-gulp.task ("debug", function () {
     gulp.src (js)
-        .pipe (concat ("all-debug.js"))
+        .pipe (concat ("all.js"))
         .pipe (gulp.dest ("./www/client/extjs4"))
     ;
 });

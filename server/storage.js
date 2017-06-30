@@ -2429,10 +2429,10 @@ global.Storage = function (options) {
 					}
 				}});
 			});
-		}, failure: function (options) {
-			log.error ({cls: "storage", fn: "init", error: util.inspect (options.error)});
+		}, failure: function (err) {
+			log.error ({cls: "storage", fn: "init", error: util.inspect (err)});
 			if (meOptions.failure) {
-				meOptions.failure (options);
+				meOptions.failure (err);
 			}
 		}});
 	});

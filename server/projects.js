@@ -215,11 +215,11 @@ projects.getStorage = function (options) {
 					} else {
 						cb ();
 					};
-				}, failure: function (options) {
+				}, failure: function (err) {
 					if (request && response) {
-						projects.sendError ({request: request, response: response, error: options.error});
+						projects.sendError ({request: request, response: response, error: err});
 					};
-					cb (options.error);
+					cb (err);
 				}});
    			},
    			function (cb) {

@@ -63,6 +63,28 @@ db.execute = function (options) {
 				}});
 			    return;
 			};
+			if (cfg.fn == "removeTOC") {
+				storage = new Storage ({code: cfg.code, connection: connection, success: function () {
+					console.log ("Removing TOC ...");
+					let i = new Import ();
+					i.removeTOC ({storage: storage, success: function () {
+						console.log ("TOC removed.");
+						cb ();
+					}});
+				}});
+				return;
+			};
+			if (cfg.fn == "createTOC") {
+				storage = new Storage ({code: cfg.code, connection: connection, success: function () {
+					console.log ("Creating TOC ...");
+					let i = new Import ();
+					i.createTOC ({storage: storage, success: function () {
+						console.log ("TOC created.");
+						cb ();
+					}});
+				}});
+				return;
+			};
 			if (cfg.fn == "import") {
 				console.log ("Importing storage ...");
 				let i = new Import ();
