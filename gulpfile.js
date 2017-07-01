@@ -2,7 +2,6 @@
 const gulp = require ("gulp");
 const concat = require ("gulp-concat");
 const js = [
-    "./client/api/check.js",
     "./www/third-party/js/core.min.js",
     "./www/third-party/js/async.js",
     "./www/third-party/js/sha1.js",
